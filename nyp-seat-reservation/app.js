@@ -9,6 +9,7 @@ const flash = require('connect-flash');
 // const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
 const mainRoute = require('./routes/main');
+const db = require('../nyp-seat-reservation/config/DBConfig');
 
 
 const app = express();
@@ -53,6 +54,9 @@ app.use((req, res, next) => {
 // 	resave: false,
 // 	saveUninitialized: false,
 // }));
+
+const fypjapplication = require('../nyp-seat-reservation/config/DBConnection');
+fypjapplication.setUpDB(false);
 
 app.use('/', mainRoute);
 
