@@ -1,13 +1,13 @@
 const mySQLDB = require('./DBConfig');
 
-const Events = require('../../models/Events');
-const Users = require('../../models/Users');
-const Venues = require('../../models/Venues');
-const EventHelpers = require('../../models/EventHelpers');
-const EventSeats = require('../../models/EventSeats');
-const EventAttendees = require('../../models/EventAttendees');
-const EventReservedSeats = require('../../models/EventReservedSeats');
-const EventSeatTypes = require('../models/EventSeatTypes');
+const Events = require('../../nyp-seat-reservation/models/Events');
+const Users = require('../../nyp-seat-reservation/models/Users');
+const Venues = require('../../nyp-seat-reservation/models/Venues');
+const EventHelpers = require('../../nyp-seat-reservation/models/EventHelpers');
+const EventSeats = require('../../nyp-seat-reservation/models/EventSeats');
+const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendees');
+const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeats');
+const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
 
 const setUpDB = (drop) => {
     mySQLDB.authenticate()
