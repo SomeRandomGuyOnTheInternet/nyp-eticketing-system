@@ -5,5 +5,8 @@ const router = express.Router();
 
 
 router.get('/', (req, res) => {
-	res.render('redirect', { title: "Redirecting..." })
+	res.render('pages/test', { title: "Redirecting..." })
 });
+
+
+module.exports = router;

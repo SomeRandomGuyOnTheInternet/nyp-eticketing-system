@@ -273,8 +273,10 @@ $embed-responsive-aspect-ratios: join(
 //
 // Font, line-height, and color for body text, headings, and more.
 
+@import url('https://fonts.googleapis.com/css?family=Rubik:300,400,400i,500,700&display=swap');
+
 // stylelint-disable value-keyword-case
-$font-family-sans-serif:      -apple-system, BlinkMacSystemFont, "Rubik", sans-serif !default;
+$font-family-sans-serif:      "Rubik", sans-serif !default;
 $font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
 $font-family-base:            $font-family-sans-serif !default;
 // stylelint-enable value-keyword-case

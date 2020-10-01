@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const exphbs = require('express-handlebars');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -9,11 +8,10 @@ const logger = require('morgan');
 const flash = require('connect-flash');
 // const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
-
 const mainRoute = require('./routes/main');
 
-const app = express();
 
+const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -34,8 +32,8 @@ app.set('trust proxy', 1);
 
 app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
-	res.locals.error = req.flash('error');
-	res.locals.success = req.flash('success');
+	// res.locals.error = req.flash('error');
+	// res.locals.success = req.flash('success');
 	next();
 });
 
