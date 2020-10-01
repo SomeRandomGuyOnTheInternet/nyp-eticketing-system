@@ -1,0 +1,43 @@
+{
+  "name": "nyp-seat-reservation",
+  "version": "3.0.0",
+  "description": "A really cool seat booking system that'll blow your socks off man woah",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "scss": "node-sass --watch nyp-seat-reservation/public/scss -o nyp-seat-reservation/public/css"
+  },
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "keywords": [
+    "ticketing",
+    "NYP",
+    "seat",
+    "events",
+    "reservation"
+  ],
+  "author": "Yo mama haha kill me",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.4",
+    "ejs": "^3.1.5",
+    "express": "^4.17.0",
+    "express-mysql-session": "^2.1.0",
+    "express-session": "^1.16.1",
+    "http-errors": "^1.8.0",
+    "lodash": "^4.17.20",
+    "method-override": "^3.0.0",
+    "moment": "^2.29.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^1.6.5",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.4",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "sequelize": "^5.8.6"
+  }
+}

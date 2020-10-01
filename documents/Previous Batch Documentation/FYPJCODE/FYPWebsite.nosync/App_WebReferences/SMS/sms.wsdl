@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="WS" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="WS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="WS">
+      <s:element name="sendMessage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SMSAccount" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Pwd" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Mobile" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Message" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="sendMessageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sendMessageResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="receiveMessage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SMSAccount" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SMSPassword" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="receiveMessageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="receiveMessageResult" type="tns:ArrayOfSMSData" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSMSData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SMSData" nillable="true" type="tns:SMSData" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SMSData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Message" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Originator" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DateReceived" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="setMessagesStatusToUnread">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SMSAccount" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SMSPassword" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="setMessagesStatusToUnreadResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="setMessagesStatusToUnreadResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="ArrayOfSMSData" nillable="true" type="tns:ArrayOfSMSData" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="sendMessageSoapIn">
+    <wsdl:part name="parameters" element="tns:sendMessage" />
+  </wsdl:message>
+  <wsdl:message name="sendMessageSoapOut">
+    <wsdl:part name="parameters" element="tns:sendMessageResponse" />
+  </wsdl:message>
+  <wsdl:message name="receiveMessageSoapIn">
+    <wsdl:part name="parameters" element="tns:receiveMessage" />
+  </wsdl:message>
+  <wsdl:message name="receiveMessageSoapOut">
+    <wsdl:part name="parameters" element="tns:receiveMessageResponse" />
+  </wsdl:message>
+  <wsdl:message name="setMessagesStatusToUnreadSoapIn">
+    <wsdl:part name="parameters" element="tns:setMessagesStatusToUnread" />
+  </wsdl:message>
+  <wsdl:message name="setMessagesStatusToUnreadSoapOut">
+    <wsdl:part name="parameters" element="tns:setMessagesStatusToUnreadResponse" />
+  </wsdl:message>
+  <wsdl:message name="sendMessageHttpGetIn">
+    <wsdl:part name="SMSAccount" type="s:string" />
+    <wsdl:part name="Pwd" type="s:string" />
+    <wsdl:part name="Mobile" type="s:string" />
+    <wsdl:part name="Message" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="sendMessageHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="receiveMessageHttpGetIn">
+    <wsdl:part name="SMSAccount" type="s:string" />
+    <wsdl:part name="SMSPassword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="receiveMessageHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSMSData" />
+  </wsdl:message>
+  <wsdl:message name="setMessagesStatusToUnreadHttpGetIn">
+    <wsdl:part name="SMSAccount" type="s:string" />
+    <wsdl:part name="SMSPassword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="setMessagesStatusToUnreadHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="sendMessageHttpPostIn">
+    <wsdl:part name="SMSAccount" type="s:string" />
+    <wsdl:part name="Pwd" type="s:string" />
+    <wsdl:part name="Mobile" type="s:string" />
+    <wsdl:part name="Message" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="sendMessageHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="receiveMessageHttpPostIn">
+    <wsdl:part name="SMSAccount" type="s:string" />
+    <wsdl:part name="SMSPassword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="receiveMessageHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSMSData" />
+  </wsdl:message>
+  <wsdl:message name="setMessagesStatusToUnreadHttpPostIn">
+    <wsdl:part name="SMSAccount" type="s:string" />
+    <wsdl:part name="SMSPassword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="setMessagesStatusToUnreadHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="SMSSoap">
+    <wsdl:operation name="sendMessage">
+      <wsdl:input message="tns:sendMessageSoapIn" />
+      <wsdl:output message="tns:sendMessageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <wsdl:input message="tns:receiveMessageSoapIn" />
+      <wsdl:output message="tns:receiveMessageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <wsdl:input message="tns:setMessagesStatusToUnreadSoapIn" />
+      <wsdl:output message="tns:setMessagesStatusToUnreadSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="SMSHttpGet">
+    <wsdl:operation name="sendMessage">
+      <wsdl:input message="tns:sendMessageHttpGetIn" />
+      <wsdl:output message="tns:sendMessageHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <wsdl:input message="tns:receiveMessageHttpGetIn" />
+      <wsdl:output message="tns:receiveMessageHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <wsdl:input message="tns:setMessagesStatusToUnreadHttpGetIn" />
+      <wsdl:output message="tns:setMessagesStatusToUnreadHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="SMSHttpPost">
+    <wsdl:operation name="sendMessage">
+      <wsdl:input message="tns:sendMessageHttpPostIn" />
+      <wsdl:output message="tns:sendMessageHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <wsdl:input message="tns:receiveMessageHttpPostIn" />
+      <wsdl:output message="tns:receiveMessageHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <wsdl:input message="tns:setMessagesStatusToUnreadHttpPostIn" />
+      <wsdl:output message="tns:setMessagesStatusToUnreadHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SMSSoap" type="tns:SMSSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="sendMessage">
+      <soap:operation soapAction="WS/sendMessage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <soap:operation soapAction="WS/receiveMessage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <soap:operation soapAction="WS/setMessagesStatusToUnread" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SMSSoap12" type="tns:SMSSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="sendMessage">
+      <soap12:operation soapAction="WS/sendMessage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <soap12:operation soapAction="WS/receiveMessage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <soap12:operation soapAction="WS/setMessagesStatusToUnread" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SMSHttpGet" type="tns:SMSHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="sendMessage">
+      <http:operation location="/sendMessage" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <http:operation location="/receiveMessage" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <http:operation location="/setMessagesStatusToUnread" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SMSHttpPost" type="tns:SMSHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="sendMessage">
+      <http:operation location="/sendMessage" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="receiveMessage">
+      <http:operation location="/receiveMessage" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setMessagesStatusToUnread">
+      <http:operation location="/setMessagesStatusToUnread" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SMS">
+    <wsdl:port name="SMSSoap" binding="tns:SMSSoap">
+      <soap:address location="http://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SMSSoap12" binding="tns:SMSSoap12">
+      <soap12:address location="http://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SMSHttpGet" binding="tns:SMSHttpGet">
+      <http:address location="http://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SMSHttpPost" binding="tns:SMSHttpPost">
+      <http:address location="http://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
