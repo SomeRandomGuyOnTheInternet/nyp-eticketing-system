@@ -8,7 +8,7 @@ Run
 
     $ cd ./nyp-seat-reservation
     $ nodemon
-yeet
+
 Or on Windows cmd::
 
     > cd ./nyp-seat-reservation

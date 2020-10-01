@@ -6,8 +6,9 @@ const bodyParser = require('body-parser');
 const createError = require('http-errors');
 const logger = require('morgan');
 const flash = require('connect-flash');
-// const MySQLStore = require('express-mysql-session');
+const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
+
 const mainRoute = require('./routes/main');
 const db = require('../nyp-seat-reservation/config/DBConfig');
 
@@ -16,6 +17,7 @@ const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('trust proxy', 1);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -29,33 +31,31 @@ app.use(cookieParser());
 app.use(logger('dev'));
 app.use(flash());
 
-app.set('trust proxy', 1);
+app.use(session({
+	key: 'nyp-seat-reservation',
+	secret: 'totallysecretpassword',
+	store: new MySQLStore({
+		host: db.host,
+		port: 3306,
+		user: db.username,
+		password: db.password,
+		database: db.database,
+		clearExpired: true,
+		checkExpirationInterval: 900000,
+		expiration: 900000,
+	}),
+	resave: false,
+	saveUninitialized: false,
+}));
 
 app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
-	// res.locals.error = req.flash('error');
-	// res.locals.success = req.flash('success');
+	res.locals.error = req.flash('error');
+	res.locals.success = req.flash('success');
 	next();
 });
 
-// app.use(session({
-// 	key: 'nyp-seat-reservation',
-// 	secret: 'totallysecretpassword',
-// 	store: new MySQLStore({
-// 		host: db.host,
-// 		port: 3306,
-// 		user: db.username,
-// 		password: db.password,
-// 		database: db.database,
-// 		clearExpired: true,
-// 		checkExpirationInterval: 900000,
-// 		expiration: 900000,
-// 	}),
-// 	resave: false,
-// 	saveUninitialized: false,
-// }));
-
-const fypjapplication = require('../nyp-seat-reservation/config/DBConnection');
+const fypjapplication = require('./config/DBConnection');
 fypjapplication.setUpDB(false);
 
 app.use('/', mainRoute);
