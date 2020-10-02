@@ -10,7 +10,7 @@ const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
 
 const mainRoute = require('./routes/main');
-const db = require('../nyp-seat-reservation/config/DBConfig');
+const db = require('./config/DBConfig');
 
 
 const app = express();
@@ -31,29 +31,29 @@ app.use(cookieParser());
 app.use(logger('dev'));
 app.use(flash());
 
-app.use(session({
-	key: 'nyp-seat-reservation',
-	secret: 'totallysecretpassword',
-	store: new MySQLStore({
-		host: db.host,
-		port: 3306,
-		user: db.username,
-		password: db.password,
-		database: db.database,
-		clearExpired: true,
-		checkExpirationInterval: 900000,
-		expiration: 900000,
-	}),
-	resave: false,
-	saveUninitialized: false,
-}));
+// app.use(session({
+// 	key: 'nyp-seat-reservation',
+// 	secret: 'totallysecretpassword',
+// 	store: new MySQLStore({
+// 		host: db.host,
+// 		port: 3306,
+// 		user: db.username,
+// 		password: db.password,
+// 		database: db.database,
+// 		clearExpired: true,
+// 		checkExpirationInterval: 900000,
+// 		expiration: 900000,
+// 	}),
+// 	resave: false,
+// 	saveUninitialized: false,
+// }));
 
-app.use((req, res, next) => {
-	res.locals.currentUser = req.user;
-	res.locals.error = req.flash('error');
-	res.locals.success = req.flash('success');
-	next();
-});
+// app.use((req, res, next) => {
+// 	res.locals.currentUser = req.user;
+// 	res.locals.error = req.flash('error');
+// 	res.locals.success = req.flash('success');
+// 	next();
+// });
 
 const fypjapplication = require('./config/DBConnection');
 fypjapplication.setUpDB(false);
