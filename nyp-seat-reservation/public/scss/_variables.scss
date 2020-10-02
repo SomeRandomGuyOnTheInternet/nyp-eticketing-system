@@ -274,7 +274,8 @@ $embed-responsive-aspect-ratios: join(
 //
 // Font, line-height, and color for body text, headings, and more.
 
-@import url('https://fonts.googleapis.com/css?family=Rubik:300,400,400i,500,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@100;200;300;400;500;600;700;800&display=swap');
 
 // stylelint-disable value-keyword-case
 $font-family-sans-serif:      "Rubik", sans-serif !default;

@@ -20,14 +20,14 @@
             <!-- Input card section  -->
             <!-- Heading  -->
             <div class="row"> <!-- Use this row div if you want your section heading to be inline with another element  -->
-                <div class="col-sm-9 col-12 align-self-center">
+                <div class="col-sm-9 col-12 align-self-end">
                     <h2 class="section-heading">Test Input Card Heading</h2>
                 </div>
-                <div class="col-sm-3 col-12 align-self-center">
+                <div class="col-sm-3 col-12 align-self-end">
                     <button type="button" class="btn btn-lg btn-primary responsive-float float-right">Test Button</button>
                 </div>
             </div>
-            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <div class="mt-0"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
             <!-- Text Box Input Card  -->
             <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
@@ -35,7 +35,7 @@
                     <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
                             <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
+                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
                             </label>
                             <input id="textTextInput" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
                         </div>
@@ -46,15 +46,28 @@
                     <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
                             <label for="testSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary">Example Select</small> <!-- The small element is where we actually write down what the input does  -->
+                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Select</small> <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <select class="form-control" id="testSelectInput"> <!-- This is where the user actually inputs all their stuff  -->
+                            <select class="form-control pl-0" id="testSelectInput"> <!-- This is where the user actually inputs all their stuff  -->
                                 <option>1</option>
                                 <option>2</option>
                                 <option>3</option>
                                 <option>4</option>
                                 <option>5</option>
                             </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- Radio Button (radio) Input Card  -->
+                <div class="col-sm-6">
+                    <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card-body input-radio-card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="testRadio" id="testRadio" value="testValue">
+                                <label class="form-check-label px-2" for="testRadio">
+                                    Test radio
+                                </label>
+                              </div>
                         </div>
                     </div>
                 </div>
