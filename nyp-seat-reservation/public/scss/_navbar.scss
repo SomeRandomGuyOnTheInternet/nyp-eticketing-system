@@ -247,6 +247,7 @@
     .nav-link.show,
     .nav-link.active {
       color: $navbar-light-active-color;
+      font-weight: $font-weight-medium;
     }
   }
 
@@ -299,6 +300,7 @@
     .nav-link.show,
     .nav-link.active {
       color: $navbar-dark-active-color;
+      font-weight: $font-weight-medium;
     }
   }
 
