@@ -8,3 +8,26 @@
         width: 100% !important;
     }
 }
+
+.card {
+    margin-top: 1rem !important;
+}
+
+.input-card-body {
+    padding: 1rem 1.25rem !important;
+}
+
+.form-control {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.card-input-label {
+    position: relative; 
+    bottom: -8.5px; 
+    margin: 0 !important; 
+}
+
+.card-input {
+    padding: 0 !important; 
+}

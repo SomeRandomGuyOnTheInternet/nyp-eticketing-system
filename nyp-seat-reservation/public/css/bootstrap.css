@@ -1416,7 +1416,8 @@ pre {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 0.2rem rgba(15, 92, 175, 0.25); }
   .form-control::placeholder {
     color: #6c757d;
-    opacity: 1; }
+    font-weight: lighter;
+    opacity: 0.4; }
   .form-control:disabled, .form-control[readonly] {
     background-color: #f0f0ed;
     opacity: 1; }
