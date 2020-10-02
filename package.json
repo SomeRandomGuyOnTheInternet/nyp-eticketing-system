@@ -4,7 +4,8 @@
   "description": "A really cool seat booking system that'll blow your socks off man woah",
   "main": "app.js",
   "scripts": {
-    "start": "cd ./nyp-seat-reservation && open-cli http://localhost:5000 -- 'google chrome' && nodemon app",
+    "mst": "cd ./nyp-seat-reservation && open-cli http://localhost:5000 -- 'google chrome' && nodemon app",
+    "wst": "cd ./nyp-seat-reservation & open-cli http://localhost:5000 -- 'google chrome' & nodemon app",
     "scss": "node-sass --watch nyp-seat-reservation/public/scss -o nyp-seat-reservation/public/css"
   },
   "engines": {

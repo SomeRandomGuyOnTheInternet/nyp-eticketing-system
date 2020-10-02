@@ -36,7 +36,7 @@ app.use(flash());
 // 	secret: 'totallysecretpassword',
 // 	store: new MySQLStore({
 // 		host: db.host,
-// 		port: 3306,
+// 		port: db.port,
 // 		user: db.username,
 // 		password: db.password,
 // 		database: db.database,
