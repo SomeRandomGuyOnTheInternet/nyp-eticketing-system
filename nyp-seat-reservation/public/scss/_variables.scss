@@ -142,7 +142,8 @@ $spacers: map-merge(
     2: ($spacer * .5),
     3: $spacer,
     4: ($spacer * 1.5),
-    5: ($spacer * 3)
+    5: ($spacer * 3),
+    6: ($spacer * 4.5)
   ),
   $spacers
 );
@@ -237,9 +238,9 @@ $line-height-sm:              1.5 !default;
 $border-width:                1px !default;
 $border-color:                $gray-300 !default;
 
-$border-radius:               .625rem !default;
-$border-radius-lg:            .8rem !default;
-$border-radius-sm:            .4rem !default;
+$border-radius:               .4rem !default;
+$border-radius-lg:            .625rem !default;
+$border-radius-sm:            .175rem !default;
 
 $rounded-pill:                50rem !default;
 
@@ -401,10 +402,10 @@ $input-btn-padding-x-sm:      .5rem !default;
 $input-btn-font-size-sm:      $font-size-sm !default;
 $input-btn-line-height-sm:    $line-height-sm !default;
 
-$input-btn-padding-y-lg:      .5rem !default;
-$input-btn-padding-x-lg:      1rem !default;
-$input-btn-font-size-lg:      $font-size-lg !default;
-$input-btn-line-height-lg:    $line-height-lg !default;
+$input-btn-padding-y-lg:      .8rem !default;
+$input-btn-padding-x-lg:      1.8rem !default;
+$input-btn-font-size-lg:      $font-size-base !default;
+$input-btn-line-height-lg:    $line-height-base !default;
 
 $input-btn-border-width:      $border-width !default;
 
@@ -445,7 +446,7 @@ $btn-block-spacing-y:         .5rem !default;
 
 // Allows for customizing button radius independently from global border radius
 $btn-border-radius:           $border-radius !default;
-$btn-border-radius-lg:        $border-radius-lg !default;
+$btn-border-radius-lg:        $border-radius !default;
 $btn-border-radius-sm:        $border-radius-sm !default;
 
 $btn-transition:              color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
@@ -831,7 +832,7 @@ $card-spacer-y:                     .75rem !default;
 $card-spacer-x:                     1.25rem !default;
 $card-border-width:                 $border-width !default;
 $card-border-radius:                $border-radius !default;
-$card-border-color:                 rgba($black, .125) !default;
+$card-border-color:                 rgba($black, .0) !default;
 $card-inner-border-radius:          subtract($card-border-radius, $card-border-width) !default;
 $card-cap-bg:                       rgba($black, .03) !default;
 $card-cap-color:                    null !default;

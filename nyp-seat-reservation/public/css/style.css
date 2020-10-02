@@ -1,0 +1,10 @@
+@media only screen and (max-width: 768px) {
+    .responsive-float {
+        float: none !important;
+    }
+
+    .nav-user-info {
+        text-align: center !important;
+        width: 100% !important;
+    }
+}
