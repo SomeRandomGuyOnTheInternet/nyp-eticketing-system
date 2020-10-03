@@ -4,7 +4,7 @@
 
 .table {
   width: 100%;
-  margin-bottom: $spacer;
+  // margin-bottom: $spacer;
   color: $table-color;
   background-color: $table-bg; // Reset for nesting within parents with `background-color`.
 
@@ -17,6 +17,7 @@
 
   thead th {
     vertical-align: bottom;
+    border-top: none;
     border-bottom: (2 * $table-border-width) solid $table-border-color;
   }
 
@@ -34,6 +35,13 @@
   th,
   td {
     padding: $table-cell-padding-sm;
+  }
+}
+
+.table-lg {
+  th,
+  td {
+    padding: $table-cell-padding-lg;
   }
 }
 
@@ -88,6 +96,20 @@
       color: $table-hover-color;
       background-color: $table-hover-bg;
     }
+  }
+}
+
+// Clickable effect
+//
+
+.table-click {
+  th {
+    font-weight: $font-weight-light;
+  }
+
+  td {
+    font-weight: $font-weight-medium;
+    color: $primary;
   }
 }
 

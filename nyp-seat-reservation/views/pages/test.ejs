@@ -7,7 +7,7 @@
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Static card section  -->
             <!-- Heading  -->
-            <h2 class="section-heading">Test Input Card Heading</h2>
+            <h2 class="section-heading">Test Card Heading</h2>
             <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
             <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
@@ -58,18 +58,110 @@
                         </div>
                     </div>
                 </div>
-                <!-- Radio Button (radio) Input Card  -->
+                <!-- Checkmark (check) Input Card w/ Label  -->
                 <div class="col-sm-6">
                     <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                        <div class="card-body input-radio-card-body">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="testRadio" id="testRadio" value="testValue">
-                                <label class="form-check-label px-2" for="testRadio">
-                                    Test radio
-                                </label>
-                              </div>
+                        <div class="card-body input-card-body">
+                            <label for="testLabelCheckForm" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Labelled Checkboxes</small> <!-- The small element is where we actually write down what the input does  -->
+                            </label>
+                            <div id="testLabelCheckForm" class="py-2"> <!-- All check input elements should be enclosed in a div with a unique id  -->
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="testLabelCheck1" id="testLabelCheck1" value="testValue1">
+                                    <label class="form-check-label px-2" for="testLabelCheck1">
+                                        Checkbox 1
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="testLabelCheck2" id="testLabelCheck2" value="testValue2">
+                                    <label class="form-check-label px-2" for="testLabelCheck2">
+                                        Checkbox 2
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="testLabelCheck3" id="testLabelCheck3" value="testValue3">
+                                    <label class="form-check-label px-2" for="testLabelCheck3">
+                                        Checkbox 3
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <!-- Checkmark (check) Input Card w/o Label  -->
+                <div class="col-sm-6">
+                    <div class="card input-card">
+                        <div class="card-body no-label-card-body">
+                            <div id="testCheckForm">
+                                <div class="form-check form-check-inline ml-2">
+                                    <input class="form-check-input lg-check" type="checkbox" name="testCheck1" id="testCheck1" value="testValue1">
+                                    <label class="form-check-label px-3" for="testCheck1">
+                                        Large Unlabelled Checkbox
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Table card card section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Test Table Card Heading</h2>
+            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">
+                    <!-- Table  -->
+                    <table class="table table-hover table-click table-lg"> 
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Venue</th>
+                                <th scope="col">Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>SIT Graduation Ceremony</td>
+                                <td>Auditorium</td>
+                                <td>18th April 2020, 9am</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>SBM Graduation Ceremony</td>
+                                <td>Auditorium</td>
+                                <td>18th April 2020, 1pm</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>SIDM Graduation Ceremony</td>
+                                <td>Auditorium</td>
+                                <td>18th April 2020, 5pm</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">4</th>
+                                <td>Guitar Club Presents: Steel Cords & Mellow Chords</td>
+                                <td>Theatre for the Arts</td>
+                                <td>21st April 2020, 4pm</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">5</th>
+                                <td>Drama Club Presents: Shrek on Ice!</td>
+                                <td>Theatre for the Arts</td>
+                                <td>22nd April 2020, 6pm</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">6</th>
+                                <td>Martial Arts Night</td>
+                                <td>Theatre for the Arts</td>
+                                <td>24th April 2020, 7pm</td>
+                            </tr>
+                        </tbody>
+                      </table>
                 </div>
             </div>
         </main>

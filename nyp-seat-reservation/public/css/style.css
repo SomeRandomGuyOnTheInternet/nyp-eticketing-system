@@ -1,6 +1,15 @@
-input[type=radio] {
+input[type=radio].lg-radio {
     transform: scale(2);
-    display: block;
+    -ms-transform: scale(2); /* IE */
+    -moz-transform: scale(2); /* FF */
+    -o-transform: scale(2); /* Opera */
+}
+
+input[type=checkbox].lg-check {
+    transform: scale(2);
+    -ms-transform: scale(2); /* IE */
+    -moz-transform: scale(2); /* FF */
+    -o-transform: scale(2); /* Opera */
 }
 
 .form-control {
@@ -16,7 +25,7 @@ input[type=radio] {
     padding: 0.5rem 1.25rem !important;
 }
 
-.input-radio-card-body {
+.no-label-card-body {
     padding: 1.5rem 1.25rem !important;
 }
 
@@ -24,6 +33,7 @@ input[type=radio] {
     position: relative; 
     bottom: -8.5px; 
     margin: 0 !important; 
+    display: block;
 }
 
 .card-input {
@@ -34,7 +44,9 @@ input[type=radio] {
     .responsive-float {
         float: none !important;
     }
+}
 
+@media only screen and (max-width: 576px) {
     .nav-user-info {
         text-align: center !important;
         width: 100% !important;

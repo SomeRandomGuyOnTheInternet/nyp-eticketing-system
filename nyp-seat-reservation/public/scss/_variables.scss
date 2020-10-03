@@ -353,12 +353,13 @@ $hr-margin-y:                 $spacer !default;
 //
 // Customizes the `.table` component with basic values, each used across all table variations.
 
-$table-cell-padding:          .75rem !default;
-$table-cell-padding-sm:       .3rem !default;
+$table-cell-padding:          1.0rem !default;
+$table-cell-padding-sm:       .4rem !default;
+$table-cell-padding-lg:       1.6rem !default;
 
 $table-color:                 $body-color !default;
 $table-bg:                    null !default;
-$table-accent-bg:             rgba($black, .05) !default;
+$table-accent-bg:             $primary !default;
 $table-hover-color:           $table-color !default;
 $table-hover-bg:              rgba($black, .075) !default;
 $table-active-bg:             $table-hover-bg !default;
