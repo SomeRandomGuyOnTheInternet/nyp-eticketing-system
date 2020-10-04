@@ -430,16 +430,27 @@
 		//if there're any legend items to be rendered
 		settings.legend.items.length ? (function(legend) {
 			//either use user-defined container or create our own and insert it right after the seat chart div
-			var $container = (legend.node || $('<div></div>').insertAfter(fn))
-				.addClass('seatCharts-legend');
-				
-			var $ul = $('<ul></ul>')
-				.addClass('seatCharts-legendList')
-				.appendTo($container);
+			var $rowContainer = (legend.node || $('<div></div>').insertAfter(fn))
+				.addClass('row seatCharts-legend');
 			
 			$.each(legend.items, function(index, item) {
-				$ul.append(
-					$('<li></li>')
+				var $column = $('<div></div>')
+					.addClass('col-md-auto')
+					.addClass('seatCharts-cardColumn')
+					.appendTo($rowContainer);
+
+				var $card = $('<div></div>')
+					.addClass('card')
+					.addClass('seatCharts-card')
+					.appendTo($column);
+
+				var $cardBody = $('<div></div>')
+					.addClass('card-body')
+					.addClass('seatCharts-cardBody')
+					.appendTo($card);
+
+				$cardBody.append(
+					$('<div></div>')
 						.addClass('seatCharts-legendItem')
 						.append(
 							$('<div></div>')
@@ -457,7 +468,7 @@
 				);
 			});
 			
-			return $container;
+			return $rowContainer;
 		})(settings.legend) : null;
 	
 		fn.attr({

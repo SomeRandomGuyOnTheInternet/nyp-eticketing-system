@@ -112,59 +112,270 @@
             <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
             <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
-                <div class="card-body p-0">
+                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
                     <!-- Table  -->
-                    <table class="table table-hover table-click table-lg"> 
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Venue</th>
-                                <th scope="col">Date & Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>SIT Graduation Ceremony</td>
-                                <td>Auditorium</td>
-                                <td>18th April 2020, 9am</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>SBM Graduation Ceremony</td>
-                                <td>Auditorium</td>
-                                <td>18th April 2020, 1pm</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td>SIDM Graduation Ceremony</td>
-                                <td>Auditorium</td>
-                                <td>18th April 2020, 5pm</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">4</th>
-                                <td>Guitar Club Presents: Steel Cords & Mellow Chords</td>
-                                <td>Theatre for the Arts</td>
-                                <td>21st April 2020, 4pm</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td>Drama Club Presents: Shrek on Ice!</td>
-                                <td>Theatre for the Arts</td>
-                                <td>22nd April 2020, 6pm</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">6</th>
-                                <td>Martial Arts Night</td>
-                                <td>Theatre for the Arts</td>
-                                <td>24th April 2020, 7pm</td>
-                            </tr>
-                        </tbody>
-                      </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-click table-lg"> 
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Venue</th>
+                                    <th scope="col">Date & Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>SIT Graduation Ceremony</td>
+                                    <td>Auditorium</td>
+                                    <td>18th April 2020, 9am</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>SBM Graduation Ceremony</td>
+                                    <td>Auditorium</td>
+                                    <td>18th April 2020, 1pm</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>SIDM Graduation Ceremony</td>
+                                    <td>Auditorium</td>
+                                    <td>18th April 2020, 5pm</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">4</th>
+                                    <td>Guitar Club Presents: Steel Cords & Mellow Chords</td>
+                                    <td>Theatre for the Arts</td>
+                                    <td>21st April 2020, 4pm</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">5</th>
+                                    <td>Drama Club Presents: Shrek on Ice!</td>
+                                    <td>Theatre for the Arts</td>
+                                    <td>22nd April 2020, 6pm</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">6</th>
+                                    <td>Martial Arts Night</td>
+                                    <td>Theatre for the Arts</td>
+                                    <td>24th April 2020, 7pm</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Static card section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Test Seat Chart Heading</h2>
+            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div id="table-card" class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body">
+                    <div id="table-wrapper" class="wrapper">
+                        <div id="seat-map" class="seatCharts-container">
+                            <div class="front-indicator">Front</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="legend" class="seatCharts-legend"></div>
         </main>
     </div>
 </body>
+
 <%- include('../templates/footer')-%>
+
+<script>
+    var firstSeatLabel = 1;
+    var tableCard = $('#table-card');
+    var wrapper = $('#table-wrapper');
+    var seatMap = $('#seat-map');
+
+    $(document).ready(function() {
+        $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+
+        var sc = $(seatMap).seatCharts({
+            map: [
+                '________________________________________',
+                '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
+                '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
+                '_GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG_',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
+                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
+                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
+                // '____GGGGGGGGGGG____',
+                // '___GGGGGGGGGGGGG___',
+                // '__GGGGGGGGGGGGGGG__',
+                // '_GGGGGGGGGGGGGGGGG_',
+                // 'GGGGGGGGGGGGGGGGGGG',
+                // 'GGGGGGG______GGGGGG',
+                // 'GGGGGGGGGGGGGGGGGGG',
+            ],
+            seats: {
+                'G': {
+                    classes : 'general',
+                    category: 'General'
+                },
+                'H': {
+                    classes : 'handicapped',
+                    category: 'Handicapped'
+                },
+                'a': {
+                    classes : 'a',
+                    category: 'Award Winners (Blocked)'
+                },
+                'b': {
+                    classes : 'b',
+                    category: 'DIT DWM (Blocked)'
+                },
+                'c': {
+                    classes : 'c',
+                    category: 'DSF DWM (Blocked)'
+                },
+                'd': {
+                    classes : 'd',
+                    category: 'DCS DWM (Blocked)'
+                },
+                'e': {
+                    classes : 'e',
+                    category: 'DIT Graduates (Blocked)'
+                },
+                'f': {
+                    classes : 'f',
+                    category: 'DSF Graduates (Blocked)'
+                },
+                'g': {
+                    classes : 'g',
+                    category: 'DEI/DCS Graduates (Blocked)'
+                },
+                'h': {
+                    classes : 'h',
+                    category: 'Late Comers (Blocked)'
+                },
+                'i': {
+                    classes : 'i',
+                    category: 'Guests of AW (Blocked)'
+                },
+                'j': {
+                    classes : 'j',
+                    category: 'VIP (Blocked)'
+                },
+                'k': {
+                    classes : 'k',
+                    category: 'Industrial Guests (Blocked)'
+                },
+                'l': {
+                    classes : 'l',
+                    category: 'Previous Alumni (Blocked)'
+                },
+            },
+            naming : {
+                rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN'],
+                // columns: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
+                getLabel : function (character, row, column) {
+                    return column;
+                },
+                getId : function (character, row, column) {
+                    return row + ':' + column;
+                },
+            },
+            legend : {
+                node : $('#legend'),
+                items : [
+                    [ 'G', 'available', 'General'],
+                    [ 'H', 'available', 'Handicapped' ],
+                    [ 'G', 'reserved', 'Reserved'],
+                    [ 'G', 'blocked', 'Blocked'],
+                    // [ 'a', 'available', 'Award Winners (Blocked)'],
+                    // [ 'b', 'blocked', 'DIT DWM (Blocked)'],
+                    // [ 'c', 'blocked', 'DSF DWM (Blocked)'],
+                    // [ 'd', 'blocked', 'DCS DWM (Blocked)'],
+                    // [ 'e', 'blocked', 'DIT Graduates (Blocked)'],
+                    // [ 'f', 'blocked', 'DSF Graduates (Blocked)'],
+                    // [ 'g', 'blocked', 'DEI/DCS Graduates (Blocked)'],
+                    // [ 'h', 'blocked', 'Late Comers (Blocked)'],
+                    // [ 'i', 'blocked', 'Guests of AW (Blocked)'],
+                    // [ 'j', 'blocked', 'VIP (Blocked)'],
+                    // [ 'k', 'blocked', 'Industrial Guests (Blocked)'],
+                    // [ 'l', 'blocked', 'Previous Alumni (Blocked)'],
+                ]					
+            },
+            click: function () {
+                if (this.status() == 'available') {
+                    return 'selected';
+                } else if (this.status() == 'selected') {
+                    return 'available';
+                } else if (this.status() == 'reserved') {
+                    return 'reserved';
+                } else {
+                    return this.style();
+                }
+            }
+        });
+
+        sc.find('available').status('blocked');
+        sc.find(/^[E-J]:[0-9]+/).status('available');
+        sc.find(/^[K-N]:[0-9]+/).status('reserved');
+        sc.find(/^[K-N]:(1[4-9]|2[0-7])+/).status('blocked');
+        sc.find(/^[T-V]:(1[4-9]|2[0-7])+/).status('reserved');
+        sc.find(/^[W-Y]:(1[4-9]|[23][0-9]|40)+/).status('reserved');
+        sc.find(/^[Z]:[0-9]+/).status('reserved');
+        sc.find(/^AA:[0-9]+/).status('reserved');
+        sc.find(/^BB:[0-9]+/).status('reserved');
+        sc.find(/^CC:[0-9]+/).status('reserved');
+        sc.find(/^DD:[0-9]+/).status('reserved');
+        sc.get("DD:1").status('available');
+
+        scaleContentToCard(tableCard, seatMap);
+
+        // var newReserved = sc.find(/^J:2[1-5]+/);
+        // newReserved.status('reserved');
+
+        // $.each(newReserved.seats, function(index) {
+        //   newReserved.seats[index].settings.$node.addClass("highlighted", 200);
+        // });
+        // .$node.addClass("highlighted", 200)
+    });
+
+    $(window).on('resize', function() {
+        scaleContentToCard(tableCard, seatMap);
+    });
+
+    function scaleContentToCard(parent, content) {
+        scale = $(parent).width() / ($(content).width() + 145);
+        $(content).css('transform', 'scale('+scale+')');
+        $(content).css('transform-origin', 'top left');
+
+        $(parent).css('height', $(content).height());
+    };
+</script>
