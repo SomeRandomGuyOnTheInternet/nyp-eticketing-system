@@ -18,5 +18,9 @@ router.get('/admin', (req, res) => {
 	res.render('pages/admin', { title: "Admin" })
 });
 
+router.get('/helperseat', (req, res) => {
+	res.render('pages/helperseat', { title: "HelperSeat" })
+});
+
 
 module.exports = router;
