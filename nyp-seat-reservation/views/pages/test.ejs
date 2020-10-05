@@ -175,9 +175,9 @@
             <!-- Content  -->
             <div id="table-card" class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
-                    <div id="table-wrapper" class="wrapper">
-                        <div id="seat-map" class="seatCharts-container">
-                            <div class="front-indicator">Front</div>
+                    <div id="table-wrapper" class="seatCharts-wrapper"> <!-- Seat maps should be ensclosed in a seat chart wrapper -->
+                        <div id="seat-map" class="seatCharts-container"> <!-- This is the element the seat chart is gonna latch itself onto -->
+                            <div class="front-indicator">Front</div> <!-- The seat chart element should also contain the front indicator so the user knows the orientation of the map -->
                         </div>
                     </div>
                 </div>
@@ -190,16 +190,15 @@
 <%- include('../templates/footer')-%>
 
 <script>
-    var firstSeatLabel = 1;
-    var tableCard = $('#table-card');
-    var wrapper = $('#table-wrapper');
-    var seatMap = $('#seat-map');
-
     $(document).ready(function() {
-        $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+        $("body").tooltip({ selector: '[data-toggle=tooltip]' }); // This just ensures that the tooltips shown are the custom bootstrap ones, instead of the system ones
 
-        var sc = $(seatMap).seatCharts({
-            map: [
+        // This whole part initialises the seat chart
+        var sc = $('#seat-map').seatCharts({ 
+            // This map is created from the seat characters defined in the seats section below
+            // Also the underscores represent empty spaces
+            // NOTE THAT the number columns must be same across all rows, otherwise the chart will break. Enter empty spaces (underscore) if you want to leave empty space
+            map: [ 
                 '________________________________________',
                 '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
                 '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
@@ -228,11 +227,11 @@
                 'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
                 'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
                 'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
+                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH',
+                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH',
+                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
+                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
+                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
                 // '____GGGGGGGGGGG____',
                 // '___GGGGGGGGGGGGG___',
                 // '__GGGGGGGGGGGGGGG__',
@@ -241,15 +240,22 @@
                 // 'GGGGGGG______GGGGGG',
                 // 'GGGGGGGGGGGGGGGGGGG',
             ],
+            // This section just defines all the different seat types
+            // Each seat type must contain a SINGLE character to identify it in places like the seat-chart above
+            // They should also contain the css class of each class (contained under the seat type section of style.css) and a user-readable category
+            // Each seat can also contain other data like price or whatever
+            // FYI, seats also have statuses that we can define. So far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted. We can add other statuses by adding its CSS classes to the seat statuses section of the style.css
+            // We can't define each seats' status here, cause we have to wait till the seat charts fully initialised to do that
             seats: {
-                'G': {
-                    classes : 'general',
-                    category: 'General'
+                'G': { // This is the seat character that we can use in the seat chart to identify the seat type
+                    classes : 'general', // This is the CSS class associated with the seat type (contained under the seat type section of style.css)
+                    category: 'General' // This is the user-readable category of the seat type
                 },
                 'H': {
                     classes : 'handicapped',
                     category: 'Handicapped'
                 },
+                // For dynamic seat types, we'll just use lowercase alphabets for their charcters and classes
                 'a': {
                     classes : 'a',
                     category: 'Award Winners (Blocked)'
@@ -299,21 +305,27 @@
                     category: 'Previous Alumni (Blocked)'
                 },
             },
+            // This section just contains how we define our rows, columns, seat label, seat id, etc
             naming : {
-                rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN'],
-                // columns: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
+                rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN'], // This array is used to define how we name our rows from top-to-bottom
+                // columns: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], // This array is used to define how we name our columns from left-to-right. Don't need to mess around with this for now.
+                // These two functions below just define how we name our labels and ids respectively
+                // So both just use the row:column format (eg: E:19)
                 getLabel : function (character, row, column) {
-                    return column;
+                    return row + ':' + column;
                 },
                 getId : function (character, row, column) {
                     return row + ':' + column;
                 },
             },
+            // This section defines how we wanna present the legend of the seat chart
             legend : {
-                node : $('#legend'),
+                node : $('#legend'), // This is the element the legend attaches itself to
+                // These are the seat legends we wanna present to the user
+                // Not every seat type and its different statuses has to be here, just the essential
                 items : [
-                    [ 'G', 'available', 'General'],
-                    [ 'H', 'available', 'Handicapped' ],
+                    [ 'G', 'available', 'General'], // Each legend contains the character of the seat type we wanna present, the status of the seat type (so far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted), and a user readable label
+                    [ 'H', 'available', 'Handicapped'],
                     [ 'G', 'reserved', 'Reserved'],
                     [ 'G', 'blocked', 'Blocked'],
                     // [ 'a', 'available', 'Award Winners (Blocked)'],
@@ -330,6 +342,8 @@
                     // [ 'l', 'blocked', 'Previous Alumni (Blocked)'],
                 ]					
             },
+            // This section defines what happens when the user clicks on a seat
+            // We have to define what happens according to the clicked seat's status
             click: function () {
                 if (this.status() == 'available') {
                     return 'selected';
@@ -343,6 +357,8 @@
             }
         });
 
+        // This is the part where we actually set the seat's status individually
+        // Note that I'm using regex here to set the seat status on a larger scale but in the actual app, we probably have to do a for-loop on all the seats and set their status individually
         sc.find('available').status('blocked');
         sc.find(/^[E-J]:[0-9]+/).status('available');
         sc.find(/^[K-N]:[0-9]+/).status('reserved');
@@ -356,26 +372,23 @@
         sc.find(/^DD:[0-9]+/).status('reserved');
         sc.get("DD:1").status('available');
 
-        scaleContentToCard(tableCard, seatMap);
-
-        // var newReserved = sc.find(/^J:2[1-5]+/);
-        // newReserved.status('reserved');
-
-        // $.each(newReserved.seats, function(index) {
-        //   newReserved.seats[index].settings.$node.addClass("highlighted", 200);
-        // });
-        // .$node.addClass("highlighted", 200)
+        scaleContentWidth($('#table-wrapper'), $('#seat-map')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
-    $(window).on('resize', function() {
-        scaleContentToCard(tableCard, seatMap);
+    $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the parent container
+        scaleContentWidth($('#table-wrapper'), $('#seat-map'));
     });
 
-    function scaleContentToCard(parent, content) {
-        scale = $(parent).width() / ($(content).width() + 145);
-        $(content).css('transform', 'scale('+scale+')');
-        $(content).css('transform-origin', 'top left');
+    function scaleContentWidth(parent, content) { // This function scales the content's width proportional to the parent container's width
+        var orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
-        $(parent).css('height', $(content).height());
+        var scale = $(parent).width() / ($(content).width() + 40); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why it works lol.
+        $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
+        $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
+
+        var newHeight = $(content)[0].getBoundingClientRect().height; // Here we get the scaled down height of the content
+        var deltaHeight = newHeight - orgHeight; // Then we get the delta between the original height of the content and the new height of the content
+        
+        $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is. This is a bit hacky but it works for now. 
     };
 </script>
