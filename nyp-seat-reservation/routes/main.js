@@ -8,4 +8,17 @@ router.get('/', (req, res) => {
 	res.render('test/main', { title: "Tessssst", user })
 });
 
+router.get('/helper', (req, res) => {
+	res.render('pages/helper', { title: "Helper" })
+});
+
+router.get('/admin', (req, res) => {
+	res.render('pages/admin', { title: "Admin" })
+});
+
+router.get('/helperseat', (req, res) => {
+	res.render('pages/helperseat', { title: "HelperSeat" })
+});
+
+
 module.exports = router;

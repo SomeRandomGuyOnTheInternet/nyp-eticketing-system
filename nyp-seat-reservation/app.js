@@ -10,6 +10,7 @@ const methodOverride = require('method-override');
 
 const mainRoute = require('./routes/main');
 const plannerRoute = require('./routes/planner');
+const adminRoute = require('./routes/admin');
 
 const app = express();
 
@@ -60,6 +61,7 @@ fypjapplication.setUpDB(false);
 
 app.use('/', mainRoute);
 app.use('/planner', plannerRoute);
+app.use('/admin', adminRoute);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });
