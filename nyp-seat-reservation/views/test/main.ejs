@@ -7,8 +7,49 @@
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Static card section  -->
             <!-- Heading  -->
+            <h2 class="section-heading">Button Card Heading</h2>
+            <div class="mt-0"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
+                <div class="col-md-3">
+                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                        <div class="card-body text-center">
+                            <span class="h5 text-primary">Auth</span>
+                            <a href="/planner/events" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                        <div class="card-body text-center">
+                            <span class="h5 text-primary">Helper</span>
+                            <a href="/planner/events" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                        <div class="card-body text-center">
+                            <span class="h5 text-primary">Planner</span>
+                            <a href="/planner/events" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                        <div class="card-body text-center">
+                            <span class="h5 text-primary">Admin</span>
+                            <a href="/planner/events" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Static card section  -->
+            <!-- Heading  -->
             <h2 class="section-heading">Test Card Heading</h2>
-            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
             <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
@@ -109,7 +150,7 @@
             <!-- Table card card section  -->
             <!-- Heading  -->
             <h2 class="section-heading">Test Table Card Heading</h2>
-            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
             <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
@@ -171,7 +212,7 @@
             <!-- Static card section  -->
             <!-- Heading  -->
             <h2 class="section-heading">Test Seat Chart Heading</h2>
-            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
             <div id="table-card" class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
@@ -187,8 +228,6 @@
     </div>
 </body>
 
-<%- include('../templates/footer')-%>
-
 <script>
     $(document).ready(function() {
         $("body").tooltip({ selector: '[data-toggle=tooltip]' }); // This just ensures that the tooltips shown are the custom bootstrap ones, instead of the system ones
@@ -197,7 +236,7 @@
         var sc = $('#seat-map').seatCharts({ 
             // This map is created from the seat characters defined in the seats section below
             // Also the underscores represent empty spaces
-            // NOTE THAT the number columns must be same across all rows, otherwise the chart will break. Enter empty spaces (underscore) if you want to leave empty space
+            // NOTE that the number columns must be same across all rows, otherwise the chart will break. Enter empty spaces (underscore) if you want to leave empty space
             map: [ 
                 '________________________________________',
                 '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
@@ -238,15 +277,16 @@
                 // '_GGGGGGGGGGGGGGGGG_',
                 // 'GGGGGGGGGGGGGGGGGGG',
                 // 'GGGGGGG______GGGGGG',
-                // 'GGGGGGGGGGGGGGGGGGG',
+                // 'GGGGGGGGGGGGGGGGGGG', // Used for testing
             ],
             // This section just defines all the different seat types
             // Each seat type must contain a SINGLE character to identify it in places like the seat-chart above
-            // They should also contain the css class of each class (contained under the seat type section of style.css) and a user-readable category
+            // They should also contain the css class to use for the type (contained under the seat type section of style.css) and a user-readable category
             // Each seat can also contain other data like price or whatever
             // FYI, seats also have statuses that we can define. So far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted. We can add other statuses by adding its CSS classes to the seat statuses section of the style.css
             // We can't define each seats' status here, cause we have to wait till the seat charts fully initialised to do that
             seats: {
+                // These are 
                 'G': { // This is the seat character that we can use in the seat chart to identify the seat type
                     classes : 'general', // This is the CSS class associated with the seat type (contained under the seat type section of style.css)
                     category: 'General' // This is the user-readable category of the seat type
@@ -358,7 +398,7 @@
         });
 
         // This is the part where we actually set the seat's status individually
-        // Note that I'm using regex here to set the seat status on a larger scale but in the actual app, we probably have to do a for-loop on all the seats and set their status individually
+        // Note that I'm using regex here to set the seat status on a large scale but in the actual app, we probably have to do a for-loop on all the seats and set their status individually
         sc.find('available').status('blocked');
         sc.find(/^[E-J]:[0-9]+/).status('available');
         sc.find(/^[K-N]:[0-9]+/).status('reserved');
@@ -382,7 +422,7 @@
     function scaleContentWidth(parent, content) { // This function scales the content's width proportional to the parent container's width
         var orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
-        var scale = $(parent).width() / ($(content).width() + 40); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why it works lol.
+        var scale = $(parent).width() / ($(content).width() + 40); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why that number works lol.
         $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
         $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
 
@@ -392,3 +432,5 @@
         $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is. This is a bit hacky but it works for now. 
     };
 </script>
+
+<%- include('../templates/footer')-%>

@@ -1,14 +1,11 @@
 const express = require('express');
-const fs = require('fs');
-
 const router = express.Router();
 
-const User = require('../models/Users.js');
-
+// Sample user object to test navigation
+const user = { name: "Vignesh", isPlanner: false, isHelper: false, isAdmin: true };
 
 router.get('/', (req, res) => {
-	res.render('pages/test', { title: "Tessssst" })
+	res.render('test/main', { title: "Tessssst", user })
 });
-
 
 module.exports = router;

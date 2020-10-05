@@ -1,7 +1,11 @@
-<nav class="navbar navbar-light navbar-expand-sm bg-white justify-content-between">
+<% if (user) { %>
+    <nav class="navbar navbar-light navbar-expand-sm bg-white justify-content-between">
+<% } else { %> 
+    <nav class="navbar navbar-light navbar-expand-sm bg-transparent justify-content-between"></nav>
+<% } %> 
     <div class="container">
         <a class="navbar-brand" href="/">
-          <img src="images/nyp-icon-transparent.png" width="65px" height="65px" class="d-inline-block align-top"
+          <img src="/images/nyp-icon-transparent.png" width="65px" height="65px" class="d-inline-block align-top"
 				alt="NYP Logo">
         </a>
         
@@ -9,23 +13,49 @@
 			<span class="navbar-toggler-icon"></span>
         </button>
         
-        <div class="navbar-collapse collapse justify-content-center" id="collapsingNavbar">
-            <ul class="navbar-nav">
-                <li class="nav-item active mx-5 text-center">
-                    <a class="nav-link" href="#">Events <span class="sr-only">Home</span></a>
-                </li>
+        <% if (user) { %> <!-- If user exists, show navigation options -->
+            <div class="navbar-collapse collapse justify-content-center" id="collapsingNavbar">
+                <ul class="navbar-nav">
+                    <% if (user.isPlanner) { %> <!-- If user is a planner, show links to them to all events and all venues -->
+                        <li class="nav-item mx-5 text-center"> <!-- the active class is used to indicate which of the tab pages is currently active -->
+                            <a class="nav-link" href="/planner/events">Events</a>
+                        </li>
+                        <li class="nav-item mx-5 text-center">
+                            <a class="nav-link" href="/planner/venues">Venues</a>
+                        </li>
+                    <% } %>
 
-                <li class="nav-item mx-5 text-center">
-                    <a class="nav-link" href="#">Venues</a>
+                    <% if (user.isHelper) { %> <!-- If user is a helper, show links to events avaliable to them -->
+                        <li class="nav-item mx-5 text-center">
+                            <a class="nav-link" href="#">Events</a>
+                        </li>
+                    <% } %>
+
+                    <% if (user.isAdmin) { %> <!-- If user is an admin, show links to planners and helpers -->
+                        <li class="nav-item mx-5 text-center">
+                            <a class="nav-link" href="#">Planners</a>
+                        </li>
+                        <li class="nav-item mx-5 text-center">
+                            <a class="nav-link" href="#">Helpers</a>
+                        </li>
+                    <% } %>
+
+                    <!-- Everybody else will get no navigation options -->
+                </ul>
+            </div>
+
+            <ul class="nav navbar-nav flex-row nav-user-info">
+                <li class="nav-item text-right nav-user-info">
+                    <span class="font-weight-medium text-dark">
+                        <%= user.name %> 
+                        <% if (user.isHelper) { %> (Helper) <% } %>
+                        <% if (user.isPlanner) { %> (Planner) <% } %>
+                        <% if (user.isAdmin) { %> (Admin) <% } %>
+                    </span>
+                    <br>
+                    <span><a href="/" class="p-0 text-secondary small">Logout</a></span>
                 </li>
             </ul>
-        </div>
-
-        <ul class="nav navbar-nav flex-row nav-user-info">
-            <li class="nav-item text-right nav-user-info">
-                <span class="font-weight-medium text-dark">John Doe (Planner)</span> <br>
-                <span><a href="#" class="p-0 text-secondary small">Logout</a></span>
-            </li>
-        </ul>
+        <% } %> 
     </div>
 </nav>

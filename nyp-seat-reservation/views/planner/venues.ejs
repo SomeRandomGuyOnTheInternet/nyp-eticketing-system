@@ -1,0 +1,53 @@
+<%- include('../templates/head')-%>
+<body>
+    <%- include('../templates/navbar')-%>
+    <div class="container"> <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Table card card section  -->
+            <!-- Heading  -->
+            <div class="row"> <!-- Use this row div if you want your section heading to be inline with another element  -->
+                <div class="col-sm-9 col-12 align-self-end">
+                    <h2 class="section-heading">Venues</h2>
+                </div>
+                <div class="col-sm-3 col-12 align-self-end">
+                    <button type="button" class="btn btn-lg btn-primary responsive-float float-right">+ Add Venue</button>
+                </div>
+            </div>
+            <div class="mt-0"></div> <!-- This spacing is different from the rest cause having multiple inline elements in the heading kinda screws up the spacing, so have to set it to zero to make it look consistent with the rest -->
+            <!-- Content  -->
+            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                    <!-- Table  -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-click table-lg"> 
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Information</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Auditorium</td>
+                                    <td>4 Events Booked</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Theatre for the Arts</td>
+                                    <td>3 Events Booked</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</body>
+
+<%- include('../templates/footer')-%>

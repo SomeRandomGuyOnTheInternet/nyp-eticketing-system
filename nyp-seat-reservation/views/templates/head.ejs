@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- NOTE THAT ALL REFERENCES TO FILES UNDER STATIC FOLDERS, LIKE PUBLIC, MUST START WITH A "/" (eg: "/images/test.png") OTHERWISE REFERENCES WILL BREAK -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-        <link rel="icon" href="images/nyp-icon-transparent.png">
+        <link rel="icon" href="/images/nyp-icon-transparent.png">
         <title>NYP Seat Reservation - <%= title%></title>
 
+        <!-- MUST FOLLOW THIS ORDER -->
+        <!-- jquery -> popper -> bootstrap scripts -> seat chart script -> other scripts -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="js/jquery-seat-chart.js"></script>
-        <script src="js/script.js"></script>
+        <script src="/js/jquery-seat-chart.js"></script>
+        <script src="/js/script.js"></script>
         
-        <link href="css/bootstrap.css" rel="stylesheet" type="text/css" />
-        <link href="css/jquery-seat-chart.css" rel="stylesheet" type="text/css" />
-        <link href="css/style.css" rel="stylesheet" type="text/css" />
+        <!-- bootstrap -> seat chart css -> other css -->
+        <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="/css/jquery-seat-chart.css" rel="stylesheet" type="text/css" />
+        <link href="/css/style.css" rel="stylesheet" type="text/css" />
     </head>

@@ -1,5 +1,10 @@
-const mySQLDB = require('./DBConfig');
+// Actual connection to the database happens here
 
+const mySQLDB = require('./DBConfig'); // We import the sequelize object we configured from this file
+
+// We wrote models without primary keys or foreign keys while defining them as sequelize automatically creates them
+// However, we need to the various specify relationships between models to sequelize so it can create foreign keys accordingly
+// These are the various models that have relationships with each other
 const Events = require('../../nyp-seat-reservation/models/Events');
 const Users = require('../../nyp-seat-reservation/models/Users');
 const Venues = require('../../nyp-seat-reservation/models/Venues');
@@ -9,10 +14,13 @@ const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendees
 const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeats');
 const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
 
+// This function carries out the actual connection to the database while specifying all the relationships between the models
 const setUpDB = (drop) => {
-    mySQLDB.authenticate()
-    .then(() => {
-    //event helpers & event
+    mySQLDB.authenticate().then(() => {
+        // Specify all models relationships here
+        // Note that one to may relationships should always follow this format
+
+        //event helpers & event
         Events.hasMany(EventHelpers, { foreignKey: 'EventId' });
         EventHelpers.belongsTo(Events, { foreignKey: 'EventId' });
         //event attendees & event
@@ -49,8 +57,7 @@ const setUpDB = (drop) => {
         EventHelpers.belongsTo(Users, { foreignKey: 'UserId' });
 
         mySQLDB.sync({ force: drop })
-
-    })
+    });
 };
 
 module.exports = {

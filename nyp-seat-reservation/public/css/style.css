@@ -28,6 +28,15 @@ input[type=checkbox].lg-check {
     padding: 0 !important; 
 }
 
+.card-hover {
+    cursor: pointer;
+}
+
+.card-hover:hover {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: opacity 0.3s ease-in-out;
+}
+
 .input-card-body {
     padding: 0.5rem 1.25rem !important;
 }
@@ -204,7 +213,7 @@ div.seatCharts-seat.handicapped {
 /* =============================== */
 
 div.seatCharts-seat.reserved {
-    background-color: #0028ac;
+    background-color: #a937b8;
 }
 
 div.seatCharts-seat.handicapped.reserved {
@@ -212,7 +221,7 @@ div.seatCharts-seat.handicapped.reserved {
 }
 
 div.seatCharts-seat.blocked {
-    background-color: #7C3EC9;
+    background-color: #161e8a;
 }
 
 div.seatCharts-seat.selected {
