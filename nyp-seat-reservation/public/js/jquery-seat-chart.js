@@ -435,7 +435,7 @@
 			
 			$.each(legend.items, function(index, item) {
 				var $column = $('<div></div>')
-					.addClass('col-md-auto')
+					.addClass('col-auto')
 					.addClass('seatCharts-cardColumn')
 					.appendTo($rowContainer);
 

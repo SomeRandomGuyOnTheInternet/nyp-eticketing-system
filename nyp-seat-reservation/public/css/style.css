@@ -69,7 +69,7 @@ input[type=checkbox].lg-check {
     min-width: 200px;
 }
 
-.wrapper {
+.seatCharts-wrapper {
     text-align: center;
     overflow: hidden;
     position: relative;
@@ -92,6 +92,48 @@ div.seatCharts-row {
     display: inline-flex;
     width: fit-content;
 }
+
+div.seatCharts-container {
+    box-sizing: border-box;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: fit-content;
+	padding: 20px;
+    text-align: center;
+}
+
+div.seatCharts-legend {
+    padding-left: 7.5px;
+    padding-right: 7.5px;
+	bottom: 16px;
+}
+
+div.seatCharts-cardBody {
+    padding: 0.6rem;
+}
+
+div.seatCharts-cardColumn {
+    padding-right: 7.5px;
+    padding-left: 7.5px;
+}
+
+ul.seatCharts-legendList {
+	padding-left: 0px;
+}
+
+span.seatCharts-legendDescription {
+	margin-left: 5px;
+	line-height: 30px;
+}
+
+#selected-seats {
+	max-height: 90px;
+	overflow: hidden;
+}
+
+/* Seat Types */
+/* =============================== */
 
 div.seatCharts-seat.available {
     background-color: #5286e7;
@@ -158,8 +200,11 @@ div.seatCharts-seat.handicapped {
     background-color: #f7ae5e;
 }
 
+/* Seat Statuses */
+/* =============================== */
+
 div.seatCharts-seat.reserved {
-    background-color: #144196;
+    background-color: #0028ac;
 }
 
 div.seatCharts-seat.handicapped.reserved {
@@ -167,7 +212,7 @@ div.seatCharts-seat.handicapped.reserved {
 }
 
 div.seatCharts-seat.blocked {
-    background-color: #6933aa;
+    background-color: #7C3EC9;
 }
 
 div.seatCharts-seat.selected {
@@ -178,43 +223,4 @@ div.seatCharts-seat.selected {
 div.seatCharts-seat.highlighted {
     opacity: 1;
     background-color: #98fb98;
-}
-
-div.seatCharts-container {
-    box-sizing: border-box;
-    position: relative;
-    top: 0;
-    left: 0;
-    width: fit-content;
-	padding: 20px;
-    text-align: center;
-}
-
-div.seatCharts-legend {
-    padding-left: 7.5px;
-    padding-right: 7.5px;
-	bottom: 16px;
-}
-
-div.seatCharts-cardBody {
-    padding: 0.6rem;
-}
-
-div.seatCharts-cardColumn {
-    padding-right: 7.5px;
-    padding-left: 7.5px;
-}
-
-ul.seatCharts-legendList {
-	padding-left: 0px;
-}
-
-span.seatCharts-legendDescription {
-	margin-left: 5px;
-	line-height: 30px;
-}
-
-#selected-seats {
-	max-height: 90px;
-	overflow: hidden;
 }
