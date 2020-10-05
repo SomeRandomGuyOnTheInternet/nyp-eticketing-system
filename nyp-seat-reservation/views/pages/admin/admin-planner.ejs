@@ -1,0 +1,58 @@
+<%- include('../../templates/head')-%>
+<body>
+    <%- include('../../templates/adminnavbar')-%>
+    <div class="container"> <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Static card section  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Table card card section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">List of Planners Accounts</h2>
+            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                    <!-- Table  -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-click table-lg"> 
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>John Doe</td>
+                                    <td>john_doe@mymail.nyp.edu.sg</td>
+                                    <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Jane Eod</td>
+                                    <td>jane_eod@mymail.nyp.edu.sg</td>
+                                    <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>David McGeneric</td>
+                                    <td>david@mymail.nyp.edu.sg</td>
+                                    <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+        </main>
+    </div>
+</body>
+
+<%- include('../../templates/footer')-%>
