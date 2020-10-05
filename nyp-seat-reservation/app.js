@@ -10,6 +10,7 @@ const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
 
 const mainRoute = require('./routes/main');
+const adminRoute = require('./routes/admin');
 const db = require('./config/DBConfig');
 
 
@@ -59,6 +60,7 @@ const fypjapplication = require('./config/DBConnection');
 fypjapplication.setUpDB(false);
 
 app.use('/', mainRoute);
+app.use('/', adminRoute);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });

@@ -14,9 +14,5 @@ router.get('/helper', (req, res) => {
 	res.render('pages/helper', { title: "Helper" })
 });
 
-router.get('/admin', (req, res) => {
-	res.render('pages/admin', { title: "Admin" })
-});
-
 
 module.exports = router;
