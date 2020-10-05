@@ -1,3 +1,5 @@
+// TODO: Complete documentation (app.js & DBConnection.js)
+
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -8,13 +10,17 @@ const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
 
+// Importing all the routes 
+// We split the webpages by routes for clarity and security purposes
+// So each route is in charge of a chunk of webpages that are connected logically (eg: all planner functions are handled under the planner route)
+// This'll make it easier to maintain the webpages
 const mainRoute = require('./routes/main');
+const helperRoute = require('./routes/helper');
 const plannerRoute = require('./routes/planner');
 const adminRoute = require('./routes/admin');
 
+// Our app is a blank canvas at this point (wow so artistic)
 const app = express();
-
-// TODO: Complete documentation (app.js & DBConnection.js)
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -59,7 +65,12 @@ app.use(flash());
 const fypjapplication = require('./config/DBConnection');
 fypjapplication.setUpDB(false);
 
+// Over here, we tell the app what url prefix to use for each of the route's webpages
+// So if we say app.use('/helper', helper.js), every webpage's url in helper.js will begin with 'helper/'
+// Eg: localhost:5000/helper/events
+// Just make sure that your route file ends with module.exports = router; otherwise it will crash
 app.use('/', mainRoute);
+app.use('/helper', helperRoute);
 app.use('/planner', plannerRoute);
 app.use('/admin', adminRoute);
 

@@ -27,16 +27,16 @@
 
                     <% if (user.isHelper) { %> <!-- If user is a helper, show links to events avaliable to them -->
                         <li class="nav-item mx-5 text-center">
-                            <a class="nav-link" href="#">Events</a>
+                            <a class="nav-link" href="/helper/">Events</a>
                         </li>
                     <% } %>
 
                     <% if (user.isAdmin) { %> <!-- If user is an admin, show links to planners and helpers -->
                         <li class="nav-item mx-5 text-center">
-                            <a class="nav-link" href="#">Planners</a>
+                            <a class="nav-link" href="/admin/planners">Planners</a>
                         </li>
                         <li class="nav-item mx-5 text-center">
-                            <a class="nav-link" href="#">Helpers</a>
+                            <a class="nav-link" href="/admin/helpers">Helpers</a>
                         </li>
                     <% } %>
 

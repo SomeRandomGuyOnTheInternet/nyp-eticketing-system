@@ -1,6 +1,6 @@
 <%- include('../templates/head')-%>
 <body>
-    <%- include('../templates/navbar-helper')-%>
+    <%- include('../templates/navbar')-%>
     <div class="container"> <!-- Always enclose everything in a container  -->
         <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
 
@@ -9,7 +9,7 @@
             <!-- Heading  -->
             <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                 <div class="col-sm-6">
-                    <h2 style="color: blue;" class="section-heading">SIT Graduation Ceremony</h2>
+                    <h2 class="section-heading text-primary">SIT Graduation Ceremony</h2>
                     <h5>18th April 2021</h5>
                 </div>
                 <!-- Select (combo box) Input Card  -->
@@ -64,12 +64,9 @@
     </div>
 </body>
 
-<%- include('../templates/footer')-%>
-
 <script>
     $(document).ready(function() {
         $("body").tooltip({ selector: '[data-toggle=tooltip]' }); // This just ensures that the tooltips shown are the custom bootstrap ones, instead of the system ones
-
         // This whole part initialises the seat chart
         var sc = $('#seat-map').seatCharts({ 
             // This map is created from the seat characters defined in the seats section below
@@ -233,7 +230,6 @@
                 }
             }
         });
-
         // This is the part where we actually set the seat's status individually
         // Note that I'm using regex here to set the seat status on a larger scale but in the actual app, we probably have to do a for-loop on all the seats and set their status individually
         sc.find('available').status('blocked');
@@ -248,24 +244,21 @@
         sc.find(/^CC:[0-9]+/).status('reserved');
         sc.find(/^DD:[0-9]+/).status('reserved');
         sc.get("DD:1").status('available');
-
         scaleContentWidth($('#table-wrapper'), $('#seat-map')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
-
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the parent container
         scaleContentWidth($('#table-wrapper'), $('#seat-map'));
     });
-
     function scaleContentWidth(parent, content) { // This function scales the content's width proportional to the parent container's width
         var orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
-
         var scale = $(parent).width() / ($(content).width() + 40); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why it works lol.
         $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
         $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
-
         var newHeight = $(content)[0].getBoundingClientRect().height; // Here we get the scaled down height of the content
         var deltaHeight = newHeight - orgHeight; // Then we get the delta between the original height of the content and the new height of the content
         
         $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is. This is a bit hacky but it works for now. 
     };
 </script>
+
+<%- include('../templates/footer')-%>
