@@ -10,5 +10,9 @@ router.get('/', (req, res) => {
 	res.render('pages/test', { title: "Tessssst" })
 });
 
+router.get('/helper', (req, res) => {
+	res.render('pages/helper', { title: "Helper" })
+});
+
 
 module.exports = router;

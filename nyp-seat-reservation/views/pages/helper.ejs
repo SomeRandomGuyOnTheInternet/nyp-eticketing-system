@@ -1,0 +1,90 @@
+<%- include('../templates/head')-%>
+<body>
+    <%- include('../templates/navbar-helper')-%>
+    <div class="container"> <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Static card section  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Input card section  -->
+            <!-- Heading  -->
+            <div class="mt-0"></div> <!-- This spacing is different from the rest cause having multiple inline elements in the heading kinda screws up the spacing, so have to set it to zero to make it look consistent with the rest -->
+            <!-- Content  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Table card card section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Available Events</h2>
+            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                    <!-- Table  -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-click table-lg"> 
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Time</th>
+                                    <th scope="col">Venue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>SIT Graduation Ceremony</td>
+                                    <td>18th April 2020</td>
+                                    <td>9am</td>
+                                    <td>Auditorium</td>
+                                </tr>
+                                <tr>
+                                    <td>SBM Graduation Ceremony</td>
+                                    <td>18th April 2020</td>
+                                    <td>1pm</td>
+                                    <td>Auditorium</td>
+                                </tr>
+                                <tr>
+                                    <td>SIDM Graduation Ceremony</td>
+                                    <td>18th April 2020</td>
+                                    <td>5pm</td>
+                                    <td>Auditorium</td>
+                                </tr>
+                                <tr>
+                                    <td>SIDM Graduation Ceremony</td>
+                                    <td>18th April 2020</td>
+                                    <td>5pm</td>
+                                    <td>Auditorium</td>
+                                </tr>
+                                <tr>
+                                    <td>Guitar Club Presents: Steel Chords & Mellow Chords</td>
+                                    <td>21st April 2020</td>
+                                    <td>5pm</td>
+                                    <td>Theatre for the Arts</td>
+                                </tr>
+                                <tr>
+                                    <td>Drama Club Presents: Shrek on Ice!</td>
+                                    <td>22nd April 2020</td>
+                                    <td>4pm</td>
+                                    <td>Theatre for the Arts</td>
+                                </tr>
+                                <tr>
+                                    <td>Martial Arts Night</td>
+                                    <td>24th April 2020</td>
+                                    <td>7pm</td>
+                                    <td>Theatre for the Arts</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Static card section  -->
+        </main>
+    </div>
+</body>
+
+<%- include('../templates/footer')-%>
