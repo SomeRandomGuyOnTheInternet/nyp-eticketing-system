@@ -500,13 +500,13 @@
     $("#successToastBtn").click(function () {
         let toastNode = ejs.render(templates.toast, { notifications: successToast }); // succesToast and dangerToast is defined above
         $("#toastContainer").append(toastNode);
-        $('.toast').toast('show'); 
+        $('.toast').not('.hide').toast('show'); 
     });
 
     $("#dangerToastBtn").click(function () {
         let toastNode = ejs.render(templates.toast, { notifications: dangerToast }); // succesToast and dangerToast is defined above
         $("#toastContainer").append(toastNode);
-        $('.toast').toast('show'); 
+        $('.toast').not('.hide').toast('show'); 
     });
 
 </script>
