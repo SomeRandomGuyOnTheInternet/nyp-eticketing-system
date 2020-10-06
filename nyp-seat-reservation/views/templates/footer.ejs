@@ -1,2 +1,7 @@
     <div class="mt-6"></div>  <!-- used for spacing between the last element and the page's base -->
+    <script>
+        $(document).ready(function() {
+            $("body").tooltip({ selector: '[data-toggle=tooltip]' }); // This just ensures that the tooltips shown are the custom bootstrap ones, instead of the system ones
+        });
+    </script>
 </html>
