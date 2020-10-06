@@ -1,27 +1,103 @@
 <%- include('../templates/head')-%>
+
 <body>
     <%- include('../templates/navbar')-%>
-    <div class="container"> <!-- Always enclose everything in a container  -->
-        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
-            
+    <div class="container">
+        <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover">
+            <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Input card section  -->
             <!-- Heading  -->
-            <div class="row"> <!-- Use this row div if you want your section heading to be inline with another element  -->
+            <div class="row">
+                <!-- Use this row div if you want your section heading to be inline with another element  -->
                 <div class="col-sm-9 col-12 align-self-end">
                     <h2 class="section-heading">List of Helpers Accounts</h2>
                 </div>
                 <div class="col-sm-3 col-12 align-self-end">
-                    <button type="button" class="btn btn-lg btn-primary responsive-float float-right w-100">Add Helper</button>
+                    <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
+                    <button type="button" class="btn btn-primary btn-lg w-100" data-toggle="modal" data-target="#Modal">
+                        Add Helpers
+                    </button>
                 </div>
             </div>
+            <!-- Modal section -->
+            <!-- This part will not be shown to the user until they click on the button that is supposed to launch the modal -->
+            <!-- The modal should have the same id as the one you specified in the element with the data-target above -->
+            <!-- Note that you can use multiple modals in one page, as long as they are all given different ids -->
+            <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="testModal"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <!-- This is where you enter the title of the modal -->
+                        <div class="modal-header">
+                            <h4 class="modal-title text-primary" id="testModalLabel">Add Helper</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <!-- This is the actual content (can put anything here) -->
+                        <div class="modal-body">
+                            <div class="card input-card">
+                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                <div class="card-body input-card-body">
+                                    <label for="textTextInput" class="card-input-label">
+                                        <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Name</small>
+                                        <!-- The small element is where we actually write down what the input does  -->
+                                    </label>
+                                    <input id="textTextInput" class="form-control card-input" type="text"
+                                        placeholder="e.g. Mark">
+                                    <!-- This is where the user actually inputs all their stuff  -->
+                                </div>
+                            </div>
+                            <div class="card input-card mt-3">
+                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                <div class="card-body input-card-body">
+                                    <label for="textTextInput" class="card-input-label">
+                                        <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Email
+                                            Address</small>
+                                        <!-- The small element is where we actually write down what the input does  -->
+                                    </label>
+                                    <input id="textTextInput" class="form-control card-input" type="text"
+                                        placeholder="e.g. example@mail.com">
+                                    <!-- This is where the user actually inputs all their stuff  -->
+                                </div>
+                            </div>
+                            <div class="card input-card mt-3">
+                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                <div class="card-body input-card-body">
+                                    <label for="textTextInput" class="card-input-label">
+                                        <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                        <small
+                                            class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small>
+                                        <!-- The small element is where we actually write down what the input does  -->
+                                    </label>
+                                    <input id="textTextInput" class="form-control card-input" type="text"
+                                        placeholder="Enter password here">
+                                    <!-- This is where the user actually inputs all their stuff  -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- This is the footer, where you usually put buttons and stuff -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary btn-lg w-100">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Table for list of helpers -->
             <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
-            <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
-                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+            <div class="card mt-3">
+                <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">
+                    <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
                     <!-- Table  -->
                     <div class="table-responsive">
-                        <table class="table table-hover table-click table-lg"> 
+                        <table class="table table-hover table-click table-lg">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -53,7 +129,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </main>
     </div>
 </body>
