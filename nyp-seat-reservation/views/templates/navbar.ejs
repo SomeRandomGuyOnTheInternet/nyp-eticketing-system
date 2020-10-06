@@ -1,4 +1,5 @@
-<% if (user) { %>
+<!-- locals.user enables us to check if the variable exists without throwing an error -->
+<% if (locals.user) { %>
     <nav class="navbar navbar-light navbar-expand-sm bg-white justify-content-between">
 <% } else { %> 
     <nav class="navbar navbar-light navbar-expand-sm bg-transparent justify-content-between"></nav>
@@ -13,7 +14,8 @@
 			<span class="navbar-toggler-icon"></span>
         </button>
         
-        <% if (user) { %> <!-- If user exists, show navigation options -->
+        <!-- locals.user enables us to check if the variable exists without throwing an error -->
+        <% if (locals.user) { %> <!-- If user exists, show navigation options -->
             <div class="navbar-collapse collapse justify-content-center" id="collapsingNavbar">
                 <ul class="navbar-nav">
                     <% if (user.isPlanner) { %> <!-- If user is a planner, show links to them to all events and all venues -->

@@ -2,6 +2,15 @@
 
 @each $color, $value in $theme-colors {
   @include bg-variant(".bg-#{$color}", $value, true);
+  @include bg-variant(".bg-#{$color}-75", rgba($value, 0.75), true);
+  @include bg-variant(".bg-#{$color}-50", rgba($value, 0.5), true);
+  @include bg-variant(".bg-#{$color}-25", rgba($value, 0.25), true);
+
+  @if ((lightness($value)) < 60 and (hue($value)) > 45) {
+    .bg-#{$color} {
+        @extend .text-light
+    }
+  }
 }
 
 @if $enable-gradients {

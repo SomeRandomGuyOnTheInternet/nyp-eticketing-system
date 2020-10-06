@@ -1,12 +1,25 @@
-<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-    <div style="position: absolute; bottom: 0; right: 50%; left: 50%;">
-        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-body">
-                See? Just like this.
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<!-- This ejs template will be used by both the client side and the server side -->
+<!-- We load this on page load if there are any notifications passed to the client to render on load -->
+<!-- This template is also in the templates.js file that the client accesses, so that we can use ejs client side templating capabilites to create notifications on the fly using ajax -->
+
+<!-- An array of notification objects must be passed into this template for it to work. The notification object should at least contain the message and its type -->
+<!-- Message types are: "success" and "danger" -->
+
+<% for (var i = 0; i < notifications.length; i++) { %>
+    <div class="toast bg-<%= notifications[i].type %>-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000"> <!-- The class will change dependeing on the notification type -->
+        <div class="toast-body p-4">
+            <div class="container-fluid p-0">
+                <div class="row">
+                    <div class="col-10">
+                        <span class="h5 text-white font-weight-medium"><%= notifications[i].message %></span> <!-- This is where we show the message -->
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="close" data-dismiss="toast" aria-label="Close">
+                            <span aria-hidden="true" class="text-white">&times;</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+<% } %>

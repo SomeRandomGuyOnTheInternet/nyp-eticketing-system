@@ -906,7 +906,8 @@ $popover-arrow-outer-color:         fade-in($popover-border-color, .05) !default
 
 // Toasts
 
-$toast-max-width:                   350px !default;
+$toast-max-width:                   85vw !default;
+$toast-min-width:                   45vw !default;
 $toast-padding-x:                   .75rem !default;
 $toast-padding-y:                   .25rem !default;
 $toast-font-size:                   .875rem !default;

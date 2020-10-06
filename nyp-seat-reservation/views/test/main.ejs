@@ -234,7 +234,24 @@
             <div id="table-card" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
                     <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#testModal"> <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
-                        Launch demo modal
+                        Show Test Modal
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Toast section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Test Toast Heading</h2>
+            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div id="table-card" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body">
+                    <button type="button" id="successToastBtn" class="btn btn-success btn-lg">
+                        Add Success Toast
+                    </button>
+                    <button type="button" id="dangerToastBtn" class="btn btn-danger btn-lg">
+                        Add Danger Toast
                     </button>
                 </div>
             </div>
@@ -258,18 +275,18 @@
                     <div class="modal-body">
                         <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
-                                <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                <label for="textModalInput1" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="textTextInput" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
+                                <input id="textModalInput1" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                         <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
-                                <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                <label for="textModalInput2" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="textTextInput" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
+                                <input id="textModalInput2" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
@@ -284,9 +301,13 @@
 </body>
 
 <script>
+    // These are example notification objects. The real app will have more attributes in them but this is enough for now.
+    const successToast = [{ message: "This is a success toast! Yay!", type: "success" }];
+    const dangerToast = [{ message: "This is a danger toast! Boo!", type: "danger" }];
+
     $(document).ready(function() {
         // This whole part initialises the seat chart
-        var sc = $('#seat-map').seatCharts({ 
+        let sc = $('#seat-map').seatCharts({ 
             // This map is created from the seat characters defined in the seats section below
             // Also the underscores represent empty spaces
             // NOTE that the number columns must be same across all rows, otherwise the chart will break. Enter empty spaces (underscore) if you want to leave empty space
@@ -471,19 +492,23 @@
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the parent container
         scaleContentWidth($('#table-wrapper'), $('#seat-map'));
     });
+    
+    // Upon clicking each toast's buttons, we call pass the template string we defined in template.js and the variables required in the templates to ejs so it gives us a complete html element with all the data filled in
+    // Then we append the resulting toast html to the toast container defined in footer.ejs
+    // We then have to call the show function of the toast
+    
+    $("#successToastBtn").click(function () {
+        let toastNode = ejs.render(templates.toast, { notifications: successToast }); // succesToast and dangerToast is defined above
+        $("#toastContainer").append(toastNode);
+        $('.toast').toast('show'); 
+    });
 
-    function scaleContentWidth(parent, content) { // This function scales the content's width proportional to the parent container's width
-        var orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
+    $("#dangerToastBtn").click(function () {
+        let toastNode = ejs.render(templates.toast, { notifications: dangerToast }); // succesToast and dangerToast is defined above
+        $("#toastContainer").append(toastNode);
+        $('.toast').toast('show'); 
+    });
 
-        var scale = $(parent).width() / ($(content).width() + 40); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why that number works lol.
-        $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
-        $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
-
-        var newHeight = $(content)[0].getBoundingClientRect().height; // Here we get the scaled down height of the content
-        var deltaHeight = newHeight - orgHeight; // Then we get the delta between the original height of the content and the new height of the content
-        
-        $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is. This is a bit hacky but it works for now. 
-    };
 </script>
 
 <%- include('../templates/footer')-%>
