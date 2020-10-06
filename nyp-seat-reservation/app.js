@@ -12,7 +12,7 @@ const methodOverride = require('method-override');
 
 // Importing all the routes 
 // We split the webpages by routes for clarity and security purposes
-// So each route is in charge of a chunk of webpages that are connected logically (eg: all planner functions are handled under the planner route)
+// So each route is in charge of a chunk of webpages that are connected logically (eg: all planner functions are handled under the planner route, which is located in planner.js)
 // This'll make it easier to maintain the webpages
 const mainRoute = require('./routes/main');
 const helperRoute = require('./routes/helper');

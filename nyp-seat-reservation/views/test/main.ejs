@@ -168,37 +168,37 @@
                             <tbody>
                                 <tr>
                                     <th scope="row">1</th>
-                                    <td>SIT Graduation Ceremony</td>
+                                    <td class="font-weight-medium"><a href="#">SIT Graduation Ceremony</a></td>
                                     <td>Auditorium</td>
                                     <td>18th April 2020, 9am</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">2</th>
-                                    <td>SBM Graduation Ceremony</td>
+                                    <td class="font-weight-medium"><a href="#">SBM Graduation Ceremony</a></td>
                                     <td>Auditorium</td>
                                     <td>18th April 2020, 1pm</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">3</th>
-                                    <td>SIDM Graduation Ceremony</td>
+                                    <td class="font-weight-medium"><a href="#">SIDM Graduation Ceremony</a></td>
                                     <td>Auditorium</td>
                                     <td>18th April 2020, 5pm</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">4</th>
-                                    <td>Guitar Club Presents: Steel Cords & Mellow Chords</td>
+                                    <td class="font-weight-medium"><a href="#">Guitar Club Presents: Steel Cords & Mellow Chords</a></td>
                                     <td>Theatre for the Arts</td>
                                     <td>21st April 2020, 4pm</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">5</th>
-                                    <td>Drama Club Presents: Shrek on Ice!</td>
+                                    <td class="font-weight-medium"><a href="#">Drama Club Presents: Shrek on Ice!</a></td>
                                     <td>Theatre for the Arts</td>
                                     <td>22nd April 2020, 6pm</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">6</th>
-                                    <td>Martial Arts Night</td>
+                                    <td class="font-weight-medium"><a href="#">Martial Arts Night</a></td>
                                     <td>Theatre for the Arts</td>
                                     <td>24th April 2020, 7pm</td>
                                 </tr>
@@ -209,7 +209,7 @@
             </div>
 
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-            <!-- Static card section  -->
+            <!-- Seat chart card section  -->
             <!-- Heading  -->
             <h2 class="section-heading">Test Seat Chart Heading</h2>
             <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
@@ -224,14 +224,23 @@
                 </div>
             </div>
             <div id="legend" class="seatCharts-legend"></div>
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Modal section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Test Modal Heading</h2>
+            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div id="table-card" class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body">
+                </div>
+            </div>
         </main>
     </div>
 </body>
 
 <script>
     $(document).ready(function() {
-        $("body").tooltip({ selector: '[data-toggle=tooltip]' }); // This just ensures that the tooltips shown are the custom bootstrap ones, instead of the system ones
-
         // This whole part initialises the seat chart
         var sc = $('#seat-map').seatCharts({ 
             // This map is created from the seat characters defined in the seats section below
