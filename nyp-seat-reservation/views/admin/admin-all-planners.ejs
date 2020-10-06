@@ -1,27 +1,70 @@
 <%- include('../templates/head')-%>
+
 <body>
     <%- include('../templates/navbar')-%>
-    <div class="container"> <!-- Always enclose everything in a container  -->
-        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
-            
+    <div class="container">
+        <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover">
+            <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Input card section  -->
             <!-- Heading  -->
-            <div class="row"> <!-- Use this row div if you want your section heading to be inline with another element  -->
+            <div class="row">
+                <!-- Use this row div if you want your section heading to be inline with another element  -->
                 <div class="col-sm-9 col-12 align-self-end">
                     <h2 class="section-heading">List of Planners Accounts</h2>
                 </div>
                 <div class="col-sm-3 col-12 align-self-end">
-                    <button type="button" class="btn btn-lg btn-primary responsive-float float-right w-100">Add Planner</button>
+                    <button type="button" class="btn btn-lg btn-primary responsive-float float-right w-100" data-toggle="modal" data-target="#Modal" 
+                    data-whatever="@Name">Add Planner</button>
                 </div>
             </div>
+            <!-- Modal -->
+            <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add Planner</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="recipient-name" class="col-form-label">Name:</label>
+                                    <input type="text" class="form-control" id="recipient-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Email Address:</label>
+                                    <input type="text" class="form-control" id="message-text">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Password:</label>
+                                    <input type="text" class="form-control" id="message-text">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table for list of planners -->
             <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
-            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
-                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+            <div class="card mt-3">
+                <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">
+                    <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
                     <!-- Table  -->
                     <div class="table-responsive">
-                        <table class="table table-hover table-click table-lg"> 
+                        <table class="table table-hover table-click table-lg">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -53,7 +96,6 @@
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 </body>
