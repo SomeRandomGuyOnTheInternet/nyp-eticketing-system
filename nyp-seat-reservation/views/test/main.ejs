@@ -12,7 +12,7 @@
             <!-- Content  -->
             <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                 <div class="col-md-3">
-                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                    <div class="card card-hover mt-3"> <!-- All clickable cards should have hover-card class  -->
                         <div class="card-body text-center">
                             <span class="h5 text-primary">Auth</span>
                             <a href="#" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                    <div class="card card-hover mt-3"> <!-- All clickable cards should have hover-card class  -->
                         <div class="card-body text-center">
                             <span class="h5 text-primary">Helper</span>
                             <a href="/helper/" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                    <div class="card card-hover mt-3"> <!-- All clickable cards should have hover-card class  -->
                         <div class="card-body text-center">
                             <span class="h5 text-primary">Planner</span>
                             <a href="/planner/events" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card card-hover"> <!-- All clickable cards should have hover-card class  -->
+                    <div class="card card-hover mt-3"> <!-- All clickable cards should have hover-card class  -->
                         <div class="card-body text-center">
                             <span class="h5 text-primary">Admin</span>
                             <a href="/admin/" class="stretched-link"></a> <!-- Stretched links enable us to make its parent div a clickable link in a non-intrusive way -->
@@ -51,7 +51,7 @@
             <h2 class="section-heading">Test Card Heading</h2>
             <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
-            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+            <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
                     <span>This is a test. It works. Yay.</span>
                 </div>
@@ -73,7 +73,7 @@
             <!-- Text Box Input Card  -->
             <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                 <div class="col-sm-6">
-                    <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                    <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
                             <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
@@ -84,7 +84,7 @@
                 </div>
                 <!-- Select (combo box) Input Card  -->
                 <div class="col-sm-6">
-                    <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                    <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
                             <label for="testSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Select</small> <!-- The small element is where we actually write down what the input does  -->
@@ -101,7 +101,7 @@
                 </div>
                 <!-- Checkmark (check) Input Card w/ Label  -->
                 <div class="col-sm-6">
-                    <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                    <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
                             <label for="testLabelCheckForm" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Labelled Checkboxes</small> <!-- The small element is where we actually write down what the input does  -->
@@ -131,7 +131,7 @@
                 </div>
                 <!-- Checkmark (check) Input Card w/o Label  -->
                 <div class="col-sm-6">
-                    <div class="card input-card">
+                    <div class="card input-card mt-3">
                         <div class="card-body no-label-card-body">
                             <div id="testCheckForm">
                                 <div class="form-check form-check-inline ml-2">
@@ -152,7 +152,7 @@
             <h2 class="section-heading">Test Table Card Heading</h2>
             <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
-            <div class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+            <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
                     <!-- Table  -->
                     <div class="table-responsive">
@@ -214,7 +214,7 @@
             <h2 class="section-heading">Test Seat Chart Heading</h2>
             <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
-            <div id="table-card" class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+            <div id="table-card" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
                     <div id="table-wrapper" class="seatCharts-wrapper"> <!-- Seat maps should be ensclosed in a seat chart wrapper -->
                         <div id="seat-map" class="seatCharts-container"> <!-- This is the element the seat chart is gonna latch itself onto -->
@@ -226,16 +226,60 @@
             <div id="legend" class="seatCharts-legend"></div>
 
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-            <!-- Modal section  -->
+            <!-- Modal button section  -->
             <!-- Heading  -->
             <h2 class="section-heading">Test Modal Heading</h2>
             <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
-            <div id="table-card" class="card"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+            <div id="table-card" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
+                    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#testModal"> <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
+                        Launch demo modal
+                    </button>
                 </div>
             </div>
         </main>
+
+        <!-- Modal section -->
+        <!-- This part will not be shown to the user until they click on the button that is supposed to launch the modal -->
+        <!-- The modal should have the same id as the one you specified in the element with the data-target above -->
+        <!-- Note that you can use multiple modals in one page, as long as they are all given different ids -->
+        <div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="testModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <!-- This is where you enter the title of the modal -->
+                    <div class="modal-header">
+                        <h4 class="modal-title text-primary" id="testModalLabel">Test Modal Title</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <!-- This is the actual content (can put anything here) -->
+                    <div class="modal-body">
+                        <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="textTextInput" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
+                            </div>
+                        </div>
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Example Text Box</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="textTextInput" class="form-control card-input" type="text" placeholder="This is an example text box woo"> <!-- This is where the user actually inputs all their stuff  -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- This is the footer, where you usually put buttons and stuff -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-lg w-100">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 
