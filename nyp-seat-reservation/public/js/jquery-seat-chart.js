@@ -440,7 +440,7 @@
 					.appendTo($rowContainer);
 
 				var $card = $('<div></div>')
-					.addClass('card')
+					.addClass('card mt-3')
 					.addClass('seatCharts-card')
 					.appendTo($column);
 

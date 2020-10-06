@@ -20,10 +20,6 @@ input[type=checkbox].lg-check {
     border: none !important;
 }
 
-.card {
-    margin-top: 1rem !important;
-}
-
 .card-input {
     padding: 0 !important; 
 }
