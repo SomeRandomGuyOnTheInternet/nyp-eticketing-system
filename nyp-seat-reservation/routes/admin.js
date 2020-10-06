@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Sample user object to test navigation
 // For the planner pages, this user is a admin
-const user = { name: "Vignesh", isPlanner: false, isHelper: false, isAdmin: true };
+const user = { name: "Administrator", isPlanner: false, isHelper: false, isAdmin: true };
 
 // When creating new routes avoid using the route's name in the webpage's name
 // Eg: Use router.get('/planners', ...) instead of router.get('/admin-planners', ...) cause then the url will be '/admin/admin-planners' which is super redundant
