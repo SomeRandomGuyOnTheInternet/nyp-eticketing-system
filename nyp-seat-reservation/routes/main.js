@@ -5,12 +5,18 @@ const router = express.Router();
 
 // Sample user object to test navigation
 // For the test pages, this user is neither a planner or helper or an admin
-const user = { name: "Vignesh", isPlanner: false, isHelper: false, isAdmin: false };
+const user = { name: "", isPlanner: false, isHelper: false, isAdmin: false };
 
 router.get('/', async (req, res) => {
 	res.render('test/main', { 
 		title: "Tessssst", 
 		user
+	})
+});
+
+router.get('/login', async (req, res) => {
+	res.render('login/login', { 
+		title: "login", 
 	})
 });
 
