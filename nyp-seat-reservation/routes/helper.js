@@ -21,4 +21,8 @@ router.get('/event', (req, res) => {
 	res.render('helper/helper-view-event', { title: "Venues", user });
 });
 
+router.get('/eventtopright', (req, res) => {
+	res.render('helper/helper-view-event-quadrant', { title: "Venues", user });
+});
+
 module.exports = router;
