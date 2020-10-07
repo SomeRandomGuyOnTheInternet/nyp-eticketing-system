@@ -26,7 +26,7 @@
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search Reservation</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <input id="textTextInput" class="form-control card-input" type="text"
+                            <input id="textTextInput" name="textTextInput" class="form-control card-input" type="text"
                                 placeholder="E.g. Vignesh / 91864675 ">
                             <!-- This is where the user actually inputs all their stuff  -->
                         </div>
@@ -48,7 +48,7 @@
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Quadrant</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <select class="form-control pl-0" id="testSelectInput" onChange="window.location.href=this.value">
+                            <select class="form-control pl-0" id="testSelectInput" name="testSelectInput" onChange="window.location.href=this.value">
                                 <!-- This is where the user actually inputs all their stuff  -->
                                 <option>Top Right</option>
                                 <option value="/helper/event">Whole Venue</option>
@@ -83,12 +83,12 @@
                     <div class="card input-card mt-3">
                         <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
-                            <label for="textTextInput" class="card-input-label">
+                            <label for="textTextInput" name="textTextInput" class="card-input-label">
                                 <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Name</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <input id="textTextInput" class="form-control card-input" type="text" placeholder="e.g. Lam En Qing">
+                            <input id="textTextInput" name="textTextInput" class="form-control card-input" type="text" placeholder="e.g. Lam En Qing">
                             <!-- This is where the user actually inputs all their stuff  -->
                         </div>
                     </div>
