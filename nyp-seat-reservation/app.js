@@ -1,4 +1,5 @@
 // TODO: Complete documentation (app.js & DBConnection.js)
+// TODO: Find another solution client-side templating cause right now, it's possible to inject bad code inside the templates and have javascript execute them
 
 const express = require('express');
 const session = require('express-session');

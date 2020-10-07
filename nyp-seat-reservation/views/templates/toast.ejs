@@ -1,10 +1,11 @@
 <!-- This ejs template will be used by both the client side and the server side -->
 <!-- We load this on page load if there are any notifications passed to the client to render on load -->
-<!-- This template is also in the templates.js file that the client accesses, so that we can use ejs client side templating capabilites to create notifications on the fly using ajax -->
+<!-- This exact template is also in the templates.js file that the client accesses, so that we can use ejs client side templating capabilites to create notifications on the fly for stuff like ajax -->
 
 <!-- An array of notification objects must be passed into this template for it to work. The notification object should at least contain the message and its type -->
 <!-- Message types are: "success" and "danger" -->
 
+<!-- CHANGES MADE HERE WON'T BE REFLECTED ON TOASTS THAT ARE CREATED AFTER PAGE LOAD UNLESS THE SAME CHANGES ARE MANUALLY MADE TO TEMPLATE.JS -->
 <% for (var i = 0; i < notifications.length; i++) { %>
     <div class="toast bg-<%= notifications[i].type %>-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000"> <!-- The class will change dependeing on the notification type -->
         <div class="toast-body p-4">

@@ -1,0 +1,77 @@
+<%- include('../templates/head')-%>
+<body>
+    <%- include('../templates/navbar')-%>
+    <div class="container"> <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Event details form section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Event Details</h2>
+            <div class="mt-4"></div>
+            <!-- Content  -->
+            <form action="/" method="post">
+                <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
+                    <!-- Event Name Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="eventNameTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Name</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="eventNameTextInput" name="eventNameTextInput" class="form-control card-input" type="text" placeholder="e.g. Dance Competition"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Event Start Date / Time Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="eventDateTimeInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Date / Time</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" placeholder="e.g 13th March 2021, 9am"> <!-- This is where the user actually inputs all their stuff  -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Max. No. of Seats Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="maxSeatsPerReservationSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Maximum no. of seats per reservation</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <select id="maxSeatsPerReservationSelectInput" name="maxSeatsPerReservationSelectInput" class="form-control pl-0"> <!-- This is where the user actually inputs all their stuff  -->
+                                    <option>No Limit</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Checkmark (check) Input Card w/o Label  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3">
+                            <div class="card-body no-label-card-body">
+                                <div id="prioritiseBackCheckForm">
+                                    <div class="form-check form-check-inline ml-2">
+                                        <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true">
+                                        <label class="form-check-label px-3" for="prioritiseBackCheck">
+                                            Prioritise seats at the back
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </form>
+
+        </main>
+    </div>
+</body>

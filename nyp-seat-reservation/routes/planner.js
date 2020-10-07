@@ -17,6 +17,10 @@ router.get('/events', (req, res) => {
 	res.render('planner/planner-all-events', { title: "Events", user }); // We pass the user object contructed above to the ejs so it can show the appropriate navbar details and other stuff
 });
 
+router.get('/add-event', (req, res) => {
+	res.render('planner/planner-add-event', { title: "Add Event", user });
+});
+
 router.get('/venues', (req, res) => {
 	res.render('planner/planner-all-venues', { title: "Venues", user });
 });

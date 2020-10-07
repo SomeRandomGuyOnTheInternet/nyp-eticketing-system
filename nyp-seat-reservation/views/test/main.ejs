@@ -301,10 +301,6 @@
 </body>
 
 <script>
-    // These are example notification objects. The real app will have more attributes in them but this is enough for now.
-    const successToast = [{ message: "This is a success toast! Yay!", type: "success" }];
-    const dangerToast = [{ message: "This is a danger toast! Boo!", type: "danger" }];
-
     $(document).ready(function() {
         // This whole part initialises the seat chart
         let sc = $('#seat-map').seatCharts({ 
@@ -360,7 +356,7 @@
             // FYI, seats also have statuses that we can define. So far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted. We can add other statuses by adding its CSS classes to the seat statuses section of the style.css
             // We can't define each seats' status here, cause we have to wait till the seat charts fully initialised to do that
             seats: {
-                // These are 
+                // Uppercase character seat types represent seat types that will be present for all events
                 'G': { // This is the seat character that we can use in the seat chart to identify the seat type
                     classes : 'general', // This is the CSS class associated with the seat type (contained under the seat type section of style.css)
                     category: 'General' // This is the user-readable category of the seat type
@@ -424,7 +420,7 @@
                 rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN'], // This array is used to define how we name our rows from top-to-bottom
                 // columns: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], // This array is used to define how we name our columns from left-to-right. Don't need to mess around with this for now.
                 // These two functions below just define how we name our labels and ids respectively
-                // So both just use the row:column format (eg: E:19)
+                // Both just use the row:column format (eg: E:19)
                 getLabel : function (character, row, column) {
                     return row + ':' + column;
                 },
@@ -489,24 +485,21 @@
         scaleContentWidth($('#table-wrapper'), $('#seat-map')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
-    $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the parent container
+    $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         scaleContentWidth($('#table-wrapper'), $('#seat-map'));
     });
     
-    // Upon clicking each toast's buttons, we call pass the template string we defined in template.js and the variables required in the templates to ejs so it gives us a complete html element with all the data filled in
-    // Then we append the resulting toast html to the toast container defined in footer.ejs
-    // We then have to call the show function of the toast
-    
+    // These are example notification objects. The real app will have more attributes in them but this is enough for now.
+    // Even if we just have one notification object, we need to put them in an array cause the template iterates through an array of notifications and adds each one individually
+    const successNotifications = [{ message: "This is a success toast! Yay!", type: "success" }];
+    const dangerNotifications = [{ message: "This is a danger toast! Boo!", type: "danger" }];
+
     $("#successToastBtn").click(function () {
-        let toastNode = ejs.render(templates.toast, { notifications: successToast }); // succesToast and dangerToast is defined above
-        $("#toastContainer").append(toastNode);
-        $('.toast').not('.hide').toast('show'); 
+        showToasts(successNotifications); // showToasts is defined in script.js
     });
 
     $("#dangerToastBtn").click(function () {
-        let toastNode = ejs.render(templates.toast, { notifications: dangerToast }); // succesToast and dangerToast is defined above
-        $("#toastContainer").append(toastNode);
-        $('.toast').not('.hide').toast('show'); 
+        showToasts(dangerNotifications); // showToasts is defined in script.js
     });
 
 </script>
