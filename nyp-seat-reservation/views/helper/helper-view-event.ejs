@@ -23,7 +23,8 @@
                         <div class="card-body input-card-body">
                             <label for="textTextInput" class="card-input-label">
                                 <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search Reservation</small>
+                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                    Reservation</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
                             <input id="textTextInput" class="form-control card-input" type="text"
@@ -88,7 +89,8 @@
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Name</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <input id="textTextInput" class="form-control card-input" type="text" placeholder="e.g. Lam En Qing">
+                            <input id="textTextInput" class="form-control card-input" type="text"
+                                placeholder="e.g. Lam En Qing">
                             <!-- This is where the user actually inputs all their stuff  -->
                         </div>
                     </div>
@@ -103,14 +105,46 @@
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Phone Number</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <input id="textTextInput" class="form-control card-input" type="text" placeholder="e.g. 95179116">
+                            <input id="textTextInput" class="form-control card-input" type="text"
+                                placeholder="e.g. 95179116">
                             <!-- This is where the user actually inputs all their stuff  -->
-                        </div> 
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="mt-4"></div>
             <button type="button" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
+            <div class="mt-6"></div>
+            <h3>Waiting List</h3>
+            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                    <!-- Table  -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-click table-lg"> 
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Phone No.</th>
+                                    <th scope="col">No. of additional guests</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-weight-medium">Lam En Qing</td>
+                                    <td class="font-weight-medium"><a href="#">90616192</a></td>
+                                    <td class="font-weight-medium">2</td>
+                                    <td class="font-weight-medium">18th April 2021</td>
+                                    <td class="font-weight-medium">9am</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </body>
@@ -297,7 +331,7 @@
         sc.find(/^CC:[0-9]+/).status('reserved');
         sc.find(/^DD:[0-9]+/).status('reserved');
         sc.get("DD:1").status('available');
-        
+
         scaleContentWidth($('#table-wrapper'), $('#seat-map')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
