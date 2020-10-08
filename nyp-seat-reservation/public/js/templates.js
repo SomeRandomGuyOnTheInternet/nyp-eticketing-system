@@ -1,10 +1,93 @@
 // TODO: Make toasts more responsive
 
-// The variables you see here are ejs templates that will be used for client side templating, so that we can to create html on the fly easily for stuff like ajax
-// Some of these templates, like toast, are exact copies of the ones you see in the templates folder on the server
-// The major disadvantage with this approach tho, is that it is possible to inject the template string with javascript code by simply adding the script tag anywhere inside. This is obviously a big problem that needs to be fixed. (eg: try adding '<script>alert("hello")</script>' in any of the template strings and have ejs execute them)
+// The functions you see here take in some values and insert them into a jquery template. We can use the html that's returned so we can to create html on the fly easily for stuff like ajax
+// Some of these templates, like toast, are exact copies of the ones you see in the templates folder on the server, just adapted to jquery syntax
 
 // UPDATE THE APPROPRIATE TEMPLATE HERE AND CHANGES WILL BE REFLECTED ON TEMPLATES USED AFTER PAGE LOAD
-const templates = {
-    toast: '<% for (var i = 0; i < notifications.length; i++) { %> <div class="toast bg-<%= notifications[i].type %>-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000"> <div class="toast-body p-4"> <div class="container-fluid p-0"> <div class="row"> <div class="col-10"> <span class="h5 text-white font-weight-medium"><%= notifications[i].message %></span> </div> <div class="col-2"> <button type="button" class="close" data-dismiss="toast" aria-label="Close"> <span aria-hidden="true" class="text-white">×</span> </button> </div> </div> </div> </div> </div> <% } %>'
-}
+
+function renderToastTemplate(notification) {
+    var $toast = $('<div></div>')
+        .addClass('toast')
+        .addClass(`bg-${notification.type}-75`)
+        .attr('role', 'alert')
+        .attr('aria-live', 'assertive')
+        .attr('aria-atomic', 'true')
+        .attr('data-delay', '100000');
+
+    var $toastBody = $('<div></div>')
+        .addClass('toast-body')
+        .addClass(`p-4`)
+        .appendTo($toast);
+
+    var $container = $('<div></div>')
+        .addClass('container-fluid')
+        .addClass(`p-0`)
+        .appendTo($toastBody);
+
+    var $row = $('<div></div>')
+        .addClass('row')
+        .appendTo($container);
+
+    var $messageCol = $('<div></div>')
+        .addClass('col-10')
+        .appendTo($row)
+        .append(
+            $('<span></span>')
+                .addClass('h5 text-white font-weight-medium')
+                .text(notification.message)
+        );
+
+    var $closeBtnCol = $('<div></div>')
+        .addClass('col-2')
+        .appendTo($row);
+
+    var $closeBtn = $('<button></button>')
+        .attr('type', 'button')
+        .addClass('close')
+        .attr('data-dismiss', 'toast')
+        .attr('aria-label', 'Close')
+        .appendTo($closeBtnCol)
+        .append(
+            $('<span></span>')
+                .attr('aria-hidden', 'Close')
+                .addClass('text-white')
+                .text('x')
+        );
+
+    return $toast;
+};
+
+function renderSeatChartLegendCardTemplate(seatChar, seatDetails) {
+    var $column = $('<div></div>')
+        .addClass('seatCharts-cardColumn')
+        .addClass('col-auto');
+
+    var $card = $('<div></div>')
+        .addClass('seatCharts-legendCard')
+        .addClass('card')
+        .addClass(seatDetails.legendClasses == "undefined" ? "" : seatDetails.legendClasses)
+        .addClass('mt-3')
+        .attr("seat-character", seatChar)
+        .appendTo($column);
+
+    var $cardBody = $('<div></div>')
+        .addClass('seatCharts-cardBody')
+        .addClass('card-body')
+        .appendTo($card);
+
+    $cardBody.append(
+        $('<div></div>')
+            .addClass('seatCharts-legendItem')
+            .append(
+                $('<div></div>')
+                    .addClass(['seatCharts-seat', 'seatCharts-cell', seatDetails.classes])
+            )
+            .append(
+                $('<span></span>')
+                    .addClass('seatCharts-legendDescription')
+                    .text((seatDetails.descriptiveCategory) ? seatDetails.descriptiveCategory : seatDetails.category)
+            )
+    );
+
+    return $column;
+};

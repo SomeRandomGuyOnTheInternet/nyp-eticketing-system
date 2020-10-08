@@ -49,76 +49,171 @@ div.seatCharts-seat:focus {
     outline: none;
 }
 
-/* div.seatCharts-cell {
-    height: 16px;
-    width: 16px;
-    margin: 3px;
-    float: left;
+/* Seat Chart Stuff */
+/* =============================== */
+
+.front-indicator {
+	margin: 5px 10px 5px 10px;
+	background-color: #f6f6f6;	
+	color: #adadad;
+	text-align: center;
+	padding: 3px;
+	border-radius: 5px;
+    min-width: 200px;
+}
+
+.seatCharts-wrapper {
     text-align: center;
-    outline: none;
-    font-size: 13px;
-    line-height:16px;
-    color: blue;
+    overflow: hidden;
+    position: relative;
+}
+
+div.seatCharts-cell {
+	color: #182C4E;
+	height: 25px;
+	width: 25px;
+	line-height: 25px;
 }
 
 div.seatCharts-seat {
-    background-color: green;
-    color: white;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    cursor: default;
-}
-
-div.seatCharts-seat:focus {
-    border: none;
-}
-
-.seatCharts-seat:focus {
-    outline: none;
-}
-
-div.seatCharts-space {
-    background-color: white;
+	color: #FFFFFF;
+	cursor: pointer;	
 }
 
 div.seatCharts-row {
-    height: 50px;
+	height: 35px;
+    display: inline-flex;
+    width: fit-content;
 }
 
-div.seatCharts-row:after {
-    clear: both;
+div.seatCharts-container {
+    box-sizing: border-box;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: fit-content;
+	padding: 20px;
+    text-align: center;
+}
+
+div.seatCharts-legend {
+    padding-left: 7.5px;
+    padding-right: 7.5px;
+	bottom: 16px;
+}
+
+div.seatCharts-cardBody {
+    padding: 0.6rem;
+}
+
+div.seatCharts-cardColumn {
+    padding-right: 7.5px;
+    padding-left: 7.5px;
+}
+
+ul.seatCharts-legendList {
+	padding-left: 0px;
+}
+
+span.seatCharts-legendDescription {
+	margin-left: 5px;
+	line-height: 30px;
+}
+
+#selected-seats {
+	max-height: 90px;
+	overflow: hidden;
+}
+
+/* Seat Types */
+/* =============================== */
+
+div.seatCharts-seat.available {
+    background-color: #5286e7;
+}
+
+div.seatCharts-seat.a {
+    background-color: #249624;
+}
+
+div.seatCharts-seat.b {
+	background-color: #d8755c;
+}
+
+div.seatCharts-seat.c {
+	background-color: #ebc47c;
+}
+
+div.seatCharts-seat.d {
+    background-color: #9c9391;
+}
+
+div.seatCharts-seat.e {
+	background-color: #e463a3;
+}
+
+div.seatCharts-seat.f {
+    background-image: linear-gradient(45deg, #de8585 18.75%, #3d54ff 18.75%, #3d54ff 50%, #de8585 50%, #de8585 68.75%, #3d54ff 68.75%, #3d54ff 100%);
+    background-size: 11.31px 11.31px;
+}
+
+div.seatCharts-seat.g {
+	background-color: #e4e478;
+}
+
+div.seatCharts-seat.h {
+	background-color: #73dadb;
+}
+
+div.seatCharts-seat.i {
+	background-color: #98fb98;
+}
+
+div.seatCharts-seat.j {
+	background-color: #d8bfd8;
+}
+
+div.seatCharts-seat.k {
+	background-color: #9971e2;
+}
+
+div.seatCharts-seat.l {
+    background-image: linear-gradient(45deg, #5fed93 18.75%, #8f3c3c 18.75%, #8f3c3c 50%, #5fed93 50%, #5fed93 68.75%, #8f3c3c 68.75%, #8f3c3c 100%);
+    background-size: 11.31px 11.31px;
+}
+
+div.seatCharts-seat.m {
+	background-color: #98fb98;
+}
+
+div.seatCharts-seat.handicapped {
+    border: 4px solid #ffffff00;
+    background: url(../images/handicapped-icon-inverted.png) no-repeat scroll right center;
+    background-size: contain;
+    background-color: #f7ae5e;
+}
+
+/* Seat Statuses */
+/* =============================== */
+
+div.seatCharts-seat.reserved {
+    background-color: #a937b8;
+}
+
+div.seatCharts-seat.handicapped.reserved {
+    background-color: #97540d;
+}
+
+div.seatCharts-seat.blocked {
+    background-color: #161e8a;
 }
 
 div.seatCharts-seat.selected {
     border: 4px solid #9e9e9e50;
-    filter: brightness(150%);
+    opacity: 0.5;
 }
 
-div.seatCharts-seat.focused {
-    filter: brightness(120%);
+div.seatCharts-seat.highlighted {
+    opacity: 1;
+    background-color: #98fb98;
 }
-
-div.seatCharts-seat.available {
-    opacity: 1.0;
-}
-
-div.seatCharts-seat.reserved {
-    background-color: #25437a;
-}
-
-div.seatCharts-seat.blocked {
-    background-color: #7C3EC9;
-}
-
-ul.seatCharts-legendList {
-    list-style: none;
-}
-
-li.seatCharts-legendItem {
-    margin-top: 10px;
-    line-height: 2;
-} */
