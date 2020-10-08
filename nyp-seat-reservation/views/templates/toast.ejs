@@ -6,21 +6,28 @@
 <!-- Message types are: "success" and "danger" -->
 
 <!-- CHANGES MADE HERE WON'T BE REFLECTED ON TOASTS THAT ARE CREATED AFTER PAGE LOAD UNLESS THE SAME CHANGES ARE MANUALLY MADE TO TEMPLATE.JS -->
-<% if (error) { %>
-    <div class="toast bg-danger-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000">
-        <div class="toast-body p-4">
-            <div class="container-fluid p-0">
-                <div class="row">
-                    <div class="col-10">
-                        <span class="h5 text-white font-weight-medium"><%= error %></span> <!-- This is where we show the message -->
-                    </div>
-                    <div class="col-2">
-                        <button type="button" class="close" data-dismiss="toast" aria-label="Close">
-                            <span aria-hidden="true" class="text-white">&times;</span>
-                        </button>
+
+<!-- Used mostly for flash messaging -->
+<!-- Since flash messages are stored in arrays, have to iterate through them -->
+<!-- Each message has a type, like danger or success, along with content  -->
+
+<% if (message.length > 0) { %>
+    <% for (i = 0; i < message.length; i++) { %>
+        <div class="toast bg-<%= message[i].type %>-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000">
+            <div class="toast-body p-4">
+                <div class="container-fluid p-0">
+                    <div class="row">
+                        <div class="col-10">
+                            <span class="h5 text-white font-weight-medium"><%= message[i].content %></span> <!-- This is where we show the message -->
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="close" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true" class="text-white">&times;</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    <% } %>
 <% } %>

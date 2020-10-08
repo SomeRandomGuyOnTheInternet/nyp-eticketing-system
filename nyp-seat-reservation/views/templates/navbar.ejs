@@ -9,7 +9,9 @@
             <img src="/images/nyp-icon-transparent.png" width="65px" height="65px" class="d-inline-block align-top"
                 alt="NYP Logo">
         </a>
-        <span class="h5 font-weight-light m-0"><b>eTicketing</b> System</span>
+        <% if (locals.user) { %>
+            <span class="h5 font-weight-light m-0"><b>eTicketing</b> System</span>
+        <% } %> 
         
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsingNavbar" aria-controls="collapsingNavbar" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
@@ -56,9 +58,7 @@
                         <% if (user.isAdmin) { %> (Admin) <% } %>
                     </span>
                     <br>
-                    <form action="/logout?_method=DELETE" method="POST">
-                        <span><button type="submit">Log out</button></span>
-                        <!-- <span><a href="/" class="p-0 text-secondary small">Logout</a></span> -->
+                        <span><a href="/" class="p-0 text-secondary small">Logout</a></span>
                     </form>
                 </li>
             </ul>

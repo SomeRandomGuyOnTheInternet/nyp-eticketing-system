@@ -65,12 +65,7 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    res.locals.currentUser = req.user;
-    res.locals.loginMessage = req.flash('loginMessage');
-    res.locals.signupMessage = req.flash('signupMessage');
-    res.locals.notification = req.flash('notification');
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('danger');
+    res.locals.message = req.flash('message');
 	next();
 });
 
