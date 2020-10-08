@@ -6,13 +6,13 @@
 <!-- Message types are: "success" and "danger" -->
 
 <!-- CHANGES MADE HERE WON'T BE REFLECTED ON TOASTS THAT ARE CREATED AFTER PAGE LOAD UNLESS THE SAME CHANGES ARE MANUALLY MADE TO TEMPLATE.JS -->
-<% for (var i = 0; i < notifications.length; i++) { %>
-    <div class="toast bg-<%= notifications[i].type %>-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000"> <!-- The class will change dependeing on the notification type -->
+<% if (error) { %>
+    <div class="toast bg-danger-75" role="alert" aria-live="assertive" aria-atomic="true" data-delay="100000">
         <div class="toast-body p-4">
             <div class="container-fluid p-0">
                 <div class="row">
                     <div class="col-10">
-                        <span class="h5 text-white font-weight-medium"><%= notifications[i].message %></span> <!-- This is where we show the message -->
+                        <span class="h5 text-white font-weight-medium"><%= error %></span> <!-- This is where we show the message -->
                     </div>
                     <div class="col-2">
                         <button type="button" class="close" data-dismiss="toast" aria-label="Close">

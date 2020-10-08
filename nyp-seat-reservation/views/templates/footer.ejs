@@ -5,9 +5,7 @@
         <div id="toastContainer" class="toast-container" style="position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 0px);">
             <!-- This is where we actually add the on page toasts to, whether they be the ones passed on page load or the ones loaded through ajax -->
             <!-- As mentioned before, locals.variable is used whenever we wanna check if the variable even exists. If we just say if (notifications), the program might crash cause the variable might not exist sometimes -->
-            <% if (locals.notifications) { %> <!-- So after we make sure there are notifications in the first place, we call the toast template so it can handle notifications accordingly -->
-                <%- include('./toast')-%> <!-- By including the toast template on page load, we can pass notifications on page load from the page's route and show them immediately -->
-            <% } %> 
+            <%- include('./toast')-%> <!-- By including the toast template on page load, we can pass notifications on page load from the page's route and show them immediately -->
         </div>
     </div>
 

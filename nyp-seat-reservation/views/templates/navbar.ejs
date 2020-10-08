@@ -55,7 +55,10 @@
                         <% if (user.isAdmin) { %> (Admin) <% } %>
                     </span>
                     <br>
-                    <span><a href="/" class="p-0 text-secondary small">Logout</a></span>
+                    <form action="/logout?_method=DELETE" method="POST">
+                        <span><button type="submit">Log out</button></span>
+                        <!-- <span><a href="/" class="p-0 text-secondary small">Logout</a></span> -->
+                    </form>
                 </li>
             </ul>
         <% } %> 

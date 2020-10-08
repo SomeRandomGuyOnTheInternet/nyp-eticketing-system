@@ -10,6 +10,8 @@ const logger = require('morgan');
 const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
+const passport = require('passport');
+
 
 // Importing all the routes 
 // We split the webpages by routes for clarity and security purposes
@@ -19,6 +21,7 @@ const mainRoute = require('./routes/main');
 const helperRoute = require('./routes/helper');
 const plannerRoute = require('./routes/planner');
 const adminRoute = require('./routes/admin');
+const authenticate = require('./config/passport');
 
 // Our app is a blank canvas at this point (wow so artistic)
 const app = express();
@@ -39,32 +42,41 @@ app.use(cookieParser());
 app.use(logger('dev'));
 app.use(flash());
 
-// app.use(session({
-// 	key: 'nyp-seat-reservation',
-// 	secret: 'totallysecretpassword',
-// 	store: new MySQLStore({
-// 		host: db.host,
-// 		port: db.port,
-// 		user: db.username,
-// 		password: db.password,
-// 		database: db.database,
-// 		clearExpired: true,
-// 		checkExpirationInterval: 900000,
-// 		expiration: 900000,
-// 	}),
-// 	resave: false,
-// 	saveUninitialized: false,
-// }));
-
-// app.use((req, res, next) => {
-// 	res.locals.currentUser = req.user;
-// 	res.locals.error = req.flash('error');
-// 	res.locals.success = req.flash('success');
-// 	next();
-// });
-
 const fypjapplication = require('./config/DBConnection');
+const db = require('./config/db');
 fypjapplication.setUpDB(false);
+
+app.use(session({
+	key: 'nyp-seat-reservation',
+	secret: 'totallysecretpassword',
+	store: new MySQLStore({
+		host: db.host,
+		port: db.port,
+		user: db.username,
+		password: db.password,
+		database: db.database,
+		clearExpired: true,
+		checkExpirationInterval: 900000,
+		expiration: 900000,
+	}),
+	resave: false,
+	saveUninitialized: false,
+}));
+
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    res.locals.loginMessage = req.flash('loginMessage');
+    res.locals.signupMessage = req.flash('signupMessage');
+    res.locals.notification = req.flash('notification');
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('danger');
+	next();
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+authenticate.localStrategy(passport);
 
 // Over here, we tell the app what url prefix to use for each of the route's webpages
 // So if we say app.use('/helper', helper.js), every webpage's url in helper.js will begin with 'helper/'
