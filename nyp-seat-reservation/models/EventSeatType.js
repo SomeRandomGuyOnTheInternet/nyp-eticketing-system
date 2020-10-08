@@ -14,6 +14,9 @@ const EventSeatType = db.define('EventSeatType', {
     seatChartCharacter: {
         type: Sequelize.CHAR
     },
+    classes: {
+        type: Sequelize.STRING
+    },
 });
 
 module.exports = EventSeatType;

@@ -431,22 +431,27 @@
 		settings.legend.items.length ? (function(legend) {
 			//either use user-defined container or create our own and insert it right after the seat chart div
 			var $rowContainer = (legend.node || $('<div></div>').insertAfter(fn))
-				.addClass('row seatCharts-legend');
+				.addClass('seatCharts-legend row');
 			
 			$.each(legend.items, function(index, item) {
+
+				console.log()
 				var $column = $('<div></div>')
-					.addClass('col-auto')
 					.addClass('seatCharts-cardColumn')
+					.addClass('col-auto')
 					.appendTo($rowContainer);
 
 				var $card = $('<div></div>')
-					.addClass('card mt-3')
-					.addClass('seatCharts-card')
+					.addClass('seatCharts-legendCard')
+					.addClass('card')
+					.addClass(typeof settings.seats[item[0]].legendClasses == "undefined" ? "" : settings.seats[item[0]].legendClasses)
+					.addClass('mt-3')
+					.attr("seat-character", settings.legend.items[index][0])
 					.appendTo($column);
 
 				var $cardBody = $('<div></div>')
-					.addClass('card-body')
 					.addClass('seatCharts-cardBody')
+					.addClass('card-body')
 					.appendTo($card);
 
 				$cardBody.append(
@@ -463,7 +468,7 @@
 						.append(
 							$('<span></span>')
 								.addClass('seatCharts-legendDescription')
-								.text(item[2])
+								.text(typeof settings.seats[item[0]].descriptiveCategory == "undefined" ? settings.seats[item[0]].category : settings.seats[item[0]].descriptiveCategory)
 						)
 				);
 			});

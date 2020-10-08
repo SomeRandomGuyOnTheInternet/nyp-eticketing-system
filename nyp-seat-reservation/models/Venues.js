@@ -5,7 +5,7 @@ const db = require('../config/DBConfig');
 // Go to DBConnection.js for more details
 
 const Venues = db.define('Venues', {
-    Name: {
+    name: {
         type: Sequelize.STRING
     },
     seatChart: {

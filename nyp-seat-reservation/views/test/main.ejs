@@ -491,15 +491,15 @@
     
     // These are example notification objects. The real app will have more attributes in them but this is enough for now.
     // Even if we just have one notification object, we need to put them in an array cause the template iterates through an array of notifications and adds each one individually
-    const successNotifications = [{ message: "This is a success toast! Yay!", type: "success" }];
-    const dangerNotifications = [{ message: "This is a danger toast! Boo!", type: "danger" }];
+    // const successNotification = { message: "This is a success toast! Yay!", type: "success" };
+    // const dangerNotification = { message: "This is a danger toast! Boo!", type: "danger" };
 
     $("#successToastBtn").click(function () {
-        showToasts(successNotifications); // showToasts is defined in script.js
+        showSuccessToast("This is a success toast! Yay!"); // showToasts is defined in script.js
     });
 
     $("#dangerToastBtn").click(function () {
-        showToasts(dangerNotifications); // showToasts is defined in script.js
+        showDangerToast("This is a danger toast! Boo!"); // showToasts is defined in script.js
     });
 
 </script>
