@@ -74,6 +74,52 @@ router.get('/helpers', checkNotAuthenticated, (req, res) => {
 	res.render('admin/admin-all-helpers', { title: "Helpers", user  })
 });
 
+router.post('/helpers', checkNotAuthenticated, async (req, res) => {
+	let name = req.body.name;
+	let email = req.body.email;
+	let password = req.body.password;
+
+	if (!name) {
+		flash.error(req, "Please enter a name!")
+		res.redirect('/admin/helpers');
+		return;
+	}
+
+	if (!email) {
+		flash.error(req, "Please enter an email!")
+		res.redirect('/admin/helpers');
+		return;
+	}
+
+	if (!password) {
+		flash.error(req, "Please enter a password!")
+		res.redirect('/admin/helpers');
+		return;
+	}
+
+	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+
+	if (existingEmail) {
+		flash.error(req, "This email has already been registered!");
+		res.redirect('/admin/helpers');
+		return;
+	}
+
+	await User.createUser({
+		email: email,
+		password: password,
+		name: name,
+		isAdmin: false,
+		isPlanner: false,
+		isHelper: true,
+		isDeleted: false
+	});
+
+	flash.success(req, "Planner account has been successfully created!")
+	res.redirect('/admin/helpers');
+	return;
+});
+
 function checkNotAuthenticated(req, res, next) {
 	if (!req.user) {
 		if (!req.user.isAdmin) {
