@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const bcrypt = require('bcrypt');
 const db = require('../config/DBConfig');
 
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE

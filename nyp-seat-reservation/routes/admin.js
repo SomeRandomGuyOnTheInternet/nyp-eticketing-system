@@ -1,6 +1,7 @@
 // All admin's webpages are contained here
 
 const express = require('express');
+const User = require('../models/User');
 const router = express.Router();
 
 const flash = require('../utils/flash');
@@ -21,6 +22,52 @@ router.get('/', checkNotAuthenticated, (req, res) => {
 
 router.get('/planners', checkNotAuthenticated, (req, res) => {
 	res.render('admin/admin-all-planners', { title: "Planners", user })
+});
+
+router.post('/planners', checkNotAuthenticated, async (req, res) => {
+	let name = req.body.name;
+	let email = req.body.email;
+	let password = req.body.password;
+
+	if (!name) {
+		flash.error(req, "Please enter a name!")
+		res.redirect('/admin/planners');
+		return;
+	}
+
+	if (!email) {
+		flash.error(req, "Please enter an email!")
+		res.redirect('/admin/planners');
+		return;
+	}
+
+	if (!password) {
+		flash.error(req, "Please enter a password!")
+		res.redirect('/admin/planners');
+		return;
+	}
+
+	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+
+	if (existingEmail) {
+		flash.error(req, "This email has already been registered!");
+		res.redirect('/admin/planners');
+		return;
+	}
+
+	await User.createUser({
+		email: email,
+		password: password,
+		name: name,
+		isAdmin: false,
+		isPlanner: true,
+		isHelper: false,
+		isDeleted: false
+	});
+
+	flash.success(req, "Planner account has been successfully created!")
+	res.redirect('/admin/planners');
+	return;
 });
 
 router.get('/helpers', checkNotAuthenticated, (req, res) => {
