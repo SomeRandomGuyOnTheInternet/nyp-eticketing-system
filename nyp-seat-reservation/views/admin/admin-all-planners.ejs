@@ -104,24 +104,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td class="font-weight-medium"><a href="#">John Doe</a></td>
-                                    <td>john_doe@mymail.nyp.edu.sg</td>
-                                    <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td class="font-weight-medium"><a href="#">Jane Eod</a></td>
-                                    <td>jane_eod@mymail.nyp.edu.sg</td>
-                                    <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td class="font-weight-medium"><a href="#">David McGeneric</a></td>
-                                    <td>david@mymail.nyp.edu.sg</td>
-                                    <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
-                                </tr>
+                                <% for (i = 0; i < planners.length; i++) { %>
+                                    <tr>
+                                        <td><%= planners[i].id %></td>
+                                        <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
+                                        <td><%= planners[i].email %></td>
+                                        <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>

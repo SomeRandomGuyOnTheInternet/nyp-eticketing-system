@@ -20,8 +20,9 @@ router.get('/', checkNotAuthenticated, (req, res) => {
 	res.render('admin/admin-dashboard', { title: "Dashboard", user }); // We pass the user object contructed above to the ejs so it can show the appropriate navbar details and other stuff
 });
 
-router.get('/planners', checkNotAuthenticated, (req, res) => {
-	res.render('admin/admin-all-planners', { title: "Planners", user })
+router.get('/planners', checkNotAuthenticated, async (req, res) => {
+	var planners = await User.getPlanners();
+	res.render('admin/admin-all-planners', { title: "Planners", user, planners })
 });
 
 router.post('/planners', checkNotAuthenticated, async (req, res) => {
@@ -70,8 +71,9 @@ router.post('/planners', checkNotAuthenticated, async (req, res) => {
 	return;
 });
 
-router.get('/helpers', checkNotAuthenticated, (req, res) => {
-	res.render('admin/admin-all-helpers', { title: "Helpers", user  })
+router.get('/helpers', checkNotAuthenticated, async(req, res) => {
+	var helpers = await User.getHelpers();
+	res.render('admin/admin-all-helpers', { title: "Helpers", user, helpers })
 });
 
 router.post('/helpers', checkNotAuthenticated, async (req, res) => {

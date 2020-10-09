@@ -83,3 +83,35 @@ module.exports.getUserByEmail = async (email) => {
         }
     });
 }
+
+module.exports.getPlanners = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.findAll({ 
+                where: { 
+                    isPlanner: true
+                } 
+            });
+
+            resolve(user)
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+module.exports.getHelpers = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.findAll({ 
+                where: { 
+                    isHelper: true
+                } 
+            });
+
+            resolve(user)
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
