@@ -18,6 +18,19 @@ function localStrategy(passport) {
         if (!password) {
             return done(null, false, { message: flash.error(req, "Please enter a password!") });
         }
+        
+        isAdmin: (req, res, next) => {
+            if(req.user) {
+                if(req.user.isAdmin) {
+                    next();
+                } else {
+                    req.flash('error', "Please make sure you have entered the right credentials");
+                    res.redirect('/admin');
+                }
+            } else {
+                res.redirect('./login');
+            }
+        }
 
         User.findOne({ 
             where: { 
