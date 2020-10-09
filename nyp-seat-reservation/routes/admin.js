@@ -13,18 +13,30 @@ const user = { name: "Administrator", isPlanner: false, isHelper: false, isAdmin
 // Eg: Use router.get('/planners', ...) instead of router.get('/admin-planners', ...) cause then the url will be '/admin/admin-planners' which is super redundant
 // Always keep route urls are short as possible
 
-router.get('/', (req, res) => {
+router.get('/', checkNotAuthenticated, (req, res) => {
 	// Put your ejs files under your specific folder
     // Eg: Admin .ejs files should be put under the admin folder
 	res.render('admin/admin-dashboard', { title: "Dashboard", user }); // We pass the user object contructed above to the ejs so it can show the appropriate navbar details and other stuff
 });
 
-router.get('/planners', (req, res) => {
+router.get('/planners', checkNotAuthenticated, (req, res) => {
 	res.render('admin/admin-all-planners', { title: "Planners", user })
 });
 
-router.get('/helpers', (req, res) => {
+router.get('/helpers', checkNotAuthenticated, (req, res) => {
 	res.render('admin/admin-all-helpers', { title: "Helpers", user  })
 });
+
+function checkNotAuthenticated(req, res, next) {
+	if (!req.user) {
+		if (!req.user.isAdmin) {
+			return res.redirect('/');
+		}
+
+		return res.redirect('/');
+	}
+
+	next();
+};
 
 module.exports = router;

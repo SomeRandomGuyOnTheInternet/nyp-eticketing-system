@@ -12,9 +12,18 @@ const flash = require('../utils/flash');
 // const user = { name: "", isPlanner: false, isHelper: false, isAdmin: false };
 
 router.get('/', async (req, res) => {
-	res.render('test/main', { 
-		title: "Test"
-	})
+	if (req.user.isAdmin) {
+		res.redirect('/admin');
+	}
+	else if (req.user.isPlanner) {
+		res.redirect('/planner/events');
+	}
+	else if (req.user.isHelper) {
+		res.redirect('/helper');
+	}
+	else {
+		res.redirect('/logout');
+	}
 });
 
 router.get('/login', async (req, res) => {
@@ -25,15 +34,15 @@ router.get('/login', async (req, res) => {
 
 router.post('/login', (req, res, next) => {
 	passport.authenticate('local', {
-		successRedirect: './admin',
+		successRedirect:'/',
 		failureRedirect: '/login',
 		failureFlash: true
 	})(req, res, next);
 });
 
-router.delete('/logout', (req, res) => {
-	req.logOut()
-	res.redirect('./login')
+router.get('/logout', (req, res) => {
+	req.logout();
+	res.redirect('/login');
 });
 
 function checkAuthenticated(req, res, next) {
