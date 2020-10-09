@@ -3,6 +3,7 @@
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
 const flash = require('../utils/flash');
 
