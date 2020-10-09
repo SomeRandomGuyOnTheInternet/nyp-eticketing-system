@@ -36,15 +36,49 @@ const User = db.define('User', {
 
 module.exports = User;
 
+// User Table Service Methods
+// We use this to do CRUD and basically communicate with the database
+
 module.exports.createUser = async (user) => {
-    user.password = await bcrypt.hash(user.password, 10)
-    return await User.create(user);
+    return new Promise(async (resolve, reject) => {
+        try {
+            user.password = await bcrypt.hash(user.password, 10)
+            await User.create(user);
+            resolve(user)
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
 
-module.exports.getUserById = async (userId) => {
-    return await User.findAll({ 
-        where: { 
-            userId
-        } 
+module.exports.getUserById = async (userId) => { 
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.findOne({ 
+                where: { 
+                    id: userId
+                } 
+            });
+
+            resolve(user)
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+module.exports.getUserByEmail = async (email) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.findOne({ 
+                where: { 
+                    email: email
+                } 
+            });
+
+            resolve(user)
+        } catch (error) {
+            reject(error);
+        }
     });
 }
