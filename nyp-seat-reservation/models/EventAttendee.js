@@ -4,7 +4,7 @@ const db = require('../config/DBConfig');
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
-const EventAttendees = db.define('EventAttendees', {
+const EventAttendee = db.define('EventAttendee', {
     name: {
         type: Sequelize.STRING
     },
@@ -13,4 +13,4 @@ const EventAttendees = db.define('EventAttendees', {
     },
 });
 
-module.exports = EventAttendees;
+module.exports = EventAttendee;

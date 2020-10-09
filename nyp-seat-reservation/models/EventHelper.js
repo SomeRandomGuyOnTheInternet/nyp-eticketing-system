@@ -5,6 +5,6 @@ const db = require('../config/DBConfig');
 // Go to DBConnection.js for more details
 // Because we can't specify primary or foreign keys here, we can just leave the attributes empty for this model as its attributes are only foreign keys
 
-const EventHelpers = db.define('EventHelpers');
+const EventHelper = db.define('EventHelper');
 
-module.exports = EventHelpers;
+module.exports = EventHelper;

@@ -5,13 +5,13 @@ const mySQLDB = require('./DBConfig'); // We import the sequelize object we conf
 // We wrote models without primary keys or foreign keys while defining them as sequelize automatically creates them
 // However, we need to the various specify relationships between models to sequelize so it can create foreign keys accordingly
 // These are the various models that have relationships with each other
-const Events = require('../../nyp-seat-reservation/models/Events');
-const Users = require('../../nyp-seat-reservation/models/Users');
-const Venues = require('../../nyp-seat-reservation/models/Venues');
-const EventHelpers = require('../../nyp-seat-reservation/models/EventHelpers');
-const EventSeats = require('../../nyp-seat-reservation/models/EventSeats');
-const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendees');
-const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeats');
+const Events = require('../../nyp-seat-reservation/models/Event');
+const Users = require('../../nyp-seat-reservation/models/User');
+const Venues = require('../../nyp-seat-reservation/models/Venue');
+const EventHelpers = require('../../nyp-seat-reservation/models/EventHelper');
+const EventSeats = require('../../nyp-seat-reservation/models/EventSeat');
+const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendee');
+const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeat');
 const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
 
 // This function carries out the actual connection to the database while specifying all the relationships between the models

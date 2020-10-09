@@ -4,7 +4,7 @@ const db = require('../config/DBConfig');
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
-const Venues = db.define('Venues', {
+const Venue = db.define('Venue', {
     name: {
         type: Sequelize.STRING
     },
@@ -16,4 +16,4 @@ const Venues = db.define('Venues', {
     },
 });
 
-module.exports = Venues;
+module.exports = Venue;

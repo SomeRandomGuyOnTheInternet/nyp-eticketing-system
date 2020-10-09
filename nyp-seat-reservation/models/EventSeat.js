@@ -4,6 +4,10 @@ const db = require('../config/DBConfig');
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
-const EventReservedSeats = db.define('EventReservedSeats');
+const EventSeat = db.define('EventSeat', {
+    seatId: {
+        type: Sequelize.STRING
+    },
+});
 
-module.exports = EventReservedSeats;
+module.exports = EventSeat;

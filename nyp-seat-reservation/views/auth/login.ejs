@@ -1,52 +1,43 @@
 <%- include('../templates/head')-%>
 <body>
     <%- include('../templates/navbar')-%>
-    <div class="container"> <!-- Always enclose everything in a container  -->
-        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
-
-            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-            <!-- Input card section  -->
-            <!-- Heading  -->
-            <div class="row"> <!-- Use this row div if you want your section heading to be inline with another element  -->
-                <div class="col-sm-9 col-12 d-flex justify-content-center align-items-center">
-                    <h1 class="section-heading">E-Ticketing System</h1>
-                </div>
-            </div>
-            <form method="POST">
-            <div class="mt-4"></div> <!-- This spacing is different from the rest cause having multiple inline elements in the heading kinda screws up the spacing, so have to set it to zero to make it look consistent with the rest -->
-            <!-- Content  -->
-            <!-- Text Box Input Card  -->
-                <div class="row d-flex justify-content-center align-items-center"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
-                    <div class="col-sm-8">
-                        <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                            <div class="card-body input-card-body">
-                                <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Email Address</small> <!-- The small element is where we actually write down what the input does  -->
-                                </label>
-                                <input id="email" name="email" class="form-control card-input" type="text" placeholder="e.g. johndoe@example.com"> <!-- This is where the user actually inputs all their stuff  -->
+    <div class="d-flex align-items-center vh-100-nav">
+        <div class="container"> <!-- Always enclose everything in a container  -->
+            <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+                <form method="POST">
+                    <div class="row justify-content-center h-100">
+                        <div class="col-sm-8 col-12 text-center">
+                            <span class="h1 font-weight-normal"><b>eTicketing</b> System</span>
+                            <div class="mb-3"></div>
+                        </div>
+                        <div class="col-sm-8 col-12">
+                            <div class="card input-card mt-3">
+                                <div class="card-body input-card-body">
+                                    <label for="email" class="card-input-label">
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Email Address</small>
+                                    </label>
+                                    <input id="email" name="email" class="form-control card-input" type="email" placeholder="e.g. user@mail.com"> 
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-8">
-                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                            <div class="card-body input-card-body">
-                                <label for="textTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small> <!-- The small element is where we actually write down what the input does  -->
-                                </label>
-                                <input id="password" name="password" class="form-control card-input" type="text" placeholder="Type password here"> <!-- This is where the user actually inputs all their stuff  -->
+                        <div class="col-sm-8 col-12">
+                            <div class="card input-card mt-3">
+                                <div class="card-body input-card-body">
+                                    <label for="password" class="card-input-label">
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small>
+                                    </label>
+                                    <input id="password" name="password" class="form-control card-input" type="password" placeholder="Enter your password here"> 
+                                </div>
                             </div>
                         </div>
+                        <div class="col-sm-8 col-12">
+                            <div class="mt-4"></div>
+                            <button  type="submit" class="btn btn-lg btn-primary w-100" submi>Login</button>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-5 d-flex justify-content-center align-items-center">
-                    <div class="col-sm-8 d-flex justify-content-center align-items-center">
-                        <button type="submit" class="btn btn-primary btn-lg w-100">Login</button>
-                    </div>
-                </div>
-            </form>
-        </main>
+                </form>
+            </main>
+        </div>
     </div>
 </body>
 

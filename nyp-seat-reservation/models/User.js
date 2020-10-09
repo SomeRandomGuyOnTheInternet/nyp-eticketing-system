@@ -4,7 +4,7 @@ const db = require('../config/DBConfig');
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
-const Users = db.define('Users', {
+const User = db.define('User', {
     email: {
         type: Sequelize.STRING
     },
@@ -28,4 +28,4 @@ const Users = db.define('Users', {
     },
 });
 
-module.exports = Users;
+module.exports = User;
