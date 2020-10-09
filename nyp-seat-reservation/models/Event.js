@@ -1,4 +1,3 @@
-const { Model } = require('sequelize');
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
 
@@ -24,3 +23,4 @@ const Events = db.define('Events', {
 });
 
 module.exports = Events;
+

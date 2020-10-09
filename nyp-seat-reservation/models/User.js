@@ -6,7 +6,8 @@ const db = require('../config/DBConfig');
 
 const User = db.define('User', {
     email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
     },
     password: {
         type: Sequelize.STRING
@@ -15,17 +16,35 @@ const User = db.define('User', {
         type: Sequelize.STRING
     },
     isAdmin: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
     },
     isPlanner: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false
     },
     isHelper: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false
     },
     isDeleted: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false
     },
 });
 
 module.exports = User;
+
+module.exports.createUser = async (user) => {
+    user.password = await bcrypt.hash(user.password, 10)
+    return await User.create(user);
+}
+
+module.exports.getUserById = async (userId) => {
+    return await User.findAll({ 
+        where: { 
+            userId
+        } 
+    });
+}

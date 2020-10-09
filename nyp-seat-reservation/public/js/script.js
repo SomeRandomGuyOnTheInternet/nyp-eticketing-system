@@ -1,8 +1,28 @@
-String.prototype.replaceAt = function(index, replacement) {
+String.prototype.replaceAt = (index, replacement) => {
     return this.substr(0, index) + replacement + this.substr(index + replacement.length);
 }
 
-function scaleContentWidth(parent, content) { // This function scales the content's width proportional to the parent container's width
+promiseAjax = (uri, method, data) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: method,
+            url: uri,
+            dataType: 'json',
+            contentType: 'application/json',
+            data: data ? JSON.stringify(data) : null,
+            success: function (data) {
+                resolve(data)
+            },
+            error: function (error) {
+                reject(error)
+            },
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            reject(errorThrown);
+        });
+    });
+}
+
+scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
     let orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
     let scale = $(parent).width() / ($(content).width() + 40); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why that number works lol.
@@ -15,15 +35,15 @@ function scaleContentWidth(parent, content) { // This function scales the conten
     $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is. This is a bit hacky but it works for now. 
 };
 
-function showSuccessToast(message) {
+showSuccessToast = (message) => {
     showToast({ message: message, type: "success" });
 };
 
-function showDangerToast(message) {
+showDangerToast = (message) => {
     showToast({ message: message, type: "danger" });
 };
 
-function showToast(notification) {
+showToast = (notification) => {
     let toastNode = renderToastTemplate(notification); // Upon clicking each toast's buttons, we call pass the template string we defined in template.js and the variables required in the templates to ejs so it gives us a complete html element with all the data filled in
     $("#toastContainer").append(toastNode); // Then we append the resulting toast html to the toast container defined in footer.ejs
     $('.toast').not('.hide').toast('show'); // Show the unhidden toasts in the toast container, which includes the one we just appended

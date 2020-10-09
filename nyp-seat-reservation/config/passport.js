@@ -11,6 +11,14 @@ function localStrategy(passport) {
         passwordField: 'password', 
         passReqToCallback: true 
     },(req, email, password, done) => {
+        if (!email) {
+            return done(null, false, { message: flash.error(req, "Please enter an email address!") });
+        }
+
+        if (!password) {
+            return done(null, false, { message: flash.error(req, "Please enter a password!") });
+        }
+
         User.findOne({ 
             where: { 
                 email: email.toLowerCase() 
