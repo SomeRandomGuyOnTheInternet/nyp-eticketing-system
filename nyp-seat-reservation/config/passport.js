@@ -1,3 +1,5 @@
+// TODO: Show error if no input
+
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
@@ -10,32 +12,25 @@ function localStrategy(passport) {
         usernameField: 'email', 
         passwordField: 'password', 
         passReqToCallback: true 
-    },(req, email, password, done) => {
-        if (!email) {
-            return done(null, false, { message: flash.error(req, "Please enter an email address!") });
-        }
-
-        if (!password) {
-            return done(null, false, { message: flash.error(req, "Please enter a password!") });
-        }
-
-        User.findOne({ 
-            where: { 
-                email: email.toLowerCase() 
-            }
-        }).then(user => {
+    }, async (req, email, password, done) => {
+        try {
+            let user = await User.getUserByEmail(email.toLocaleLowerCase());
+    
             if (!user) {
                 return done(null, false, { message: flash.error(req, "Please enter a valid email address!") });
             }
-
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-                if (isMatch) {
-                    return done(null, user);
-                } else {
-                    return done(null, false, { message: flash.error(req, "Please enter the correct password!") })
-                }
-            });
-        });
+    
+            const isMatch = await bcrypt.compare(password, user.password);
+    
+            if (isMatch) {
+                return done(null, user);
+            } else {
+                return done(null, false, { message: flash.error(req, "Please enter the correct password!") });
+            }
+        } catch (error) {
+            console.log(error);
+            return done(null, false, { message: flash.error(req, "Something went wrong while signing you in. Please try again later!") });
+        }
     }));
 
     passport.serializeUser((user, done) => { 
