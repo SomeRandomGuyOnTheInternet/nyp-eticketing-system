@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const bcrypt = require('bcrypt');
 const db = require('../config/DBConfig');
 
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
@@ -98,6 +99,22 @@ module.exports.getHelpers = async () => {
             });
 
             resolve(helpers)
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+module.exports.getPlanners = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.findAll({ 
+                where: { 
+                    isPlanner: true
+                } 
+            });
+
+            resolve(user)
         } catch (error) {
             reject(error);
         }
