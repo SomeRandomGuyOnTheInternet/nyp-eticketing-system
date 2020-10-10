@@ -177,9 +177,13 @@
 <script>
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
-    // We have two types of maps, the original venue map, and a copy of the map that'll be edited for the event by the planner
-    // The below statement allows us to instantiate both at the same time using the base map
-    let [originalMap, eventMap] = Array(2).fill([ 
+    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
+    let selectedSeatType; // This variable will contain the character of the seat type we've selected
+
+    // Seat chart configuration
+    let sc = {};
+
+    sc.map = [
         '________________________________________',
         '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
         '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
@@ -213,9 +217,9 @@
         'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
         'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
         'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-    ]);
+    ];
 
-    let seats = {
+    sc.seats = {
         'G': {
             category: 'General',
             blocked: false,
@@ -230,44 +234,30 @@
         }
     };
 
-    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
-    let selectedSeatType;
+    sc.naming = {
+        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
+        getLabel : function (character, row, column) {
+            return row + ':' + column;
+        },
+        getId : function (character, row, column) {
+            return row + ':' + column;
+        }
+    };
+
+    sc.legend = {
+        node : $('#legend'),
+        items : [
+            [ 'G', 'available', 'General'], // Each legend contains the character of the seat type we wanna present, the status of the seat type (so far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted), and a user readable label
+            [ 'H', 'available', 'Handicapped']
+        ]				
+    };
+
+    sc.click = function () {
+        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
+    };
 
     $(document).ready(function() {
-        let sc = $('#seatMap').seatCharts({
-            map: originalMap,
-            seats: seats,
-            naming : {
-                rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN'],
-                getLabel : function (character, row, column) {
-                    return row + ':' + column;
-                },
-                getId : function (character, row, column) {
-                    return row + ':' + column;
-                },
-            },
-            legend : {
-                node : $('#legend'),
-                items : [
-                    [ 'G', 'available', 'General'], // Each legend contains the character of the seat type we wanna present, the status of the seat type (so far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted), and a user readable label
-                    [ 'H', 'available', 'Handicapped']
-                ]					
-            },
-            click: function () {
-                let selectedSeatTypeDetails = seats[selectedSeatType];
-
-                if (selectedSeatTypeDetails) {
-                    this.settings.character = selectedSeatType;
-                    this.settings.data = selectedSeatTypeDetails;
-
-                    replaceMapSeatClasses(this.settings.$node, selectedSeatTypeDetails.classes);
-                    replaceMapSeatCharacter(this.settings, selectedSeatType);
-                };
-
-                return 'available';
-            }
-        });
-
+        bindMap();
         scaleContentWidth($('#tableWrapper'), $('#seatMap')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
@@ -286,7 +276,7 @@
             return;
         }
 
-        seats[seatCharacter] = {
+        sc.seats[seatCharacter] = {
             category: seatName,
             descriptiveCategory: descriptiveCategory,
             blocked: seatIsBlocked,
@@ -295,7 +285,7 @@
         };
 
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
-        renderSeatChartLegendCardTemplate(seatCharacter, seats[seatCharacter]).appendTo($("#legend")); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
+        renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($("#legend")); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
         
         $("#addSeatTypeModal").modal('hide'); // Hides the modal
         $("#seatTypeNameInput").val(''); // Reset input to default state
@@ -305,29 +295,17 @@
     });
 
     $(document).on("click", ".seatCharts-legendCard:not(#addSeatTypeCard)", function() {
-        const wasHighlighted = $(this).hasClass("highlighted");
-
-        $(".seatCharts-legendCard").removeClass("highlighted");
-
-        if (wasHighlighted) {
-            selectedSeatType = null;
-        } else {
-            $(".seatCharts-legendCard").removeClass("highlighted");
-            $(this).addClass("highlighted");
+        const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
+        
+        if (highlighted) {
             selectedSeatType = $(this).attr("seat-character");
+        } else {
+            selectedSeatType = null;
         }
     });
 
-    function replaceMapSeatCharacter(seatSettings, newCharacter) {
-        eventMap[seatSettings.row] = eventMap[seatSettings.row].replaceAt(seatSettings.column, newCharacter);
-    };
-
-    function replaceMapSeatClasses(node, classes) {
-        node.removeClass();
-        node
-            .addClass("seatCharts-seat seatCharts-cell")
-            .addClass(classes)
-            .addClass("available");
+    bindMap = () => {
+        $('#seatMap').seatCharts(sc);
     };
 </script>
 

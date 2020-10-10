@@ -434,8 +434,6 @@
 				.addClass('seatCharts-legend row');
 			
 			$.each(legend.items, function(index, item) {
-
-				console.log()
 				var $column = $('<div></div>')
 					.addClass('seatCharts-cardColumn')
 					.addClass('col-auto')

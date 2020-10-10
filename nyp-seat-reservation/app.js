@@ -2,6 +2,7 @@
 // TODO: Find another solution client-side templating cause right now, it's possible to inject bad code inside the templates and have javascript execute them
 // TODO: Use camelcase for html ids
 // TODO: Update console.log to morgan
+// TODO: Create 404 page
 
 const express = require('express');
 const session = require('express-session');

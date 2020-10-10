@@ -15,10 +15,12 @@ const Events = db.define('Events', {
         type: Sequelize.INTEGER
     },
     prioritiseBackRows: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
     isDeleted: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
 });
 

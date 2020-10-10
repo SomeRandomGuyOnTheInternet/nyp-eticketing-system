@@ -59,7 +59,7 @@ div.seatCharts-seat:focus {
 	text-align: center;
 	padding: 3px;
 	border-radius: 5px;
-    min-width: 200px;
+    min-width: 300px;
 }
 
 .seatCharts-wrapper {
@@ -82,7 +82,7 @@ div.seatCharts-seat {
 
 div.seatCharts-row {
 	height: 35px;
-    display: inline-flex;
+    display: flex;
     width: fit-content;
 }
 
@@ -191,6 +191,10 @@ div.seatCharts-seat.handicapped {
     background: url(../images/handicapped-icon-inverted.png) no-repeat scroll right center;
     background-size: contain;
     background-color: #f7ae5e;
+}
+
+div.seatCharts-seat.temp-space {
+    background-color: #ffffff00;
 }
 
 /* Seat Statuses */

@@ -21,7 +21,7 @@ function createInstance(Users) {
         {
             email: 'john_doe@mymail.nyp.edu.sg',
             password: '$2b$10$oB4JiW92q0LMyjIWS2yM6uBGirey6pVG4XCDaoRDjZEI8U9viROFe',
-            name: 'john',
+            name: 'John Doe',
             isAdmin: false,
             isPlanner: true,
             isHelper: false,

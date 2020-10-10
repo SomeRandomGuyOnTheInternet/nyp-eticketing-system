@@ -9,7 +9,8 @@ const EventSeatType = db.define('EventSeatType', {
         type: Sequelize.STRING
     },
     isBlocked: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
     seatChartCharacter: {
         type: Sequelize.CHAR

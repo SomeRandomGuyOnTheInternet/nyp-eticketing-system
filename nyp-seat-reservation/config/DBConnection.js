@@ -57,10 +57,11 @@ const setUpDB = (drop) => {
         Users.hasMany(EventHelpers, { foreignKey: 'UserId' });
         EventHelpers.belongsTo(Users, { foreignKey: 'UserId' });
 
-        mySQLDB.sync({ force: drop })
-        .then(() => {
-            if (drop == true) createInstance(Users)
-        })
+        mySQLDB.sync({ force: drop }).then(() => {
+            if (drop == true) {
+                createInstance(Users);
+            }
+        });
     });
 };
 
