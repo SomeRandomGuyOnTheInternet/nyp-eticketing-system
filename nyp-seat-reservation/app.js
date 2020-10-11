@@ -24,7 +24,7 @@ const mainRoute = require('./routes/main');
 const helperRoute = require('./routes/helper');
 const plannerRoute = require('./routes/planner');
 const adminRoute = require('./routes/admin');
-const authenticate = require('./config/passport');
+const apiRoute = require('./routes/api');
 
 // Our app is a blank canvas at this point (wow so artistic)
 const app = express();
@@ -74,6 +74,7 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
+const authenticate = require('./config/passport');
 authenticate.localStrategy(passport);
 
 // Over here, we tell the app what url prefix to use for each of the route's webpages
@@ -84,6 +85,7 @@ app.use('/', mainRoute);
 app.use('/helper', helperRoute);
 app.use('/planner', plannerRoute);
 app.use('/admin', adminRoute);
+app.use('/api', apiRoute);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });

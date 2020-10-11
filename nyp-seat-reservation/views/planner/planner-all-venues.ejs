@@ -26,20 +26,15 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
-                                    <th scope="col">Information</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td class="font-weight-medium"><a href="#">Auditorium</a></td>
-                                    <td>4 Events Booked</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td class="font-weight-medium"><a href="#">Theatre for the Arts</a></td>
-                                    <td>3 Events Booked</td>
-                                </tr>
+                                <% for (i = 0; i < venues.length; i++) { %>
+                                    <tr>
+                                        <td scope="row"><%= i + 1 %></td>
+                                        <td class="font-weight-medium"><a href="/planner/venues/<%= venues[i].id %>"><%= venues[i].name %></a></td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>

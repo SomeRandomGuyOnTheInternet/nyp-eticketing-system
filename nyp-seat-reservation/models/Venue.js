@@ -8,8 +8,8 @@ const Venue = db.define('Venue', {
     name: {
         type: Sequelize.STRING
     },
-    seatChart: {
-        type: Sequelize.STRING
+    seatMap: {
+        type: Sequelize.TEXT
     },
     isDeleted: {
         type: Sequelize.BOOLEAN,
@@ -21,7 +21,7 @@ const Venue = db.define('Venue', {
 
 module.exports = Venue;
 
-// Venie Table Service Methods
+// Venue Table Service Methods
 // We use this to do CRUD and basically communicate with the database
 
 // Every model should have their own version of this
@@ -35,7 +35,7 @@ module.exports.createVenue = async (venue) => { //
             reject(error);
         }
     });
-}
+};
 
 module.exports.getVenueById = async (id) => {
     return new Promise(async (resolve, reject) => {
@@ -46,9 +46,39 @@ module.exports.getVenueById = async (id) => {
                 } 
             });
 
+            if (venue) {
+                venue.seatMap = JSON.parse(venue.seatMap);
+            }
+
             resolve(venue)
         } catch (error) {
             reject(error);
         }
     });
-}
+};
+
+module.exports.getAllVenues = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let venues = await Venue.findAll({ raw: true });
+            resolve(venues)
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+module.exports.updateVenue = async (venue) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Venue.update(
+                venue,
+                { where: { id: venue.id } }
+            );
+
+            resolve(venue)
+        } catch (error) {
+            reject(error);
+        }
+    });
+};

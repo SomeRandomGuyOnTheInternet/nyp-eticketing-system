@@ -1,4 +1,4 @@
-function createInstance(Users) {
+function createUsers(Users) {
     Users.bulkCreate([
         {
             email: 'admin@mymail.nyp.edu.sg',
@@ -30,4 +30,4 @@ function createInstance(Users) {
     ]);
 };
 
-module.exports = createInstance;
+module.exports = createUsers;

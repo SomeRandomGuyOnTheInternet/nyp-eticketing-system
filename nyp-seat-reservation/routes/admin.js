@@ -22,7 +22,12 @@ router.get('/', auth.isAdmin, (req, res) => {
 
 router.get('/planners', auth.isAdmin, async (req, res) => {
 	var planners = await User.getPlanners();
-	res.render('admin/admin-all-planners', { title: "Planners", user, planners })
+
+	res.render('admin/admin-all-planners', { 
+		title: "Planners", 
+		user, 
+		planners 
+	});
 });
 
 router.post('/planners', auth.isAdmin, async (req, res) => {
@@ -31,19 +36,19 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
 	let password = req.body.password;
 
 	if (!name) {
-		flash.error(req, "Please enter a name!")
+		flash.error(req, "Please enter a name!");
 		res.redirect('/admin/planners');
 		return;
 	}
 
 	if (!email) {
-		flash.error(req, "Please enter an email!")
+		flash.error(req, "Please enter an email!");
 		res.redirect('/admin/planners');
 		return;
 	}
 
 	if (!password) {
-		flash.error(req, "Please enter a password!")
+		flash.error(req, "Please enter a password!");
 		res.redirect('/admin/planners');
 		return;
 	}
@@ -66,14 +71,19 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
 		isDeleted: false
 	});
 
-	flash.success(req, "Planner account has been successfully created!")
+	flash.success(req, "Planner account has been successfully created!");
 	res.redirect('/admin/planners');
 	return;
 });
 
 router.get('/helpers', auth.isAdmin, async(req, res) => {
 	var helpers = await User.getHelpers();
-	res.render('admin/admin-all-helpers', { title: "Helpers", user, helpers })
+	
+	res.render('admin/admin-all-helpers', { 
+		title: "Helpers", 
+		user, 
+		helpers 
+	});
 });
 
 router.post('/helpers', auth.isAdmin, async (req, res) => {
@@ -82,19 +92,19 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 	let password = req.body.password;
 
 	if (!name) {
-		flash.error(req, "Please enter a name!")
+		flash.error(req, "Please enter a name!");
 		res.redirect('/admin/helpers');
 		return;
 	}
 
 	if (!email) {
-		flash.error(req, "Please enter an email!")
+		flash.error(req, "Please enter an email!");
 		res.redirect('/admin/helpers');
 		return;
 	}
 
 	if (!password) {
-		flash.error(req, "Please enter a password!")
+		flash.error(req, "Please enter a password!");
 		res.redirect('/admin/helpers');
 		return;
 	}
@@ -117,7 +127,7 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 		isDeleted: false
 	});
 
-	flash.success(req, "Planner account has been successfully created!")
+	flash.success(req, "Planner account has been successfully created!");
 	res.redirect('/admin/helpers');
 	return;
 });

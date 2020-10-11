@@ -1,3 +1,10 @@
+// TODO: Improve ajax error handling by using switch case on error codes
+
+const apiRoutes = {
+    createVenue: "/api/create-venue",
+    editVenue: "/api/update-venue",
+};
+
 String.prototype.replaceAt = function(index, replacement) {
     return this.substr(0, index) + replacement + this.substr(index + replacement.length);
 };

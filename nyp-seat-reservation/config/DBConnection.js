@@ -13,7 +13,9 @@ const EventSeats = require('../../nyp-seat-reservation/models/EventSeat');
 const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendee');
 const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeat');
 const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
-const createInstance = require('./DBInstance');
+
+const createUsers = require('./dataset/create-users');
+const createVenues = require('./dataset/create-venues');
 
 // This function carries out the actual connection to the database while specifying all the relationships between the models
 const setUpDB = (drop) => {
@@ -59,7 +61,8 @@ const setUpDB = (drop) => {
 
         mySQLDB.sync({ force: drop }).then(() => {
             if (drop == true) {
-                createInstance(Users);
+                createUsers(Users);
+                createVenues(Venues);
             }
         });
     });
