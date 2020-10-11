@@ -61,10 +61,9 @@ router.get('/venues/:id', auth.isPlanner, async (req, res) => {
 		res.redirect('/planner/venues');
 		return;
 	}
-
-	console.log(venue)
+	
 	res.render('planner/planner-edit-venue', { 
-		title: "Venues", 
+		title: venue.name, 
 		user: req.user,
 		venue: venue,
 	});

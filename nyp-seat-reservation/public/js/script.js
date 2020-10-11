@@ -118,6 +118,19 @@ replaceMapSeatClasses = (node, classes) => {
         .addClass("available");
 };
 
+resizeRow = (columns, rows, map) => {
+    const defaultRow = defaultSeat.repeat(columns); // The default row is just the one that gets assigned to any new row that's created. We take the number of columns the user input and multiply it by the default seat type (general, G) to get it
+    resizeArray(map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
+};
+
+resizeColumn = (columns, rows, map) => {
+    for (i = 0; i < rows; i++) { // To change the number of columns we have to loop through each row indvidually and resize them
+        const splitRow = [...map[i]]; // Since rows are stored as strings in the map, we have to split them into an array
+        resizeArray(splitRow, columns, defaultSeat); // And then we use the resize function to remove or add columns with the default seat depending on the user's input 
+        map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
+    }
+};
+
 showSuccessToast = (message) => {
     showToast({ message: message, type: "success" });
 };
