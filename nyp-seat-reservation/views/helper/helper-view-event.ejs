@@ -1,5 +1,6 @@
 <%- include('../templates/head')-%>
 
+<!-- #TODO formatting for Modal (line 74) -->
 <body>
     <%- include('../templates/navbar')-%>
     <div class="container">
@@ -61,19 +62,32 @@
                     </div>
                 </div>
             </div>
-            <div id="table-card" class="card mt-3">
-                <!-- Put interactible elements in a card, enclosed with card-body  -->
+            <div id="seatChartCard" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
-                    <div id="table-wrapper" class="seatCharts-wrapper">
-                        <!-- Seat maps should be ensclosed in a seat chart wrapper -->
-                        <div id="seat-map" class="seatCharts-container">
-                            <!-- This is the element the seat chart is gonna latch itself onto -->
-                            <div class="front-indicator">Front</div>
-                            <!-- The seat chart element should also contain the front indicator so the user knows the orientation of the map -->
+                    <div id="tableWrapper" class="seatCharts-wrapper"> <!-- Seat maps should be ensclosed in a seat chart wrapper -->
+                        <div id="seatMap" class="seatCharts-container"> <!-- This is the element the seat chart is gonna latch itself onto -->
+                            <div class="front-indicator">Front</div> <!-- The seat chart element should also contain the front indicator so the user knows the orientation of the map -->
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="testModal"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <!-- This is where you enter the title of the modal -->
+                            <!-- This is the actual content (can put anything here) -->
+                            <div class="modal-body">
+                                <div class="d-flex">
+                                    <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                    <div id="colorCode" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>                           
+                                    <span id="seatID" class="align-self-center"></span>
+                                    <span class="align-self-center">Reserved for Adam</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             <div id="legend" class="seatCharts-legend"></div>
 
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
@@ -150,6 +164,177 @@
 </body>
 
 <script>
+    const defaultSeat = "G";
+    const emptySpace = "_"; // The actual empty space character (_) creates a seat cell that cannot be interacted with
+    const tempEmptySpace = "E"; // We have to use a temporary character (E) that can be interacted with to denote empty space while the user is editing the seat map
+    // We will convert the temporary characters in the map to the actual empty space character when we're submitting the seat map
+
+    let selectedSeatType; // This variable will contain the character of the seat type we've selected
+
+    // Seat chart configuration
+    let sc = {};
+
+    sc.map = [
+                '________________________________________',
+                '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
+                '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
+                '_GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG_',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH',
+                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH',
+                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
+                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
+                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
+                // '____GGGGGGGGGGG____',
+                // '___GGGGGGGGGGGGG___',
+                // '__GGGGGGGGGGGGGGG__',
+                // '_GGGGGGGGGGGGGGGGG_',
+                // 'GGGGGGGGGGGGGGGGGGG',
+                // 'GGGGGGG______GGGGGG',
+                // 'GGGGGGGGGGGGGGGGGGG',
+            ],
+
+    sc.seats = {
+        [defaultSeat]: {
+            category: 'General',
+            blocked: false,
+            classes: 'general',
+        },
+        [tempEmptySpace]: {
+            category: 'Empty Space',
+            blocked: false,
+            classes: 'temp-space',
+        },
+
+    };
+
+    sc.naming = {
+        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
+        getLabel: function (character, row, column) {
+            return row + ':' + column;
+        },
+        getId: function (character, row, column) {
+            return row + ':' + column;
+        }
+    };
+
+    sc.legend = {
+        node: $('#legend'),
+        items: []					
+    };
+
+    sc.click = function () {
+        $("#Modal").modal();
+        $("#colorCode").addClass(this.settings.data.classes);
+        $("#seatID").text(this.settings.id);
+    };
+
+
+    // Rest of the functions
+    $(document).ready(function() {
+        bindMap(sc, '#seatMap');
+        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+    });
+
+    $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+    });
+
+    $("#columnInput, #rowInput").change(function () {
+        const columnInput = $("#columnInput").val();
+        const rowInput = $("#rowInput").val();
+        
+        if (!$.isNumeric(columnInput) || !$.isNumeric(rowInput)) {
+            showDangerToast("Please enter a valid value!");
+            return;
+        }
+        
+        const columns = columnInput.toNum();
+        const rows = rowInput.toNum();
+
+        if (columns < 1 || rows < 1) {
+            showDangerToast("Please enter a larger value!");
+            return;
+        }
+
+        if (columns > 40 || rows > 40) {
+            showDangerToast("Please enter a smaller value!");
+            return;
+        }
+
+        if (this.id == "rowInput") {
+            const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
+
+            resizeRow(columns, rows, sc.map); // Changes number of columns
+            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
+            resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Reduce the maps's 
+        }
+
+        if (this.id == "columnInput") {
+            resizeColumn(columns, rows, sc.map); // Changes number of rows
+            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
+            scaleContentWidth($('#tableWrapper'), $('#seatMap')); // Scale the map so the columns are all visible
+        }
+    });
+
+    $(document).on("click", ".seatCharts-legendCard", function() {
+        const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
+        
+        if (highlighted) {
+            selectedSeatType = $(this).attr("seat-character");
+        } else {
+            selectedSeatType = null;
+        }
+    });
+
+    $('#saveVenueForm').submit(async function (event) {
+        event.preventDefault();
+        
+        if (!$("#nameInput").val()) {
+            showDangerToast("Please enter a venue name!");
+            return;
+        }
+
+        const name = toTitleCase($("#nameInput").val());
+        const map = replaceMapSeatCharacters(sc.map, tempEmptySpace, emptySpace);
+
+        $('#saveVenueTypeButton').prop('disabled', true);
+
+        try {
+            await createVenue(name, map);
+            window.location.replace("/planner/venues");
+        } catch (error) {
+            showDangerToast(error.responseText);
+        } finally {
+            $('#saveVenueTypeButton').prop('disabled', false);
+        }
+    });
+</script>
+
+<!-- <script>
     $(document).ready(function () {
         // This whole part initialises the seat chart
         var sc = $('#seat-map').seatCharts({
@@ -338,6 +523,6 @@
     $(window).on('resize', function () { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the parent container
         scaleContentWidth($('#table-wrapper'), $('#seat-map'));
     });
-</script>
+</script> -->
 
 <%- include('../templates/footer')-%>

@@ -145,8 +145,9 @@
     };
 
     sc.click = function () {
-        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
+        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
     };
+
 
     // Rest of the functions
     $(document).ready(function() {
@@ -201,11 +202,11 @@
     $(document).on("click", ".seatCharts-legendCard", function() {
         const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
         
-        if (highlighted) {
-            selectedSeatType = $(this).attr("seat-character");
-        } else {
-            selectedSeatType = null;
-        }
+        // if (highlighted) {
+        //     selectedSeatType = $(this).attr("seat-character");
+        // } else {
+        //     selectedSeatType = null;
+        // }
     });
 
     $('#saveEditedVenueForm').submit(async function (event) {
