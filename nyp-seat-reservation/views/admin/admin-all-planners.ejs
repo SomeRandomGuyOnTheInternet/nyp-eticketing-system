@@ -73,7 +73,7 @@
                                                 class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small>
                                             <!-- The small element is where we actually write down what the input does  -->
                                         </label>
-                                        <input id="password" name="password" class="form-control card-input" type="text" placeholder="Enter password here">
+                                        <input id="password" name="password" class="form-control card-input" type="password" placeholder="Enter password here">
                                         <!-- This is where the user actually inputs all their stuff  -->
                                     </div>
                                 </div>
@@ -109,7 +109,7 @@
                                         <td><%= planners[i].id %></td>
                                         <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
                                         <td><%= planners[i].email %></td>
-                                        <td><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></td>
+                                        <td><a href="/admin/deleteplanner/<%= planners[i].id %>"><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></a></td>
                                     </tr>
                                 <% } %>
                             </tbody>

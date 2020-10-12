@@ -56,8 +56,6 @@ router.post('/update-venue', async (req, res) => {
     await Venue.updateVenue(venue);
 
     ajax.success(res, "Successfully updated venue!");
-    flash.success(req, "Venue has been successfully updated!");
-    return
 });
 
 module.exports = router;

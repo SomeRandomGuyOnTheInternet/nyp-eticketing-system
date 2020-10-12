@@ -25,7 +25,7 @@ router.get('/planners', auth.isAdmin, async (req, res) => {
 
 	res.render('admin/admin-all-planners', { 
 		title: "Planners", 
-		user, 
+		user: req.user, 
 		planners 
 	});
 });
@@ -81,7 +81,7 @@ router.get('/helpers', auth.isAdmin, async(req, res) => {
 	
 	res.render('admin/admin-all-helpers', { 
 		title: "Helpers", 
-		user, 
+		user: req.user,
 		helpers 
 	});
 });
@@ -130,6 +130,22 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 	flash.success(req, "Planner account has been successfully created!");
 	res.redirect('/admin/helpers');
 	return;
+});
+
+//Delete function for planner accounts
+router.get('/deleteplanner/:id', async (req, res) => {
+	const id = req.params.id;
+	await User.deleteuSers(id);
+	flash.success(req, 'Successfully deleted planner account');
+	res.redirect('/admin/planners');
+});
+
+//Delete function for helper accounts
+router.get('/deletehelper/:id', async (req, res) => {
+	const id = req.params.id;
+	await User.deleteuSers(id);
+	flash.success(req, 'Successfully deleted helper account');
+	res.redirect('/admin/helpers');
 });
 
 module.exports = router;
