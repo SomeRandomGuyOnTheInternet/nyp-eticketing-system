@@ -96,7 +96,7 @@
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <button id="saveEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit">Update Venue</button>
                 <div class="mt-3"></div> <!-- Used for spacing between sections  -->
-                <button id="cancelEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit" style="background-color: red;">Cancel</button>
+                <button id="cancelEditedVenueButton" class="btn btn-danger btn-lg w-100" type="submit">Cancel</button>
             </form>
         </main>
     </div>
@@ -147,8 +147,9 @@
     };
 
     sc.click = function () {
-        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
+        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
     };
+
 
     // Rest of the functions
     $(document).ready(function() {
@@ -203,11 +204,11 @@
     $(document).on("click", ".seatCharts-legendCard", function() {
         const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
         
-        if (highlighted) {
-            selectedSeatType = $(this).attr("seat-character");
-        } else {
-            selectedSeatType = null;
-        }
+        // if (highlighted) {
+        //     selectedSeatType = $(this).attr("seat-character");
+        // } else {
+        //     selectedSeatType = null;
+        // }
     });
 
     $('#saveEditedVenueForm').submit(async function (event) {
@@ -225,7 +226,10 @@
 
         try {
             await updateVenue(venue);
-            window.location.replace("/planner/venues");
+            showSuccessToast("Venue has been updated successfully!", "completeupdatevenuetoast");
+            $('#completeupdatevenuetoast').on('hidden.bs.toast', function () {
+                window.location.replace("/planner/venues");
+            })
         } catch (error) {
             handleError(error);
         } finally {

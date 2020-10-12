@@ -7,6 +7,7 @@
 
 function renderToastTemplate(notification) {
     var $toast = $('<div></div>')
+        .attr('id', notification.id)
         .addClass('toast')
         .addClass(`bg-${notification.type}-75`)
         .attr('role', 'alert')

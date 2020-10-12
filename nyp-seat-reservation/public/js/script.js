@@ -140,12 +140,12 @@ bindMap = (sc, seatMapNode) => {
     $(seatMapNode).seatCharts(sc);
 };
 
-showSuccessToast = (message) => {
-    showToast({ message: message, type: "success" });
+showSuccessToast = (message, id = null) => {
+    showToast({ message: message, type: "success", id });
 };
 
-showDangerToast = (message) => {
-    showToast({ message: message, type: "danger" });
+showDangerToast = (message, id = null) => {
+    showToast({ message: message, type: "danger", id });
 };
 
 showToast = (notification) => {
