@@ -47,7 +47,7 @@ app.use(flash());
 
 const fypjapplication = require('./config/DBConnection');
 const db = require('./config/db');
-fypjapplication.setUpDB(true);
+fypjapplication.setUpDB(false);
 
 app.use(session({
 	key: 'nyp-seat-reservation',
