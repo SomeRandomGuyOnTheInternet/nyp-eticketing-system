@@ -120,3 +120,16 @@ module.exports.getPlanners = async () => {
         }
     });
 }
+
+//Delete user
+module.exports.deleteuSers = async (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.getUserById(id)
+            user.destroy();
+            resolve(user)
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
