@@ -32,12 +32,31 @@ toTitleCase = (str) => {
     });
 };
 
+throwError = (message) => {
+    throw { 
+        responseText: message 
+    };
+};
+
+handleError = (error) => {
+    console.error(error);
+
+    if (error.responseText) {
+        showDangerToast(error.responseText);
+    } else {
+        showDangerToast("Something went wrong. Please try again later!");
+    }
+};
+
 scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
     const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
     if ($(content).width() > $(parent).width()) {
         const scale = $(parent).width() / ($(content).width() + 35); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why that number works lol.
         $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
+        $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
+    } else {
+        $(content).css('transform', 'scale('+1+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
         $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
     }
     
@@ -47,7 +66,7 @@ scaleContentWidth = (parent, content) => { // This function scales the content's
 resizeParentHeight = (orgHeight, parent, content) => { // This function resizes the parent's height using the delta between the original hight and the current height of the content
     const newHeight = $(content)[0].getBoundingClientRect().height; // Here we get the new height of the content
     const deltaHeight = newHeight - orgHeight; // Then we get the delta between the original height of the content and the new height of the content
-    $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is. This is a bit hacky but it works for now. 
+    $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is.
 };
 
 toggleHighlight = (node, nodeCssClass) => {
@@ -107,7 +126,7 @@ resizeColumn = (columns, rows, map) => {
 };
 
 reloadMap = (sc, seatMapNode) => {
-    unbindMap(seatMapNode);
+    unbindMap(seatMapNode, mapLegendNode);
     bindMap(sc, seatMapNode);
 };
 

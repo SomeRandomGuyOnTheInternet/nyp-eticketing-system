@@ -227,7 +227,7 @@
             await updateVenue(venue);
             window.location.replace("/planner/venues");
         } catch (error) {
-            showDangerToast(error.responseText);
+            handleError(error);
         } finally {
             $('#saveEditedVenueButton').prop('disabled', false);
         }

@@ -212,10 +212,7 @@
 
     sc.legend = {
         node : $('#legend'),
-        items : [
-            [ 'G', 'available', 'General'], // Each legend contains the character of the seat type we wanna present, the status of the seat type (so far we have five statuses: available, reserved (planner can edit), blocked (planner cannot edit), selected (currently selected seats), highlighted), and a user readable label
-            [ 'H', 'available', 'Handicapped']
-        ]				
+        items : []				
     };
 
     sc.click = function () {
@@ -224,18 +221,33 @@
 
     $(document).ready(async function() {
         try {
+            // Get all venues and populate select options with all venues
             venues = await getAllVenues();
+            populateVenueSelect(venues);
+            setVenueDetails(getVenueFromSelect());
+
+            // Bind map
             bindMap(sc, '#seatMap');
             scaleContentWidth($('#tableWrapper'), $('#seatMap')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
-        } catch (error) {
-            if (error.resposeText) {
-                showDangerToast(error.resposeText);
+
+            for (const seatCharacter in sc.seats) {
+                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($("#legend"));
             }
-            window.location.replace("/planner/events");
+        } catch (error) {
+            handleError(error);
         }
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+    });
+
+    $('#venueSelectInput').on('change', function() {
+        const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
+
+        setVenueDetails(getVenueFromSelect());
+        reloadMap(sc, '#seatMap', '.seatCharts-legendCard:not(#addSeatTypeCard)');
+        resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Resize parent's height in relation to the original height
         scaleContentWidth($('#tableWrapper'), $('#seatMap'));
     });
 
@@ -279,22 +291,36 @@
     });
 
     populateVenueSelect = (venues) => {
-        for (i = 0; i < venues.length; i++) {
-            $('#venueSelectInput').add(new Option(venues[i].name, i));
+        if (venues.length < 1) {
+            throwError('There are no venues available. Please try again later!');
         }
+        
+        for (i = 0; i < venues.length; i++) {
+            $('#venueSelectInput').append($('<option>', {
+                value: i,
+                text: venues[i].name
+            }));
+        }
+
+        $("#venueSelectInput").val($("#venueSelectInput option:first").val());
     };
 
-    onVenueSelect = () => {
-        const selectedVenueIndex = $("#venueSelectInput").val();
+    getVenueFromSelect = () => {
+        const selectedVenueVal = $("#venueSelectInput").val();
 
-        if (!$.isNumeric(selectedVenueIndex)) {
-            throw { error: 'Selected option is not a valid venue' };
+        if (!selectedVenueVal) {
+            throwError('The selected option is not valid. Please try again later!');
         }
-        
-        const columns = columnInput.toNum();
-        const rows = rowInput.toNum();
 
-        
+        if (!$.isNumeric(selectedVenueVal)) {
+            throwError('The selected option is not valid. Please try again later!');
+        }
+
+        return venues[selectedVenueVal.toNum()];
+    }
+
+    setVenueDetails = (venue) => {
+        sc.map = JSON.parse(venue.seatMap);
     }
 </script>
 
