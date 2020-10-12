@@ -92,3 +92,34 @@ function renderSeatChartLegendCardTemplate(seatChar, seatDetails) {
 
     return $column;
 };
+
+function renderStudentHelperCardTemplate(helper) {
+    var $card = $('<div></div>')
+        .addClass('card mb-2')
+        .attr("helper-id", helper.id);
+
+    var $cardBody = $('<div></div>')
+        .addClass('card-body')
+        .appendTo($card);
+
+    $cardBody.append(
+        $('<span></span>')
+            .addClass('h5')
+            .text(helper.name)
+            .appendTo($cardBody)
+    );
+
+    $cardBody.append(
+        $('<br>')
+            .appendTo($cardBody)
+    );
+
+    $cardBody.append( 
+        $('<small></small>')
+            .addClass('card-subtitle mb-2 text-secondary font-weight-normal')
+            .text(helper.email)
+            .appendTo($cardBody)
+    );
+
+    return $card;
+};

@@ -111,7 +111,12 @@
     // Seat chart configuration
     let sc = {};
 
-    sc.map;
+    sc.map = [
+        'GGGGGG',
+        'GGGGGG',
+        'GGGGGG',
+        'GGGGGG',
+    ];
 
     sc.seats = {
         [defaultSeat]: {
@@ -182,7 +187,7 @@
 
             resizeRow(columns, rows, sc.map); // Changes number of columns
             reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
-            resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Reduce the maps's height 
+            resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Reduce the maps's 
         }
 
         if (this.id == "columnInput") {
@@ -219,7 +224,7 @@
             await createVenue(name, map);
             window.location.replace("/planner/venues");
         } catch (error) {
-            handleError(error);
+            showDangerToast(error.responseText);
         } finally {
             $('#saveVenueTypeButton').prop('disabled', false);
         }

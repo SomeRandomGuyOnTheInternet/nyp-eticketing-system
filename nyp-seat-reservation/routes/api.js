@@ -6,6 +6,7 @@ const router = express.Router();
 const flash = require('../utils/flash');
 const ajax = require('../utils/ajax');
 
+const User = require('../models/User');
 const Venue = require('../models/Venue');
 
 router.post('/create-venue', async (req, res) => {
@@ -56,6 +57,12 @@ router.post('/update-venue', async (req, res) => {
     await Venue.updateVenue(venue);
 
     ajax.success(res, "Successfully updated venue!");
+});
+
+router.get('/get-all-helpers', async (req, res) => {
+    const helpers = await User.getHelpers();
+    ajax.success(res, "Successfully gotten all helpers!", helpers);
+    return
 });
 
 module.exports = router;

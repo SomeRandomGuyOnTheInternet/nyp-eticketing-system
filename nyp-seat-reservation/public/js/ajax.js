@@ -2,6 +2,7 @@ const apiRoutes = {
     createVenue: "/api/create-venue",
     getAllVenues: "/api/get-all-venues",
     updateVenue: "/api/update-venue",
+    getAllHelpers: "/api/get-all-helpers",
 };
 
 promiseAjax = (uri, method, data) => {
@@ -60,6 +61,17 @@ updateVenue = async (venue) => {
                 }
             );
             resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+getAllHelpers = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(apiRoutes.getAllHelpers, 'GET', null);
+            resolve(res.data);
         } catch (error) {
             reject(error);
         }
