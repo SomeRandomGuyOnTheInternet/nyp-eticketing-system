@@ -152,7 +152,7 @@
 
     // Rest of the functions
     $(document).ready(function() {
-        bindMap();
+        bindMap(sc, '#seatMap');
         scaleContentWidth($('#tableWrapper'), $('#seatMap'));
     });
 
@@ -186,13 +186,13 @@
             const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
 
             resizeRow(columns, rows, sc.map); // Changes number of columns
-            reloadMap(); // Reloads the map with the updated map
+            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
             resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Reduce the maps's 
         }
 
         if (this.id == "columnInput") {
             resizeColumn(columns, rows, sc.map); // Changes number of rows
-            reloadMap(); // Reloads the map with the updated map
+            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
             scaleContentWidth($('#tableWrapper'), $('#seatMap')); // Scale the map so the columns are all visible
         }
     });
@@ -207,7 +207,7 @@
         }
     });
 
-    $('#saveVenueForm').submit(function (event) {
+    $('#saveVenueForm').submit(async function (event) {
         event.preventDefault();
         
         if (!$("#nameInput").val()) {
@@ -218,42 +218,17 @@
         const name = toTitleCase($("#nameInput").val());
         const map = replaceMapSeatCharacters(sc.map, tempEmptySpace, emptySpace);
 
-        saveVenue(name, map);
-    });
-
-    saveVenue = async (name, map) => {
         $('#saveVenueTypeButton').prop('disabled', true);
 
         try {
-            await promiseAjax(apiRoutes.createVenue, 'POST', 
-                {
-                    name: name,
-                    seatMap: map
-                }
-            );
-
+            await createVenue(name, map);
             window.location.replace("/planner/venues");
         } catch (error) {
             showDangerToast(error.responseText);
         } finally {
             $('#saveVenueTypeButton').prop('disabled', false);
         }
-    };
-
-    reloadMap = () => {
-        unbindCurrentMap();
-        bindMap();
-    };
-
-    unbindCurrentMap = (mapNode) => {
-        $('.seatCharts-row').remove();
-        $('#seatMap, #seatMap *').unbind().removeData();
-        $('#seatMap').attr('aria-activedescendant', null);
-    };
-
-    bindMap = () => {
-        $('#seatMap').seatCharts(sc);
-    };
+    });
 </script>
 
 <%- include('../templates/footer')-%>

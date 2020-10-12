@@ -92,8 +92,6 @@
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Venue</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
                                 <select id="venueSelectInput" name="venueSelectInput" class="form-control card-input"> <!-- This is where the user actually inputs all their stuff  -->
-                                    <option>Auditorium</option>
-                                    <option>Theatre for the Arts</option>
                                 </select>
                             </div>
                         </div>
@@ -180,44 +178,12 @@
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
     let selectedSeatType; // This variable will contain the character of the seat type we've selected
 
+    let venues = [];
+
     // Seat chart configuration
     let sc = {};
 
-    sc.map = [
-        '________________________________________',
-        '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
-        '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
-        '_GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG_',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-        'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-        'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-        'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-    ];
+    sc.map;
 
     sc.seats = {
         'G': {
@@ -256,9 +222,17 @@
         replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
     };
 
-    $(document).ready(function() {
-        bindMap();
-        scaleContentWidth($('#tableWrapper'), $('#seatMap')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
+    $(document).ready(async function() {
+        try {
+            venues = await getAllVenues();
+            bindMap(sc, '#seatMap');
+            scaleContentWidth($('#tableWrapper'), $('#seatMap')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
+        } catch (error) {
+            if (error.resposeText) {
+                showDangerToast(error.resposeText);
+            }
+            window.location.replace("/planner/events");
+        }
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -304,9 +278,22 @@
         }
     });
 
-    bindMap = () => {
-        $('#seatMap').seatCharts(sc);
+    populateVenueSelect = (venues) => {
+        for (i = 0; i < venues.length; i++) {
+            $('#venueSelectInput').add(new Option(venues[i].name, i));
+        }
     };
+
+    onVenueSelect = () => {
+        const selectedVenueIndex = $("#venueSelectInput").val();
+
+        if (!$.isNumeric(selectedVenueIndex)) {
+            throw 'Venue is not a '
+        }
+        
+        const columns = columnInput.toNum();
+        const rows = rowInput.toNum();
+    }
 </script>
 
 <%- include('../templates/footer')-%>

@@ -1,10 +1,5 @@
 // TODO: Improve ajax error handling by using switch case on error codes
 
-const apiRoutes = {
-    createVenue: "/api/create-venue",
-    editVenue: "/api/update-venue",
-};
-
 String.prototype.replaceAt = function(index, replacement) {
     return this.substr(0, index) + replacement + this.substr(index + replacement.length);
 };
@@ -37,26 +32,6 @@ toTitleCase = (str) => {
     });
 };
 
-promiseAjax = (uri, method, data) => {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            type: method,
-            url: uri,
-            dataType: 'json',
-            contentType: 'application/json',
-            data: data ? JSON.stringify(data) : null,
-            success: function (data) {
-                resolve(data)
-            },
-            error: function (error) {
-                reject(error)
-            },
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            reject(errorThrown);
-        });
-    });
-};
-
 scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
     const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
@@ -86,14 +61,6 @@ toggleHighlight = (node, nodeCssClass) => {
     }
 };
 
-replaceMapSeatCharacters = (map, characterToReplace, newCharacter) => {
-    for (i = 0; i < map.length; i++) {
-        map[i] = map[i].replaceAll(characterToReplace, newCharacter);
-    }
-
-    return map;
-};
-
 replaceMapSeat = (map, seat, selectedSeatType, selectedSeatTypeDetails) => {
     if (selectedSeatTypeDetails) {
         seat.settings.character = selectedSeatType;
@@ -118,6 +85,14 @@ replaceMapSeatClasses = (node, classes) => {
         .addClass("available");
 };
 
+replaceMapSeatCharacters = (map, characterToReplace, newCharacter) => {
+    for (i = 0; i < map.length; i++) {
+        map[i] = map[i].replaceAll(characterToReplace, newCharacter);
+    }
+
+    return map;
+};
+
 resizeRow = (columns, rows, map) => {
     const defaultRow = defaultSeat.repeat(columns); // The default row is just the one that gets assigned to any new row that's created. We take the number of columns the user input and multiply it by the default seat type (general, G) to get it
     resizeArray(map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
@@ -129,6 +104,21 @@ resizeColumn = (columns, rows, map) => {
         resizeArray(splitRow, columns, defaultSeat); // And then we use the resize function to remove or add columns with the default seat depending on the user's input 
         map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
     }
+};
+
+reloadMap = (sc, seatMapNode) => {
+    unbindMap(seatMapNode);
+    bindMap(sc, seatMapNode);
+};
+
+unbindMap = (seatMapNode) => {
+    $('.seatCharts-row').remove();
+    $(`${seatMapNode}, ${seatMapNode} *`).unbind().removeData();
+    $(seatMapNode).attr('aria-activedescendant', null);
+};
+
+bindMap = (sc, seatMapNode) => {
+    $(seatMapNode).seatCharts(sc);
 };
 
 showSuccessToast = (message) => {
