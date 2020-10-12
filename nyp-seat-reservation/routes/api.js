@@ -32,6 +32,12 @@ router.post('/create-venue', async (req, res) => {
     return
 });
 
+router.get('/get-all-venues', async (req, res) => {
+    const venues = await Venue.getAllVenues();
+    ajax.success(res, "Successfully gotten all venues!", venues);
+    return
+});
+
 router.post('/update-venue', async (req, res) => {
     let venue = req.body.venue;
 
