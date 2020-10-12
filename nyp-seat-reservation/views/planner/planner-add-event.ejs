@@ -273,8 +273,7 @@
     $('#venueSelectInput').on('change', function() {
         const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
         setEventMap(getSelectedObject(venues, '#venueSelectInput'));
-
-        reloadMap(sc, '#seatMap', '.seatCharts-legendCard:not(#addSeatTypeCard)');
+        reloadMap(sc, '#seatMap');
         resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Resize parent's height in relation to the original height
         scaleContentWidth($('#tableWrapper'), $('#seatMap'));
     });

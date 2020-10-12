@@ -11,7 +11,6 @@ const Venues = require('../../nyp-seat-reservation/models/Venue');
 const EventHelpers = require('../../nyp-seat-reservation/models/EventHelper');
 const EventSeats = require('../../nyp-seat-reservation/models/EventSeat');
 const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendee');
-const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeat');
 const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
 
 const createUsers = require('./dataset/create-users');
@@ -23,43 +22,41 @@ const setUpDB = (drop) => {
         // Specify all models relationships here
         // Note that one to may relationships should always follow this format
 
-        //event helpers & event
-        Events.hasMany(EventHelpers, { foreignKey: 'EventId' });
-        EventHelpers.belongsTo(Events, { foreignKey: 'EventId' });
-        //event attendees & event
-        Events.hasMany(EventAttendees, { foreignKey: 'EventId' });
-        EventAttendees.belongsTo(Events, { foreignKey: 'EventId' });
-        //event reserved seats & event
-        Events.hasMany(EventReservedSeats, { foreignKey: 'EventId' });
-        EventReservedSeats.belongsTo(Events, { foreignKey: 'EventId' });
-        //event seats & event
-        Events.hasMany(EventSeats, { foreignKey: 'EventId' });
-        EventSeats.belongsTo(Events, { foreignKey: 'EventId'});
-        //event seat type & event
-        Events.hasMany(EventSeatTypes, { foreignKey: 'EventId' });
-        EventSeatTypes.belongsTo(Events, { foreignKey: 'EventId' });
+        // Each venue can house many events
+        Venues.hasMany(Events, { foreignKey: 'venueId' });
+        Events.belongsTo(Venues, { foreignKey: 'venueId' });
 
+        // Each user (planners) can create many venues
+        Users.hasMany(Venues, { foreignKey: 'userId' });
+        Venues.belongsTo(Users, { foreignKey: 'userId' });
 
-        //venues & planners
-        Venues.hasMany(Users, { foreignKey: 'UserId' });
-        Users.belongsTo(Venues, { foreignKey: 'UserId' });
+        // Each event has many seat types
+        Events.hasMany(EventSeatTypes, { foreignKey: 'eventId' });
+        EventSeatTypes.belongsTo(Events, { foreignKey: 'eventId' });
 
-        //events seats & events seat type
-        EventSeats.hasMany(EventSeatTypes, { foreignKey: 'SeatTypeId' });
-        EventSeatTypes.belongsTo( EventSeats, { foreignKey: 'SeatTypeId' });
-        
-        //events reserved seats & attendee
-        EventReservedSeats.hasMany(EventAttendees, { foreignKey: 'AttendeeId' });
-        EventAttendees.belongsTo(EventReservedSeats, { foreignKey: 'AttendeeId' });
-        //events reserved seats & seat type
-        EventReservedSeats.hasMany(EventSeatTypes, { foreignKey: 'SeatTypeId' });
-        EventSeatTypes.belongsTo(EventReservedSeats, { foreignKey: 'SeatTypeId' });
+        // Each seat type of an event can belong to many seats in the venue
+        EventSeatTypes.hasMany(EventSeats, { foreignKey: 'seatTypeId' });
+        EventSeats.belongsTo(EventSeatTypes, { foreignKey: 'seatTypeId' });
 
-        //user & event helpers
-        Users.hasMany(EventHelpers, { foreignKey: 'UserId' });
-        EventHelpers.belongsTo(Users, { foreignKey: 'UserId' });
+        // Each event can have many helpers
+        Events.hasMany(EventHelpers, { foreignKey: 'eventId' });
+        EventHelpers.belongsTo(Events, { foreignKey: 'eventId' });
 
-        mySQLDB.sync({ force: drop }).then(() => {
+        // Each user can help with many events
+        Users.hasMany(EventHelpers, { foreignKey: 'userId' });
+        EventHelpers.belongsTo(Users, { foreignKey: 'userId' });
+
+        // Each event has many attendees
+        Events.hasMany(EventAttendees, { foreignKey: 'eventId' });
+        EventAttendees.belongsTo(Events, { foreignKey: 'eventId' });
+
+        // Each attendee can reserve many seats in an event
+        EventAttendees.hasMany(EventSeats, { foreignKey: 'attendeeId' });
+        EventSeats.belongsTo(EventAttendees, { foreignKey: 'attendeeId' });
+
+        mySQLDB.sync({ 
+            force: drop 
+        }).then(() => {
             if (drop == true) {
                 createUsers(Users);
                 createVenues(Venues);
