@@ -288,11 +288,13 @@
         const selectedVenueIndex = $("#venueSelectInput").val();
 
         if (!$.isNumeric(selectedVenueIndex)) {
-            throw 'Venue is not a '
+            throw { error: 'Selected option is not a valid venue' };
         }
         
         const columns = columnInput.toNum();
         const rows = rowInput.toNum();
+
+        
     }
 </script>
 
