@@ -204,11 +204,11 @@
     $(document).on("click", ".seatCharts-legendCard", function() {
         const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
         
-        // if (highlighted) {
-        //     selectedSeatType = $(this).attr("seat-character");
-        // } else {
-        //     selectedSeatType = null;
-        // }
+        if (highlighted) {
+            selectedSeatType = $(this).attr("seat-character");
+        } else {
+            selectedSeatType = null;
+        }
     });
 
     $('#saveEditedVenueForm').submit(async function (event) {

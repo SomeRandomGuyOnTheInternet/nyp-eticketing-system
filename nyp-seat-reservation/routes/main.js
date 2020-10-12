@@ -46,4 +46,10 @@ router.get('/logout', (req, res) => {
 	res.redirect('/login');
 });
 
+router.get('/test', async (req, res) => {
+	res.render('test/main', { 
+		title: "Test", 
+	})
+});
+
 module.exports = router;
