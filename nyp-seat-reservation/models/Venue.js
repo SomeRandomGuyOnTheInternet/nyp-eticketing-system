@@ -75,7 +75,6 @@ module.exports.updateVenue = async (venue) => {
                 venue,
                 { where: { id: venue.id } }
             );
-
             resolve(venue)
         } catch (error) {
             reject(error);

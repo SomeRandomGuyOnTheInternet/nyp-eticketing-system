@@ -123,3 +123,11 @@ function renderStudentHelperCardTemplate(helper) {
 
     return $card;
 };
+
+function renderNoStudentHelpersSelectedTemplate() {
+    var $span = $('<span></span>')
+        .addClass('text-secondary h6')
+        .text("You have not selected any student helpers!");
+
+    return $span;
+};

@@ -8,6 +8,9 @@ const ajax = require('../utils/ajax');
 
 const User = require('../models/User');
 const Venue = require('../models/Venue');
+const Event = require('../models/Event');
+const EventSeatType = require('../models/EventSeatType');
+const EventHelper = require('../models/EventHelper');
 
 router.post('/create-venue', async (req, res) => {
     const name = req.body.name;
@@ -63,6 +66,72 @@ router.get('/get-all-helpers', async (req, res) => {
     const helpers = await User.getHelpers();
     ajax.success(res, "Successfully gotten all helpers!", helpers);
     return
+});
+
+router.post('/create-event', async (req, res) => {
+    const name = req.body.name;
+    const seatMap = JSON.stringify(req.body.seatMap);
+    const startDateTime = req.body.startDateTime;
+    const prioritiseBackRows = req.body.prioritiseBackRows;
+    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
+
+    if (!name) {
+        ajax.error(res, "Please enter a event name!");
+        return;
+    }
+
+    if (!seatMap) {
+        ajax.error(res, "Please enter a seat map for the event!");
+        return;
+    }
+
+    if (!startDateTime) {
+        ajax.error(res, "Please enter a valid start date/time for the event!");
+        return;
+    }
+
+    if (seatsPerReservation) {
+        if (isNaN(seatsPerReservation)) {
+            ajax.error(res, "Please enter a valid max number of seats per reservation!");
+            return;
+        } else {
+            if (seatsPerReservation < 1) {
+                ajax.error(res, "Please enter a higher number of seats per reservation!");
+                return;
+            }
+
+            if (seatsPerReservation > 10) {
+                ajax.error(res, "Please enter a lower number of seats per reservation!");
+                return;
+            }
+        }
+    }
+
+    const event = await Event.createEvent({
+        name: name,
+        seatMap: seatMap,
+        startDateTime: startDateTime,
+        seatsPerReservation: seatsPerReservation,
+        prioritiseBackRows: prioritiseBackRows
+    });
+
+    ajax.success(res, "Successfully created event!", event);
+});
+
+router.post('/create-event-seat-types', async (req, res) => {
+    const seatTypes = req.body.seatTypes;
+    // TODO: Do validation for each seat type in array
+    await EventSeatType.createEventSeatTypes(seatTypes);
+
+    ajax.success(res, "Successfully created event seat types!");
+});
+
+router.post('/create-event-helpers', async (req, res) => {
+    const eventHelpers = req.body.eventHelpers;
+    // TODO: Do validation for each event helper in array
+    await EventHelper.createEventHelpers(eventHelpers);
+    
+    ajax.success(res, "Successfully created event helpers!");
 });
 
 module.exports = router;

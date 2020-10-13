@@ -3,29 +3,29 @@
 <!-- TODO: Delete seat types -->
 <!-- TODO: Click on row to replace entire row with seat type -->
 <!-- TODO: Delete student helper -->
+<!-- TODO: Use handleError a lot more -->
 
 <%- include('../templates/head')-%>
 <body>
     <%- include('../templates/navbar')-%>
     <div class="container"> <!-- Always enclose everything in a container  -->
         <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
-
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Event details form section  -->
             <!-- Heading  -->
             <h2 class="section-heading">Event Details</h2>
             <div class="mt-3"></div>
             <!-- Content  -->
-            <form action="/" method="post">
+            <form id="addEventForm" action="/" method="post">
                 <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                     <!-- Event Name Input Card  -->
                     <div class="col-sm-6">
                         <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
-                                <label for="eventNameTextInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                <label for="eventNameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Name</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventNameTextInput" name="eventNameTextInput" class="form-control card-input" type="text" placeholder="e.g. Dance Competition"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" placeholder="e.g. Dance Competition" required> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                                 <label for="eventDateTimeInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Date / Time</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" placeholder="e.g 13th March 2021, 9am"> <!-- This is where the user actually inputs all their stuff  -->
+                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" placeholder="e.g 13th March 2021, 9am" required> <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
@@ -44,17 +44,10 @@
                     <div class="col-sm-6">
                         <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
-                                <label for="maxSeatsPerReservationSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                <label for="maxSeatsPerReservationInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Maximum no. of seats per reservation</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <select id="maxSeatsPerReservationSelectInput" name="maxSeatsPerReservationSelectInput" class="form-control card-input"> <!-- This is where the user actually inputs all their stuff  -->
-                                    <option>No Limit</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                    <option>6</option>
-                                </select>
+                                <input id="maxSeatsPerReservationInput" name="maxSeatsPerReservationInput" class="form-control card-input" type="number" min="1" max="10" placeholder="No Limit">
                             </div>
                         </div>
                     </div>
@@ -62,7 +55,7 @@
                     <div class="col-sm-6">
                         <div class="card input-card mt-3">
                             <div class="card-body no-label-card-body">
-                                <div id="prioritiseBackCheckForm">
+                                <div id="prioritiseBackCheck">
                                     <div class="form-check form-check-inline ml-2">
                                         <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true">
                                         <label class="form-check-label px-3" for="prioritiseBackCheck">
@@ -131,7 +124,7 @@
                 <div class="row">
                     <!-- Helper Select Input Card  -->
                     <div class="col-sm-6 border-right border-secondary">
-                        <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card input-card mb-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
                                 <label for="helperSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Student Helpers</small> <!-- The small element is where we actually write down what the input does  -->
@@ -145,8 +138,9 @@
                     <div id="helpersCardCol" class="col-sm-6">
                     </div>
                 </div>
+                <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+                <button id="createEventButton" class="btn btn-primary btn-lg w-100" type="submit">Create Event</button>
             </form>
-
         </main>
     </div>
 
@@ -193,6 +187,23 @@
 </body>
 
 <script>
+    const addEventForm = '#addEventForm';
+    const eventNameInput = '#eventNameInput';
+    const eventDateTimeInput = '#eventDateTimeInput';
+    const maxSeatsPerReservationInput = '#maxSeatsPerReservationInput';
+    const prioritiseBackCheck = '#prioritiseBackCheck';
+    const venueSelectInput = '#venueSelectInput';
+    const tableWrapper = '#tableWrapper';
+    const seatMap = '#seatMap';
+    const legend = '#legend';
+    const addSeatTypeCard = '#addSeatTypeCard';
+    const helperSelectInput = '#helperSelectInput';
+    const helpersCardCol = '#helpersCardCol';
+    const createEventButton = '#createEventButton';
+    const addSeatTypeModal = '#addSeatTypeModal';
+    const seatTypeNameInput = '#seatTypeNameInput';
+    const blockSeatTypeCheck = '#blockSeatTypeCheck';
+    const addSeatTypeButton = '#addSeatTypeButton';
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
@@ -232,7 +243,7 @@
     };
 
     sc.legend = {
-        node : $('#legend'),
+        node : $(legend),
         items : []				
     };
 
@@ -244,22 +255,21 @@
         try {
             venues = await getAllVenues();
             helpers = await getAllHelpers();
-
             helpers.forEach(function (helper) {
                 helper.selected = false;
             });
 
-            populateSelect(venues, '#venueSelectInput');
-            populateSelect(helpers, '#helperSelectInput');
-
-            setEventMap(getSelectedObject(venues, '#venueSelectInput'));
+            populateSelect(venues, venueSelectInput);
+            populateHelperSelect(helpers);
+            populateSelectedHelperColumn(helpers);
 
             // Bind map
-            bindMap(sc, '#seatMap');
-            scaleContentWidth($('#tableWrapper'), $('#seatMap')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
+            setEventMap(getSelectedObject(venues, venueSelectInput));
+            bindMap(sc, seatMap);
+            scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
 
             for (const seatCharacter in sc.seats) {
-                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($("#legend"));
+                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
             }
         } catch (error) {
             handleError(error);
@@ -267,26 +277,26 @@
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+        scaleContentWidth(tableWrapper, seatMap);
     });
 
-    $('#venueSelectInput').on('change', function() {
-        const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
-        setEventMap(getSelectedObject(venues, '#venueSelectInput'));
-        reloadMap(sc, '#seatMap');
-        resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Resize parent's height in relation to the original height
-        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+    $(venueSelectInput).on('change', function() {
+        setEventMap(getSelectedObject(venues, venueSelectInput));
+        const orgHeight = $(seatMap)[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
+        reloadMap(sc, seatMap);
+        resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
+        scaleContentWidth(tableWrapper, seatMap);
     });
 
-    $('#helperSelectInput').on('change', function() {
-        getSelectedObject(helpers, '#helperSelectInput').selected = true;
-        reloadHelperSelect(helpers);
-        reloadSelectedHelperColumn(helpers);
+    $(helperSelectInput).on('change', function() {
+        getSelectedObject(helpers, helperSelectInput).selected = true;
+        populateHelperSelect(helpers);
+        populateSelectedHelperColumn(helpers);
     });
 
-    $("#addSeatTypeButton").click(function () {
-        const seatName = $("#seatTypeNameInput").val();
-        const seatIsBlocked = $("#blockSeatTypeCheck").is(':checked');
+    $(addSeatTypeButton).click(function () {
+        const seatName = $(seatTypeNameInput).val();
+        const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
         const seatCharacter = availableSeatCharacters[0];
         const descriptiveCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
 
@@ -304,15 +314,15 @@
         };
 
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
-        renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($("#legend")); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
+        renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend)); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
         
-        $("#addSeatTypeModal").modal('hide'); // Hides the modal
-        $("#seatTypeNameInput").val(''); // Reset input to default state
-        $("#blockSeatTypeCheck").prop('checked', false);
+        $(addSeatTypeModal).modal('hide'); // Hides the modal
+        $(seatTypeNameInput).val(''); // Reset input to default state
+        $(blockSeatTypeCheck).prop('checked', false);
     });
 
-    $(document).on("click", ".seatCharts-legendCard:not(#addSeatTypeCard)", function() {
-        const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
+    $(document).on("click", `.seatCharts-legendCard:not(${addSeatTypeCard})`, function() {
+        const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
         
         if (highlighted) {
             selectedSeatType = $(this).attr("seat-character");
@@ -321,34 +331,96 @@
         }
     });
 
-    reloadHelperSelect = (helpers) => {
-        $('#helperSelectInput option:not(:first)').remove();
+    $(addEventForm).submit(async function (e) {
+        e.preventDefault();
+        $(createEventButton).prop('disabled', true);
+        
+        try {
+            const event = await createEvent(
+                $(eventNameInput).val(),
+                sc.map,
+                $(eventDateTimeInput).val(),
+                $(maxSeatsPerReservationInput).val(),
+                $(prioritiseBackCheck).is(':checked')
+            );
+            
+            const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
+            const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
+
+            await createEventSeatTypes(seatTypeArray);
+            await createEventHelpers(eventHelperArray);
+            
+            window.location.replace("/planner/events");
+        } catch (error) {
+            handleError(error);
+        } finally {
+            $(createEventButton).prop('disabled', false);
+        }
+    });
+
+    populateHelperSelect = (helpers) => {
+        $(`${helperSelectInput} option:not(:first)`).remove();
         
         for (i = 0; i < helpers.length; i++) {
             if (!helpers[i].selected) {
-                $('#helperSelectInput').append($('<option>', {
+                $(helperSelectInput).append($('<option>', {
                     value: i,
                     text: helpers[i].name
                 }));
             }
         }
         
-        $('#helperSelectInput').val($('#helperSelectInput option:first').val());
+        $(helperSelectInput).val($(`${helperSelectInput} option:first`).val());
     };
 
-    reloadSelectedHelperColumn = (helpers) => {
-        $('#helpersCardCol').empty();
+    populateSelectedHelperColumn = (helpers) => {
+        $(helpersCardCol).empty();
         
         for (i = 0; i < helpers.length; i++) {
             if (helpers[i].selected) {
-                $("#helpersCardCol").append(renderStudentHelperCardTemplate(helpers[i]));
+                $(helpersCardCol).append(renderStudentHelperCardTemplate(helpers[i]));
             }
+        }
+
+        if($(helpersCardCol).is(':empty')) {
+            $(helpersCardCol).append(renderNoStudentHelpersSelectedTemplate());
         }
     };
 
     setEventMap = (venue) => {
         sc.map = JSON.parse(venue.seatMap);
-    }
+    };
+
+    getSeatTypeArray = (seats, eventId) => {
+        let seatArray = [];
+        
+        for (const seatCharacter in seats) {
+            seatArray.push({
+                name: seats[seatCharacter].category,
+                character: seatCharacter,
+                isBlocked: seats[seatCharacter].blocked,
+                cssClasses: seats[seatCharacter].classes,
+                eventId: eventId
+            });
+        }
+
+        return seatArray;
+    };
+
+    getSelectedEventHelperArray = (helpers, eventId) => {
+        let selectedSeatArray = [];
+        
+        for (i = 0; i < helpers.length; i++) {
+            if (helpers[i].selected) {
+                selectedSeatArray.push({
+                    userId: helpers[i].id,
+                    eventId: eventId
+                });
+            }
+        }
+
+        return selectedSeatArray;
+    };
 </script>
 
 <%- include('../templates/footer')-%>

@@ -3,6 +3,9 @@ const apiRoutes = {
     getAllVenues: "/api/get-all-venues",
     updateVenue: "/api/update-venue",
     getAllHelpers: "/api/get-all-helpers",
+    createEvent: "/api/create-event",
+    createEventSeatTypes: "/api/create-event-seat-types",
+    createEventHelpers: "/api/create-event-helpers",
 };
 
 promiseAjax = (uri, method, data) => {
@@ -72,6 +75,55 @@ getAllHelpers = async () => {
         try {
             const res = await promiseAjax(apiRoutes.getAllHelpers, 'GET', null);
             resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(apiRoutes.createEvent, 'POST', 
+                {
+                    name: name,
+                    seatMap: seatMap,
+                    startDateTime: startDateTime,
+                    seatsPerReservation: seatsPerReservation,
+                    prioritiseBackRows: prioritiseBackRows,
+                }
+            );
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+createEventSeatTypes = async (seatTypeArray) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(apiRoutes.createEventSeatTypes, 'POST', 
+                {
+                    seatTypes: seatTypeArray
+                }
+            );
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+createEventHelpers = async (eventHelperArray) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(apiRoutes.createEventHelpers, 'POST', 
+                {
+                    eventHelpers: eventHelperArray
+                }
+            );
+            resolve(res);
         } catch (error) {
             reject(error);
         }

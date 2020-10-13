@@ -8,6 +8,9 @@ const Event = db.define('Event', {
     name: {
         type: Sequelize.STRING
     },
+    seatMap: {
+        type: Sequelize.TEXT
+    },
     startDateTime: {
         type: Sequelize.DATE
     },
@@ -34,8 +37,8 @@ module.exports = Event;
 module.exports.createEvent = async (event) => {
     return new Promise(async (resolve, reject) => {
         try {
-            await Event.create(event);
-            resolve(event);
+            const newEvent = await Event.create(event);
+            resolve(newEvent);
         } catch (error) {
             reject(error);
         }
@@ -45,10 +48,8 @@ module.exports.createEvent = async (event) => {
 module.exports.getEventById = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let event = await Event.findOne({ 
-                where: { 
-                    id: id
-                } 
+            const event = await Event.findOne({ 
+                where: { id: id } 
             });
 
             resolve(event);
@@ -61,7 +62,7 @@ module.exports.getEventById = async (id) => {
 module.exports.getAllEvents = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            let events = await Event.findAll({ raw: true });
+            const events = await Event.findAll({ raw: true });
             resolve(events);
         } catch (error) {
             reject(error);

@@ -327,7 +327,7 @@
             await createVenue(name, map);
             window.location.replace("/planner/venues");
         } catch (error) {
-            showDangerToast(error.responseText);
+            handleError(error);
         } finally {
             $('#saveVenueTypeButton').prop('disabled', false);
         }

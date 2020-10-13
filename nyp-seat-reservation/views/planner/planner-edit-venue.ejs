@@ -116,7 +116,6 @@
     let sc = {};
 
     sc.map = venue.seatMap;
-    replaceMapSeatCharacters(sc.map, emptySpace, tempEmptySpace); // Convert empty space characters to a temporary character that can be interacted with
 
     sc.seats = {
         [defaultSeat]: {
@@ -153,6 +152,7 @@
 
     // Rest of the functions
     $(document).ready(function() {
+        replaceMapSeatCharacters(sc.map, emptySpace, tempEmptySpace); // Convert empty space characters to a temporary character that can be interacted with
         bindMap(sc, '#seatMap');
         scaleContentWidth($('#tableWrapper'), $('#seatMap'));
 
