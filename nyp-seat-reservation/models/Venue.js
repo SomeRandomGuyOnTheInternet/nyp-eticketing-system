@@ -81,3 +81,15 @@ module.exports.updateVenue = async (venue) => {
         }
     });
 };
+
+module.exports.deleteVenue = async (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let venue = await Venue.getVenueById(id)
+            venue.destroy();
+            resolve(venue)
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
