@@ -59,6 +59,13 @@ router.post('/update-venue', async (req, res) => {
     ajax.success(res, "Successfully updated venue!");
 });
 
+router.get('/delete-venue/:id', async (req, res) => {
+	const id = req.params.id;
+	await Venue.deleteVenue(id);
+	flash.success(req, 'Successfully deleted venue!');
+	res.redirect('/planner/venues');
+});
+
 router.get('/get-all-helpers', async (req, res) => {
     const helpers = await User.getHelpers();
     ajax.success(res, "Successfully gotten all helpers!", helpers);

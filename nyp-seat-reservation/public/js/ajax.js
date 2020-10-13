@@ -2,6 +2,7 @@ const apiRoutes = {
     createVenue: "/api/create-venue",
     getAllVenues: "/api/get-all-venues",
     updateVenue: "/api/update-venue",
+    deleteVenue: "/api/delete-venue",
     getAllHelpers: "/api/get-all-helpers",
 };
 
@@ -58,6 +59,21 @@ updateVenue = async (venue) => {
             const res = await promiseAjax(apiRoutes.updateVenue, 'POST', 
                 {
                     venue: venue
+                }
+            );
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+deleteVenue = async (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(apiRoutes.deleteVenue, 'POST', 
+                {
+                    id: id
                 }
             );
             resolve(res);
