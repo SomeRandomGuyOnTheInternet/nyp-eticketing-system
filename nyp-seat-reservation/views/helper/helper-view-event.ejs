@@ -155,9 +155,12 @@
                         <div class="modal-body">
                             <div class="d-flex">
                                 <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                                <div id="seatDetailsSeatCell" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>                           
-                                <span id="seatDetailsId" class="align-self-center"></span>
-                                <span id="seatDetailsDescription" class="align-self-center">Reserved for Adam</span>
+                                <div id="seatDetailsSeatCell" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>    
+                                <div class="ml-4">
+                                    <span id="seatDetailsId" class="align-self-center h4"></span>
+                                    <br>
+                                    <span id="seatDetailsDescription" class="align-self-center">Reserved for Adam</span>
+                                </div>                       
                             </div>
                         </div>
                     </div>
@@ -215,11 +218,13 @@
     sc.click = function () {
         // Temporary hack
         if (this.settings.data.blocked) {
-            console.log(this)
             $(seatDetailsModal).modal();
-            $(seatDetailsSeatCell).addClass(this.settings.data.classes);
             $(seatDetailsSeatId).text(this.settings.id);
             $(seatDetailsDescription).text(`Blocked for ${this.settings.data.category}`);
+            $(seatDetailsSeatCell)
+                .removeClass()
+                .addClass('seatCharts-seat seatCharts-cell available')
+                .addClass(this.settings.data.classes);
         } else {
             if (this.status() == 'available') {
                 return 'selected';
@@ -233,6 +238,7 @@
     $(document).ready(async function() {
         try {
             const eventDetails = await getEventDetailsForHelper(eventId, helperId);
+
             sc.map = eventDetails.event.seatMap;
             sc.seats = getSeatsObject(eventDetails.seatTypes);
 
