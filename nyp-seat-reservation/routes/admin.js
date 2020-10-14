@@ -47,6 +47,13 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
 		return;
 	}
 
+	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+	if (!email.match(mailformat)) {
+		flash.error(req, "Please enter a valid email!");
+		res.redirect('/admin/planners');
+		return;
+	}
+
 	if (!password) {
 		flash.error(req, "Please enter a password!");
 		res.redirect('/admin/planners');
@@ -100,6 +107,13 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 	if (!email) {
 		flash.error(req, "Please enter an email!");
 		res.redirect('/admin/helpers');
+		return;
+	}
+	
+	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+	if (!email.match(mailformat)) {
+		flash.error(req, "Please enter a valid email address!");
+		res.redirect('/admin/planners');
 		return;
 	}
 
