@@ -722,5 +722,5 @@ unbindMap = (seatMapNode,) => {
 };
 
 bindMap = (sc, seatMapNode) => {
-   return $(seatMapNode).seatCharts(sc);
+	return $(seatMapNode).seatCharts(sc);
 };

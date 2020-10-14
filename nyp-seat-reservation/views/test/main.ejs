@@ -484,6 +484,8 @@
         sc.find(/^DD:[0-9]+/).status('reserved');
         sc.get("DD:1").status('available');
 
+        console.log(sc);
+
         scaleContentWidth($('#table-wrapper'), $('#seat-map')); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
