@@ -16,49 +16,23 @@
                         <table class="table table-hover table-click table-lg"> 
                             <thead>
                                 <tr>
+                                    <th scope="col">#</th>
                                     <th scope="col">Name</th>
+                                    <th scope="col">Venue</th>
                                     <th scope="col">Date</th>
                                     <th scope="col">Time</th>
-                                    <th scope="col">Venue</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="font-weight-medium"><a href="/helper/event">SIT Graduation Ceremony</a></td> <!-- If your table links to some other page, always put the link in the main column like in this example -->
-                                    <td>18th April 2020</td>
-                                    <td>9am</td>
-                                    <td>Auditorium</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-weight-medium"><a href="/helper/event">SBM Graduation Ceremony</a></td>
-                                    <td>18th April 2020</td>
-                                    <td>1pm</td>
-                                    <td>Auditorium</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-weight-medium"><a href="/helper/event">SIDM Graduation Ceremony</a></td>
-                                    <td>18th April 2020</td>
-                                    <td>5pm</td>
-                                    <td>Auditorium</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-weight-medium"><a href="/helper/event">Guitar Club Presents: Steel Chords & Mellow Chords</a></td>
-                                    <td>21st April 2020</td>
-                                    <td>5pm</td>
-                                    <td>Theatre for the Arts</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-weight-medium"><a href="/helper/event">Drama Club Presents: Shrek on Ice!</a></td>
-                                    <td>22nd April 2020</td>
-                                    <td>4pm</td>
-                                    <td>Theatre for the Arts</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-weight-medium"><a href="/helper/event">Martial Arts Night</a></td>
-                                    <td>24th April 2020</td>
-                                    <td>7pm</td>
-                                    <td>Theatre for the Arts</td>
-                                </tr>
+                                <% for (i = 0; i < events.length; i++) { %>
+                                    <tr>
+                                        <th scope="row"><%= i + 1 %></th>
+                                        <td class="font-weight-medium"><a href="/helper/events/<%= events[i].id %>"><%= events[i].name %></a></td>
+                                        <td><%= events[i]['Venue.name'] %></td>
+                                        <td><%= moment(events[i].startDateTime).format('Do MMMM YYYY') %></td>
+                                        <td><%= moment(events[i].startDateTime).format('h:mm a') %></td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>

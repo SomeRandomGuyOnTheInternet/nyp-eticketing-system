@@ -108,6 +108,35 @@ populateSelect = (objects, selectNode) => {
     $(selectNode).val($(`${selectNode} option:first`).val());
 };
 
+populateHelperSelect = (helpers, helperSelectNode) => {
+    $(`${helperSelectNode} option:not(:first)`).remove();
+    
+    for (i = 0; i < helpers.length; i++) {
+        if (!helpers[i].selected) {
+            $(helperSelectNode).append($('<option>', {
+                value: i,
+                text: `${helpers[i].name} - ${helpers[i].email}`
+            }));
+        }
+    }
+    
+    $(helperSelectNode).val($(`${helperSelectNode} option:first`).val());
+};
+
+populateSelectedHelperColumn = (helpers, selectedHelpersColNode) => {
+    $(selectedHelpersColNode).empty();
+    
+    for (i = 0; i < helpers.length; i++) {
+        if (helpers[i].selected) {
+            $(selectedHelpersColNode).append(renderStudentHelperCardTemplate(helpers[i]));
+        }
+    }
+
+    if($(selectedHelpersColNode).is(':empty')) {
+        $(selectedHelpersColNode).append(renderNoStudentHelpersSelectedTemplate());
+    }
+};
+
 getSelectedObject = (objects, selectNode) => {
     const selectedValue = $(selectNode).val();
 
@@ -120,4 +149,35 @@ getSelectedObject = (objects, selectNode) => {
     }
 
     return objects[selectedValue.toNum()];
+};
+
+getSeatTypeArray = (seats, eventId) => {
+    let seatArray = [];
+    
+    for (const seatCharacter in seats) {
+        seatArray.push({
+            name: seats[seatCharacter].category,
+            character: seatCharacter,
+            isBlocked: seats[seatCharacter].blocked,
+            cssClasses: seats[seatCharacter].classes,
+            eventId: eventId
+        });
+    }
+
+    return seatArray;
+};
+
+getSelectedEventHelperArray = (helpers, eventId) => {
+    let selectedSeatArray = [];
+    
+    for (i = 0; i < helpers.length; i++) {
+        if (helpers[i].selected) {
+            selectedSeatArray.push({
+                userId: helpers[i].id,
+                eventId: eventId
+            });
+        }
+    }
+
+    return selectedSeatArray;
 };

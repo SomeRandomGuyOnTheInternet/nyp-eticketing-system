@@ -1,6 +1,8 @@
 const db = require('../config/DBConfig');
+
 const User = require('./User');
 const Event = require('./Event');
+const Venue = require('./Venue');
 
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
@@ -77,6 +79,22 @@ module.exports.getEventsByHelperId = async (helperId) => {
                 raw: true
             });
             resolve(events);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+module.exports.isHelperForEvent = async (helperId, eventId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const eventHelper = await EventHelper.findOne({
+                where: { 
+                    userId: helperId,
+                    eventId: eventId,
+                },
+            });
+            resolve(eventHelper != null);
         } catch (error) {
             reject(error);
         }

@@ -8,6 +8,7 @@
 <!-- TODO: Drag and select seats for helpers -->
 
 <%- include('../templates/head')-%>
+
 <body>
     <%- include('../templates/navbar')-%>
     <div class="container"> <!-- Always enclose everything in a container  -->
@@ -219,7 +220,7 @@
     // Seat chart configuration
     let sc = {};
 
-    sc.map;
+    sc.map = [];
 
     sc.seats = {
         'G': {
@@ -264,8 +265,8 @@
             });
 
             populateSelect(venues, venueSelectInput);
-            populateHelperSelect(helpers);
-            populateSelectedHelperColumn(helpers);
+            populateHelperSelect(helpers, helperSelectInput);
+            populateSelectedHelperColumn(helpers, helpersCardCol);
 
             // Bind map
             setEventMap(getSelectedObject(venues, venueSelectInput));
@@ -294,8 +295,8 @@
 
     $(helperSelectInput).on('change', function() {
         getSelectedObject(helpers, helperSelectInput).selected = true;
-        populateHelperSelect(helpers);
-        populateSelectedHelperColumn(helpers);
+        populateHelperSelect(helpers, helperSelectInput);
+        populateSelectedHelperColumn(helpers, helpersCardCol);
     });
 
     $(addSeatTypeButton).click(function () {
@@ -363,70 +364,8 @@
         }
     });
 
-    populateHelperSelect = (helpers) => {
-        $(`${helperSelectInput} option:not(:first)`).remove();
-        
-        for (i = 0; i < helpers.length; i++) {
-            if (!helpers[i].selected) {
-                $(helperSelectInput).append($('<option>', {
-                    value: i,
-                    text: `${helpers[i].name} - ${helpers[i].email}`
-                }));
-            }
-        }
-        
-        $(helperSelectInput).val($(`${helperSelectInput} option:first`).val());
-    };
-
-    populateSelectedHelperColumn = (helpers) => {
-        $(helpersCardCol).empty();
-        
-        for (i = 0; i < helpers.length; i++) {
-            if (helpers[i].selected) {
-                $(helpersCardCol).append(renderStudentHelperCardTemplate(helpers[i]));
-            }
-        }
-
-        if($(helpersCardCol).is(':empty')) {
-            $(helpersCardCol).append(renderNoStudentHelpersSelectedTemplate());
-        }
-    };
-
     setEventMap = (venue) => {
         sc.map = JSON.parse(venue.seatMap);
-    };
-
-    getSeatTypeArray = (seats, eventId) => {
-        let seatArray = [];
-        
-        for (const seatCharacter in seats) {
-            seatArray.push({
-                name: seats[seatCharacter].category,
-                character: seatCharacter,
-                isBlocked: seats[seatCharacter].blocked,
-                cssClasses: seats[seatCharacter].classes,
-                eventId: eventId
-            });
-        }
-
-        return seatArray;
-    };
-
-
-
-    getSelectedEventHelperArray = (helpers, eventId) => {
-        let selectedSeatArray = [];
-        
-        for (i = 0; i < helpers.length; i++) {
-            if (helpers[i].selected) {
-                selectedSeatArray.push({
-                    userId: helpers[i].id,
-                    eventId: eventId
-                });
-            }
-        }
-
-        return selectedSeatArray;
     };
 </script>
 

@@ -1,0 +1,351 @@
+<%- include('../templates/head')-%>
+
+<body>
+    <%- include('../templates/navbar')-%>
+    <div class="container"> <!-- Always enclose everything in a container  -->
+        <main role="main" class="inner cover"> <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
+            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+            <!-- Event details form section  -->
+            <!-- Heading  -->
+            <h2 class="section-heading">Event Details</h2>
+            <div class="mt-3"></div>
+            <!-- Content  -->
+            <form id="editEventForm" action="/" method="post">
+                <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
+                    <!-- Event Name Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="eventNameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Name</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" value="<%= event.name %>" placeholder="e.g. Dance Competition" required> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Event Start Date / Time Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="eventDateTimeInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Date / Time</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" value="<%= event.startDateTime %>" placeholder="e.g 13th March 2021, 9am" required> <!-- This is where the user actually inputs all their stuff  -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Max. No. of Seats Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="maxSeatsPerReservationInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Maximum no. of seats per reservation</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="maxSeatsPerReservationInput" name="maxSeatsPerReservationInput" class="form-control card-input" type="number" min="1" max="10" value="<%= event.seatsPerReservation %>" placeholder="No Limit">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Checkmark (check) Input Card w/o Label  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3">
+                            <div class="card-body no-label-card-body">
+                                <div id="prioritiseBackCheck">
+                                    <div class="form-check form-check-inline ml-2">
+                                        <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true" <% if (event.prioritiseBackRows) { %> checked <% } %>>
+                                        <label class="form-check-label px-3" for="prioritiseBackCheck">
+                                            Prioritise seats at the back
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+                <!-- Seat chart card section  -->
+                <!-- Heading  -->
+                <h2 class="section-heading">Seat Chart</h2>
+                <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+                <!-- Content  -->
+                <div class="row">
+                    <!-- Venues Select Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="venueSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Venue</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <select id="venueSelectInput" name="venueSelectInput" class="form-control card-input"> <!-- This is where the user actually inputs all their stuff  -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seatChartCard" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                    <div class="card-body">
+                        <div id="tableWrapper" class="seatCharts-wrapper"> <!-- Seat maps should be ensclosed in a seat chart wrapper -->
+                            <div id="seatMap" class="seatCharts-container"> <!-- This is the element the seat chart is gonna latch itself onto -->
+                                <div class="front-indicator">Front</div> <!-- The seat chart element should also contain the front indicator so the user knows the orientation of the map -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="legend" class="seatCharts-legend row">
+                    <!-- Add Seat Type Card -->
+                    <!-- This card will always be fixed in front of all the other legend cards -->
+                    <div id="addSeatTypeCol" class="seatCharts-cardColumn col-auto">
+                        <div id="addSeatTypeCard" class="seatCharts-legendCard card card-hover text-primary font-weight-medium py-2 px-4 mt-3">
+                            <div class="seatCharts-cardBody card-body">
+                                <div id="addSeatContent" class="seatCharts-legendItem">
+                                    <span class="seatCharts-legendDescription">
+                                        <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Seat Type
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="#addSeatTypeModal" class="stretched-link" data-toggle="modal" data-target="#addSeatTypeModal"></a> <!-- On pressing this card, the add seat type button will show up -->
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2"></div>
+                <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
+                <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+                <!-- Helpers input section  -->
+                <!-- Heading  -->
+                <h2 class="section-heading">Student Helpers</h2>
+                <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
+                <div class="row">
+                    <!-- Helper Select Input Card  -->
+                    <div class="col-sm-6 border-right border-secondary">
+                        <div class="card input-card mb-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="helperSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Student Helpers</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <select id="helperSelectInput" name="helperSelectInput" class="form-control card-input"> <!-- This is where the user actually inputs all their stuff  -->
+                                    <option selected="true" disabled="disabled">Choose Helper</option> 
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="helpersCardCol" class="col-sm-6">
+                    </div>
+                </div>
+                <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+                <button id="updateEventButton" class="btn btn-primary btn-lg w-100" type="submit">Update Event</button>
+            </form>
+        </main>
+    </div>
+
+    <div id="addSeatTypeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addSeatTypeModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <!-- This is where you enter the title of the modal -->
+                <div class="modal-header">
+                    <h4 class="modal-title text-primary" id="addSeatTypeModalLabel">Add Seat Type</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!-- This is the actual content (can put anything here) -->
+                <div class="modal-body">
+                    <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card-body input-card-body">
+                            <label for="seatTypeNameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Name</small> <!-- The small element is where we actually write down what the input does  -->
+                            </label>
+                            <input id="seatTypeNameInput" name="seatTypeNameInput" class="form-control card-input" type="text" placeholder="e.g. Handicapped"> <!-- This is where the user actually inputs all their stuff  -->
+                        </div>
+                    </div>
+                    <div class="card input-card mt-3">
+                        <div class="card-body no-label-card-body">
+                            <div id="blockSeatTypeCheckForm">
+                                <div class="form-check form-check-inline ml-2">
+                                    <input id="blockSeatTypeCheck" name="blockSeatTypeCheck"  class="form-check-input lg-check" type="checkbox" value="true">
+                                    <label class="form-check-label px-3" for="blockSeatTypeCheck">
+                                        Block helpers from reserving this seat type
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- This is the footer, where you usually put buttons and stuff -->
+                <div class="modal-footer">
+                    <button id="addSeatTypeButton" class="btn btn-primary btn-lg w-100" type="button">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const editEventForm = '#editEventForm';
+    const eventNameInput = '#eventNameInput';
+    const eventDateTimeInput = '#eventDateTimeInput';
+    const maxSeatsPerReservationInput = '#maxSeatsPerReservationInput';
+    const prioritiseBackCheck = '#prioritiseBackCheck';
+    const venueSelectInput = '#venueSelectInput';
+    const tableWrapper = '#tableWrapper';
+    const seatMap = '#seatMap';
+    const legend = '#legend';
+    const addSeatTypeCard = '#addSeatTypeCard';
+    const helperSelectInput = '#helperSelectInput';
+    const helpersCardCol = '#helpersCardCol';
+    const updateEventButton = '#updateEventButton';
+    const addSeatTypeModal = '#addSeatTypeModal';
+    const seatTypeNameInput = '#seatTypeNameInput';
+    const blockSeatTypeCheck = '#blockSeatTypeCheck';
+    const addSeatTypeButton = '#addSeatTypeButton';
+    const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
+
+    // TODO: remove seat characters that are already used by the event
+    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
+
+    let venues = [];
+    let helpers = [];
+
+    let selectedSeatType; // This variable will contain the character of the seat type we've selected
+    let selectedVenue;
+
+    // Seat chart configuration
+    let sc = {};
+
+    sc.map = [];
+
+    sc.seats = {};
+
+    sc.naming = {
+        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
+        getLabel : function (character, row, column) {
+            return row + ':' + column;
+        },
+        getId : function (character, row, column) {
+            return row + ':' + column;
+        }
+    };
+
+    sc.legend = {
+        node : $(legend),
+        items : []				
+    };
+
+    sc.click = function () {
+        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
+    };
+
+    $(document).ready(async function() {
+        try {
+            venues = await getAllVenues();
+            helpers = await getAllHelpers();
+            helpers.forEach(function (helper) {
+                helper.selected = false;
+            });
+
+            populateSelect(venues, venueSelectInput);
+            populateHelperSelect(helpers, helperSelectInput);
+            populateSelectedHelperColumn(helpers, helpersCardCol);
+
+            // Bind map
+            setEventMap(getSelectedObject(venues, venueSelectInput));
+            bindMap(sc, seatMap);
+            scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
+
+            for (const seatCharacter in sc.seats) {
+                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
+            }
+        } catch (error) {
+            handleError(error);
+        }
+    });
+
+    $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+        scaleContentWidth(tableWrapper, seatMap);
+    });
+
+    $(venueSelectInput).on('change', function() {
+        setEventMap(getSelectedObject(venues, venueSelectInput));
+        const orgHeight = $(seatMap)[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
+        reloadMap(sc, seatMap);
+        resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
+        scaleContentWidth(tableWrapper, seatMap);
+    });
+
+    $(helperSelectInput).on('change', function() {
+        getSelectedObject(helpers, helperSelectInput).selected = true;
+        populateHelperSelect(helpers, helperSelectInput);
+        populateSelectedHelperColumn(helpers, helpersCardCol);
+    });
+
+    $(addSeatTypeButton).click(function () {
+        const seatName = $(seatTypeNameInput).val();
+        const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
+        const seatCharacter = availableSeatCharacters[0];
+        const descriptiveCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
+
+        if (!seatName) {
+            showDangerToast("Please enter a seat name!");
+            return;
+        }
+
+        sc.seats[seatCharacter] = {
+            category: seatName,
+            descriptiveCategory: descriptiveCategory,
+            blocked: seatIsBlocked,
+            classes: seatCharacter,
+            legendClasses: selectableLegendClasses
+        };
+
+        availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
+        renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend)); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
+        
+        $(addSeatTypeModal).modal('hide'); // Hides the modal
+        $(seatTypeNameInput).val(''); // Reset input to default state
+        $(blockSeatTypeCheck).prop('checked', false);
+    });
+
+    $(document).on("click", `.seatCharts-legendCard:not(${addSeatTypeCard})`, function() {
+        const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
+        
+        if (highlighted) {
+            selectedSeatType = $(this).attr("seat-character");
+        } else {
+            selectedSeatType = null;
+        }
+    });
+
+    $(editEventForm).submit(async function (e) {
+        e.preventDefault();
+        $(updateEventButton).prop('disabled', true);
+        
+        try {
+            const event = await createEvent(
+                $(eventNameInput).val(),
+                sc.map,
+                $(eventDateTimeInput).val(),
+                $(maxSeatsPerReservationInput).val(),
+                $(prioritiseBackCheck).is(':checked'),
+                getSelectedObject(venues, venueSelectInput).id
+            );
+            
+            const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
+            const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
+
+            await createEventSeatTypes(seatTypeArray);
+            await createEventHelpers(eventHelperArray);
+            
+            window.location.replace("/planner/events");
+        } catch (error) {
+            handleError(error);
+        } finally {
+            $(updateEventButton).prop('disabled', false);
+        }
+    });
+
+    setEventMap = (venue) => {
+        sc.map = JSON.parse(venue.seatMap);
+    };
+</script>
+
+<%- include('../templates/footer')-%>

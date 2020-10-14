@@ -33,9 +33,19 @@ router.get('/events', auth.isPlanner, async (req, res) => {
 });
 
 router.get('/events/:id', auth.isPlanner, async (req, res) => {
+	const id = req.params.id;
+	const event = await Event.getEventById(id);
+
+	if (!event) {
+		flash.error(req, "That ID does not belong to any event!");
+		res.redirect('/planner/events');
+		return;
+	}
+
 	res.render('planner/planner-edit-event', { 
-		title: "Events", 
-		user: req.user  
+		title: event.name, 
+		user: req.user,
+		event: event,
 	});
 });
 
