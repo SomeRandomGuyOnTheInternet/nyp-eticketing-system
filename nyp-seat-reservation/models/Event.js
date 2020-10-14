@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
 
+const Venue = require('./Venue');
+
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
@@ -49,9 +51,12 @@ module.exports.getEventById = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
             const event = await Event.findOne({ 
+                include: [{
+                    model: Venue,
+                    required: true,
+                }],
                 where: { id: id } 
             });
-
             resolve(event);
         } catch (error) {
             reject(error);
@@ -62,7 +67,14 @@ module.exports.getEventById = async (id) => {
 module.exports.getAllEvents = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const events = await Event.findAll({ raw: true });
+            const events = await Event.findAll({ 
+                include: [{
+                    model: Venue,
+                    required: true,
+                }],
+                order: [['startDateTime', 'ASC']],
+                raw: true 
+            });
             resolve(events);
         } catch (error) {
             reject(error);

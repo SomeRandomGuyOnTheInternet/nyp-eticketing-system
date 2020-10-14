@@ -4,6 +4,8 @@
 <!-- TODO: Click on row to replace entire row with seat type -->
 <!-- TODO: Delete student helper -->
 <!-- TODO: Use handleError a lot more -->
+<!-- TODO: Rollback sequelize transaction on error -->
+<!-- TODO: Drag and select seats for helpers -->
 
 <%- include('../templates/head')-%>
 <body>
@@ -207,10 +209,12 @@
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
-    let selectedSeatType; // This variable will contain the character of the seat type we've selected
 
     let venues = [];
     let helpers = [];
+
+    let selectedSeatType; // This variable will contain the character of the seat type we've selected
+    let selectedVenue;
 
     // Seat chart configuration
     let sc = {};
@@ -341,7 +345,8 @@
                 sc.map,
                 $(eventDateTimeInput).val(),
                 $(maxSeatsPerReservationInput).val(),
-                $(prioritiseBackCheck).is(':checked')
+                $(prioritiseBackCheck).is(':checked'),
+                getSelectedObject(venues, venueSelectInput).id
             );
             
             const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
@@ -365,7 +370,7 @@
             if (!helpers[i].selected) {
                 $(helperSelectInput).append($('<option>', {
                     value: i,
-                    text: helpers[i].name
+                    text: `${helpers[i].name} - ${helpers[i].email}`
                 }));
             }
         }
@@ -406,6 +411,8 @@
 
         return seatArray;
     };
+
+
 
     getSelectedEventHelperArray = (helpers, eventId) => {
         let selectedSeatArray = [];

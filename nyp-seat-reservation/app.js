@@ -14,7 +14,7 @@ const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
 const passport = require('passport');
-
+const moment = require('moment');
 
 // Importing all the routes 
 // We split the webpages by routes for clarity and security purposes
@@ -44,6 +44,7 @@ app.use(methodOverride('_method'));
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(flash());
+app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
 const db = require('./config/db');

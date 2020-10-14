@@ -60,15 +60,20 @@ module.exports.getHelpersByEventId = async (eventId) => {
     });
 };
 
-module.exports.getEventsByUserId = async (userId) => {
+module.exports.getEventsByHelperId = async (helperId) => {
     return new Promise(async (resolve, reject) => {
         try {
             const events = await Event.findAll({
                 include: [{
                     model: EventHelper,
-                    where: { userId: userId },
+                    where: { userId: helperId },
+                    required: true,
+                },
+                {
+                    model: Venue,
                     required: true,
                 }],
+                order: [['startDateTime', 'ASC']],
                 raw: true
             });
             resolve(events);

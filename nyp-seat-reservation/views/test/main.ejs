@@ -301,7 +301,9 @@
 </body>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(async function() {
+        await callTestApi();
+
         // This whole part initialises the seat chart
         let sc = $('#seat-map').seatCharts({ 
             // This map is created from the seat characters defined in the seats section below

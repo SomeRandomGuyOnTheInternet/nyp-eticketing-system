@@ -1,3 +1,5 @@
+// TODO: Make message flashing an API
+
 // All APIs are contained here
 
 const express = require('express');
@@ -11,6 +13,12 @@ const Venue = require('../models/Venue');
 const Event = require('../models/Event');
 const EventSeatType = require('../models/EventSeatType');
 const EventHelper = require('../models/EventHelper');
+
+router.get('/test', async (req, res) => {
+    const test = await Event.getAllEvents();
+    console.log(test);
+    ajax.success(res, "It works! Yay!");
+});
 
 router.post('/create-venue', async (req, res) => {
     const name = req.body.name;
@@ -81,6 +89,7 @@ router.post('/create-event', async (req, res) => {
     const startDateTime = req.body.startDateTime;
     const prioritiseBackRows = req.body.prioritiseBackRows;
     const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
+    const venueId = req.body.venueId == '' ? null : req.body.venueId;
 
     if (!name) {
         ajax.error(res, "Please enter a event name!");
@@ -114,12 +123,23 @@ router.post('/create-event', async (req, res) => {
         }
     }
 
+    if (!venueId) {
+        ajax.error(res, "Please enter a valid id for the venue!");
+        return;
+    }
+
+    if (isNaN(venueId)) {
+        ajax.error(res, "Please enter a valid id for the venue!");
+        return;
+    }
+
     const event = await Event.createEvent({
         name: name,
         seatMap: seatMap,
         startDateTime: startDateTime,
         seatsPerReservation: seatsPerReservation,
-        prioritiseBackRows: prioritiseBackRows
+        prioritiseBackRows: prioritiseBackRows,
+        venueId: venueId
     });
 
     ajax.success(res, "Successfully created event!", event);

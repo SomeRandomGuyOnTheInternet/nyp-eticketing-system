@@ -12,6 +12,26 @@ String.prototype.replaceAll = function(str1, str2, ignore) {
     return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
 };
 
+promiseAjax = (uri, method, data) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: method,
+            url: uri,
+            dataType: 'json',
+            contentType: 'application/json',
+            data: data ? JSON.stringify(data) : null,
+            success: function (data) {
+                resolve(data)
+            },
+            error: function (error) {
+                reject(error)
+            },
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            reject(errorThrown);
+        });
+    });
+};
+
 resizeArray = (arr, size, defval) => {
     var delta = arr.length - size;
 

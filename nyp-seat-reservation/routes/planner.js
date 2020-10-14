@@ -11,6 +11,7 @@ const flash = require('../utils/flash');
 const auth = require('../utils/check-auth');
 
 const Venue = require('../models/Venue');
+const Event = require('../models/Event');
 
 // Sample user object to test navigation
 // For the planner pages, this user is a planner
@@ -22,9 +23,12 @@ const Venue = require('../models/Venue');
 router.get('/events', auth.isPlanner, async (req, res) => {
     // Put your ejs files under your specific folder
 	// Eg: Planner .ejs files should be put under the planner folder
+	const events = await Event.getAllEvents();
+
 	res.render('planner/planner-all-events', { 
 		title: "Events", 
-		user: req.user 
+		user: req.user,
+		events: events,
 	});
 });
 

@@ -36,7 +36,7 @@
     "install": "^0.13.0",
     "lodash": "^4.17.20",
     "method-override": "^3.0.0",
-    "moment": "^2.29.0",
+    "moment": "^2.29.1",
     "morgan": "^1.10.0",
     "mysql2": "^1.6.5",
     "node-sass": "^4.14.1",

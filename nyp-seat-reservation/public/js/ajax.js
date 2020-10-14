@@ -7,26 +7,7 @@ const apiRoutes = {
     createEvent: "/api/create-event",
     createEventSeatTypes: "/api/create-event-seat-types",
     createEventHelpers: "/api/create-event-helpers",
-};
-
-promiseAjax = (uri, method, data) => {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            type: method,
-            url: uri,
-            dataType: 'json',
-            contentType: 'application/json',
-            data: data ? JSON.stringify(data) : null,
-            success: function (data) {
-                resolve(data)
-            },
-            error: function (error) {
-                reject(error)
-            },
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            reject(errorThrown);
-        });
-    });
+    test: "/api/test",
 };
 
 createVenue = async (name, map) => {
@@ -97,7 +78,7 @@ getAllHelpers = async () => {
     });
 };
 
-createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows) => {
+createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows, venueId) => {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(apiRoutes.createEvent, 'POST', 
@@ -107,6 +88,7 @@ createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioriti
                     startDateTime: startDateTime,
                     seatsPerReservation: seatsPerReservation,
                     prioritiseBackRows: prioritiseBackRows,
+                    venueId: venueId,
                 }
             );
             resolve(res.data);
@@ -139,6 +121,18 @@ createEventHelpers = async (eventHelperArray) => {
                     eventHelpers: eventHelperArray
                 }
             );
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+
+callTestApi = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(apiRoutes.test, 'GET', null);
             resolve(res);
         } catch (error) {
             reject(error);
