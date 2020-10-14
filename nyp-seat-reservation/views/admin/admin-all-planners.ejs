@@ -13,15 +13,52 @@
             <div class="row">
                 <!-- Use this row div if you want your section heading to be inline with another element  -->
                 <div class="col-sm-9 col-12 align-self-end">
-                    <h2 class="section-heading">List of Planners Accounts</h2>
+                    <h2 class="section-heading">Planner Accounts</h2>
                 </div>
                 <div class="col-sm-3 col-12 align-self-end">
                     <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
                     <button type="button" class="btn btn-primary btn-lg w-100" data-toggle="modal" data-target="#Modal">
-                        Add Planner
+                        <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Planner
                     </button>
                 </div>
             </div>
+            <!-- Table for list of planners -->
+            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="card mt-3">
+                <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">
+                    <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                    <!-- Table  -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-click table-lg">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (i = 0; i < planners.length; i++) { %>
+                                    <tr>
+                                        <td><%= i + 1 %></td>
+                                        <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
+                                        <td><%= planners[i].email %></td>
+                                        <td>
+                                            <a href="/admin/deleteplanner/<%= planners[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
+                                                <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal section -->
             <!-- This part will not be shown to the user until they click on the button that is supposed to launch the modal -->
             <!-- The modal should have the same id as the one you specified in the element with the data-target above -->
@@ -86,37 +123,6 @@
                     </div>
                 </div>
             </form>
-            <!-- Table for list of planners -->
-            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
-            <!-- Content  -->
-            <div class="card mt-3">
-                <!-- Put interactible elements in a card, enclosed with card-body  -->
-                <div class="card-body p-0">
-                    <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
-                    <!-- Table  -->
-                    <div class="table-responsive">
-                        <table class="table table-hover table-click table-lg">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Email</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (i = 0; i < planners.length; i++) { %>
-                                    <tr>
-                                        <td><%= planners[i].id %></td>
-                                        <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
-                                        <td><%= planners[i].email %></td>
-                                        <td><a href="/admin/deleteplanner/<%= planners[i].id %>"><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></a></td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </body>

@@ -712,7 +712,7 @@ resizeColumn = (columns, rows, map) => {
 
 reloadMap = (sc, seatMapNode) => {
     unbindMap(seatMapNode);
-    bindMap(sc, seatMapNode);
+    return bindMap(sc, seatMapNode);
 };
 
 unbindMap = (seatMapNode,) => {
@@ -722,5 +722,5 @@ unbindMap = (seatMapNode,) => {
 };
 
 bindMap = (sc, seatMapNode) => {
-    $(seatMapNode).seatCharts(sc);
+   return $(seatMapNode).seatCharts(sc);
 };

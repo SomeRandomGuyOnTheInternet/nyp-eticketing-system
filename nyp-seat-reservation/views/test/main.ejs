@@ -468,7 +468,7 @@
                 }
             }
         });
-
+        
         // This is the part where we actually set the seat's status individually
         // Note that I'm using regex here to set the seat status on a large scale but in the actual app, we probably have to do a for-loop on all the seats and set their status individually
         sc.find('available').status('blocked');

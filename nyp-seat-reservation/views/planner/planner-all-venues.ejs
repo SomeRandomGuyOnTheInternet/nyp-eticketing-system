@@ -34,7 +34,7 @@
                                     <tr>
                                         <td scope="row"><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="/planner/venues/<%= venues[i].id %>"><%= venues[i].name %></a></td>
-                                        <td><a href="/api/delete-venue/<%= venues[i].id %>"><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></a></td>
+                                        <td><a href="/api/delete-venue/<%= venues[i].id %>"><i class="fa fa-trash text-danger" style="font-size: 25px;"></i></a></td>
                                     </tr>
                                 <% } %>
                             </tbody>

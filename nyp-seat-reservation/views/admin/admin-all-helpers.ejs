@@ -13,12 +13,12 @@
             <div class="row">
                 <!-- Use this row div if you want your section heading to be inline with another element  -->
                 <div class="col-sm-9 col-12 align-self-end">
-                    <h2 class="section-heading">List of Helpers Accounts</h2>
+                    <h2 class="section-heading">Helper Accounts</h2>
                 </div>
                 <div class="col-sm-3 col-12 align-self-end">
                     <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
                     <button type="button" class="btn btn-primary btn-lg w-100" data-toggle="modal" data-target="#Modal">
-                        Add Helpers
+                        <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Helpers
                     </button>
                 </div>
             </div>
@@ -106,6 +106,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -114,7 +115,11 @@
                                         <td scope="row"><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="#"><%= helpers[i].name %></a></td>
                                         <td><%= helpers[i].email %></td>
-                                        <td><a href="/admin/deletehelper/<%= helpers[i].id %>"><i class="fa fa-trash-o" style="font-size:30px;color:red"></i></a></td>
+                                        <td>
+                                            <a href="/admin/deletehelper/<%= helpers[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
+                                                <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                            </a>
+                                        </td>
                                     </tr>
                                 <% } %>
                             </tbody>
