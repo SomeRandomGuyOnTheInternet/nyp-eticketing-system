@@ -14,11 +14,13 @@ const Event = require('../models/Event');
 const EventSeatType = require('../models/EventSeatType');
 const EventHelper = require('../models/EventHelper');
 
+
 router.get('/test', async (req, res) => {
     const test = await Event.getAllEvents();
     console.log(test);
     ajax.success(res, "It works! Yay!");
 });
+
 
 router.post('/create-venue', async (req, res) => {
     const name = req.body.name;
@@ -73,15 +75,9 @@ router.post('/update-venue', async (req, res) => {
 router.get('/delete-venue/:id', async (req, res) => {
 	const id = req.params.id;
 	await Venue.deleteVenue(id);
-	flash.success(req, 'Successfully deleted venue!');
 	res.redirect('/planner/venues');
 });
 
-router.get('/get-all-helpers', async (req, res) => {
-    const helpers = await User.getHelpers();
-    ajax.success(res, "Successfully gotten all helpers!", helpers);
-    return
-});
 
 router.post('/create-event', async (req, res) => {
     const name = req.body.name;
@@ -145,6 +141,39 @@ router.post('/create-event', async (req, res) => {
     ajax.success(res, "Successfully created event!", event);
 });
 
+
+router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
+    const eventId = req.params.eventId;
+    const helperId = req.params.helperId;
+
+    console.log(eventId, helperId)
+
+    const isHelper = await EventHelper.isHelperForEvent(helperId, eventId);
+
+	if (!isHelper) {
+        ajax.error(res, "This helper is not authorised to help for this event!");
+        return;
+    }
+
+    const event = await Event.getEventById(eventId);
+    const seatTypes = await EventSeatType.getEventSeatTypes(eventId);
+    
+    ajax.success(res, "Successfully gotten event details for the helper!", {
+        event: event,
+        seatTypes: seatTypes,
+    });
+
+    return
+});
+
+
+router.get('/get-all-helpers', async (req, res) => {
+    const helpers = await User.getHelpers();
+    ajax.success(res, "Successfully gotten all helpers!", helpers);
+    return
+});
+
+
 router.post('/create-event-seat-types', async (req, res) => {
     const seatTypes = req.body.seatTypes;
     // TODO: Do validation for each seat type in array
@@ -152,6 +181,7 @@ router.post('/create-event-seat-types', async (req, res) => {
 
     ajax.success(res, "Successfully created event seat types!");
 });
+
 
 router.post('/create-event-helpers', async (req, res) => {
     const eventHelpers = req.body.eventHelpers;

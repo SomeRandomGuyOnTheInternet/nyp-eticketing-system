@@ -1,19 +1,9 @@
-const apiRoutes = {
-    createVenue: "/api/create-venue",
-    getAllVenues: "/api/get-all-venues",
-    updateVenue: "/api/update-venue",
-    deleteVenue: "/api/delete-venue",
-    getAllHelpers: "/api/get-all-helpers",
-    createEvent: "/api/create-event",
-    createEventSeatTypes: "/api/create-event-seat-types",
-    createEventHelpers: "/api/create-event-helpers",
-    test: "/api/test",
-};
+const baseRoute = "/api/";
 
 createVenue = async (name, map) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.createVenue, 'POST', 
+            const res = await promiseAjax(`${baseRoute}/create-venue`, 'POST', 
                 {
                     name: name,
                     seatMap: map
@@ -29,7 +19,7 @@ createVenue = async (name, map) => {
 getAllVenues = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.getAllVenues, 'GET', null);
+            const res = await promiseAjax(`${baseRoute}/get-all-venues`, 'GET', null);
             resolve(res.data);
         } catch (error) {
             reject(error);
@@ -40,7 +30,7 @@ getAllVenues = async () => {
 updateVenue = async (venue) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.updateVenue, 'POST', 
+            const res = await promiseAjax(`${baseRoute}/update-venue`, 'POST', 
                 {
                     venue: venue
                 }
@@ -55,7 +45,7 @@ updateVenue = async (venue) => {
 deleteVenue = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.deleteVenue, 'POST', 
+            const res = await promiseAjax(`${baseRoute}/delete-venue`, 'POST', 
                 {
                     id: id
                 }
@@ -70,7 +60,7 @@ deleteVenue = async (id) => {
 getAllHelpers = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.getAllHelpers, 'GET', null);
+            const res = await promiseAjax(`${baseRoute}/get-all-helpers`, 'GET', null);
             resolve(res.data);
         } catch (error) {
             reject(error);
@@ -81,7 +71,7 @@ getAllHelpers = async () => {
 createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows, venueId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.createEvent, 'POST', 
+            const res = await promiseAjax(`${baseRoute}/create-event`, 'POST', 
                 {
                     name: name,
                     seatMap: seatMap,
@@ -98,10 +88,21 @@ createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioriti
     });
 };
 
+getEventDetailsForHelper = async (eventId, helperId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(`${baseRoute}/helpers/${helperId}/events/${eventId}`, 'GET');
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 createEventSeatTypes = async (seatTypeArray) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.createEventSeatTypes, 'POST', 
+            const res = await promiseAjax(`${baseRoute}/create-event-seat-types`, 'POST', 
                 {
                     seatTypes: seatTypeArray
                 }
@@ -116,7 +117,7 @@ createEventSeatTypes = async (seatTypeArray) => {
 createEventHelpers = async (eventHelperArray) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.createEventHelpers, 'POST', 
+            const res = await promiseAjax(`${baseRoute}/create-event-helpers`, 'POST', 
                 {
                     eventHelpers: eventHelperArray
                 }
@@ -129,10 +130,12 @@ createEventHelpers = async (eventHelperArray) => {
 };
 
 
+
+
 callTestApi = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(apiRoutes.test, 'GET', null);
+            const res = await promiseAjax(`${baseRoute}/test`, 'GET', null);
             resolve(res);
         } catch (error) {
             reject(error);

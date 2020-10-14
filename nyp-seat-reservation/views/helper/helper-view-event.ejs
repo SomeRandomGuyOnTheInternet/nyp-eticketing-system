@@ -1,6 +1,7 @@
+<!-- TODO: set seat status -->
+
 <%- include('../templates/head')-%>
 
-<!-- #TODO formatting for Modal (line 74) -->
 <body>
     <%- include('../templates/navbar')-%>
     <div class="container">
@@ -14,22 +15,22 @@
             <div class="row">
                 <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                 <div class="col-sm-6">
-                    <h2 class="section-heading text-primary">SIT Graduation Ceremony</h2>
-                    <h5>18th April 2021 • 9am</h5>
+                    <h2 id="nameHeading" class="section-heading text-primary"><%= event.name %></h2>
+                    <h5 id="startDateTimeHeading"><%= moment(event.startDateTime).format('Do MMMM YYYY') %> • <%= moment(event.startDateTime).format('h:mm a') %></h5>
                 </div>
                 <!-- Select (combo box) Input Card  -->
                 <div class="col-sm-6">
                     <div class="card input-card">
                         <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
-                            <label for="textTextInput" class="card-input-label">
+                            <label for="searchReservationInput" class="card-input-label">
                                 <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
                                     Reservation</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <input id="textTextInput" class="form-control card-input" type="text"
-                                placeholder="E.g. Vignesh / 91864675 ">
+                            <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="text"
+                                placeholder="E.g. 91864675 ">
                             <!-- This is where the user actually inputs all their stuff  -->
                         </div>
                     </div>
@@ -38,7 +39,7 @@
 
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Content  -->
-            <h3>Auditorium</h3>
+            <h3 id="venueNameHeading"><%= event['Venue.name'] %></h3>
             <div class="row">
                 <div class="col-sm-6">
                     <!-- Used for spacing between sections  -->
@@ -47,10 +48,10 @@
                         <div class="card-body input-card-body">
                             <label for="testSelectInput" class="card-input-label">
                                 <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Quadrant</small>
+                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Zoom</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <select class="form-control card-input" id="testSelectInput" name="testSelectInput" onChange="window.location.href=this.value">
+                            <select id="zoomQuadrantSelect" class="form-control card-input" id="testSelectInput" name="testSelectInput" onChange="window.location.href=this.value">
                                 <!-- This is where the user actually inputs all their stuff  -->
                                 <option>Whole Venue</option>
                                 <option>Top Left</option>
@@ -71,63 +72,49 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="testModal"
-                    aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <!-- This is where you enter the title of the modal -->
-                            <!-- This is the actual content (can put anything here) -->
-                            <div class="modal-body">
-                                <div class="d-flex">
-                                    <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                                    <div id="colorCode" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>                           
-                                    <span id="seatID" class="align-self-center"></span>
-                                    <span class="align-self-center">Reserved for Adam</span>
-                                </div>
+            <div id="legend" class="seatCharts-legend row"></div>
+
+            <form id="reserveSeatForm" action="/" method="post">
+                <div class="mt-6"></div> <!-- Used for spacing between sections  -->
+                <h3>Reservation</h3>
+                <div class="row">
+                    <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3">
+                            <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="reservationNameInput" class="card-input-label">
+                                    <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Name</small>
+                                    <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="reservationNameInput" name="reservationNameInput" class="form-control card-input" type="text"
+                                    placeholder="e.g. Lam En Qing">
+                                <!-- This is where the user actually inputs all their stuff  -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Select (combo box) Input Card  -->
+                    <div class="col-sm-6">
+                        <div class="card input-card mt-3">
+                            <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="reservationPhoneNumberInput" class="card-input-label">
+                                    <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Phone Number</small>
+                                    <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="reservationPhoneNumberInput" name="reservationPhoneNumberInput" class="form-control card-input" type="text"
+                                    placeholder="e.g. 95179116">
+                                <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
                 </div>
-            <div id="legend" class="seatCharts-legend"></div>
+                <div class="mt-4"></div>
+                <button id="reserveSeatButton" type="submit" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
+            </form>
 
-            <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-            <h3>Reservation</h3>
-            <div class="row">
-                <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
-                <div class="col-sm-6">
-                    <div class="card input-card mt-3">
-                        <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                        <div class="card-body input-card-body">
-                            <label for="textTextInput" class="card-input-label">
-                                <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Name</small>
-                                <!-- The small element is where we actually write down what the input does  -->
-                            </label>
-                            <input id="textTextInput" name="textTextInput" class="form-control card-input" type="text"
-                                placeholder="e.g. Lam En Qing">
-                            <!-- This is where the user actually inputs all their stuff  -->
-                        </div>
-                    </div>
-                </div>
-                <!-- Select (combo box) Input Card  -->
-                <div class="col-sm-6">
-                    <div class="card input-card mt-3">
-                        <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                        <div class="card-body input-card-body">
-                            <label for="textTextInput" class="card-input-label">
-                                <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Phone Number</small>
-                                <!-- The small element is where we actually write down what the input does  -->
-                            </label>
-                            <input id="textTextInput" name="textTextInput" class="form-control card-input" type="text"
-                                placeholder="e.g. 95179116">
-                            <!-- This is where the user actually inputs all their stuff  -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4"></div>
-            <button type="button" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
             <div class="mt-6"></div>
             <h3>Waiting List</h3>
             <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
@@ -159,77 +146,56 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="seatDetailsModal" tabindex="-1" role="dialog" aria-labelledby="seatDetailsModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <!-- This is where you enter the title of the modal -->
+                        <!-- This is the actual content (can put anything here) -->
+                        <div class="modal-body">
+                            <div class="d-flex">
+                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                <div id="seatDetailsSeatCell" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>                           
+                                <span id="seatDetailsId" class="align-self-center"></span>
+                                <span id="seatDetailsDescription" class="align-self-center">Reserved for Adam</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </body>
 
 <script>
-    const defaultSeat = "G";
-    const emptySpace = "_"; // The actual empty space character (_) creates a seat cell that cannot be interacted with
-    const tempEmptySpace = "E"; // We have to use a temporary character (E) that can be interacted with to denote empty space while the user is editing the seat map
-    // We will convert the temporary characters in the map to the actual empty space character when we're submitting the seat map
+    const helperId = <%= user.id %>;
+    const eventId = <%= event.id %>;
 
-    let selectedSeatType; // This variable will contain the character of the seat type we've selected
+    const nameHeading = '#nameHeading';
+    const startDateTimeHeading = '#startDateTimeHeading';
+    const searchReservationInput = '#searchReservationInput';
+    const venueNameHeading = '#venueNameHeading';
+    const zoomQuadrantSelect = '#zoomQuadrantSelect';
+    const venueSelectInput = '#venueSelectInput';
+    const seatChartCard = '#seatChartCard';
+    const tableWrapper = '#tableWrapper';
+    const seatMap = '#seatMap';
+    const legend = '#legend';
+    const reserveSeatForm = '#reserveSeatForm';
+    const reservationNameInput = '#reservationNameInput';
+    const reservationPhoneNumberInput = '#reservationPhoneNumberInput';
+    const reserveSeatButton = '#reserveSeatButton';
+    const seatDetailsModal = '#seatDetailsModal';
+    const seatDetailsSeatCell = '#seatDetailsSeatCell';
+    const seatDetailsSeatId = '#seatDetailsId';
+    const seatDetailsDescription = '#seatDetailsDescription';
 
     // Seat chart configuration
     let sc = {};
 
-    sc.map = [
-                '________________________________________',
-                '___GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG___',
-                '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
-                '_GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG_',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGG______________GGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
-                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH',
-                'HGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH',
-                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
-                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
-                'HGGGGGGGGGGGG______________GGGGGGGGGGGGH',
-                // '____GGGGGGGGGGG____',
-                // '___GGGGGGGGGGGGG___',
-                // '__GGGGGGGGGGGGGGG__',
-                // '_GGGGGGGGGGGGGGGGG_',
-                // 'GGGGGGGGGGGGGGGGGGG',
-                // 'GGGGGGG______GGGGGG',
-                // 'GGGGGGGGGGGGGGGGGGG',
-            ],
+    sc.map = [],
 
-    sc.seats = {
-        [defaultSeat]: {
-            category: 'General',
-            blocked: false,
-            classes: 'general',
-        },
-        [tempEmptySpace]: {
-            category: 'Empty Space',
-            blocked: false,
-            classes: 'temp-space',
-        },
-
-    };
+    sc.seats = {};
 
     sc.naming = {
         rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
@@ -242,96 +208,63 @@
     };
 
     sc.legend = {
-        node: $('#legend'),
+        node: $(legend),
         items: []					
     };
 
     sc.click = function () {
-        $("#Modal").modal();
-        $("#colorCode").addClass(this.settings.data.classes);
-        $("#seatID").text(this.settings.id);
+        // Temporary hack
+        if (this.settings.data.blocked) {
+            console.log(this)
+            $(seatDetailsModal).modal();
+            $(seatDetailsSeatCell).addClass(this.settings.data.classes);
+            $(seatDetailsSeatId).text(this.settings.id);
+            $(seatDetailsDescription).text(`Blocked for ${this.settings.data.category}`);
+        } else {
+            if (this.status() == 'available') {
+                return 'selected';
+            } else if (this.status() == 'selected') {
+                return 'available';
+            }
+        }
     };
 
-
     // Rest of the functions
-    $(document).ready(function() {
-        bindMap(sc, '#seatMap');
-        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+    $(document).ready(async function() {
+        try {
+            const eventDetails = await getEventDetailsForHelper(eventId, helperId);
+            sc.map = eventDetails.event.seatMap;
+            sc.seats = getSeatsObject(eventDetails.seatTypes);
+
+            bindMap(sc, seatMap);
+            scaleContentWidth(tableWrapper, seatMap);
+
+            for (const seatCharacter in sc.seats) {
+                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
+            }
+        } catch (error) {
+            handleError(error);
+        }
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+        scaleContentWidth(tableWrapper, seatMap);
     });
 
-    $("#columnInput, #rowInput").change(function () {
-        const columnInput = $("#columnInput").val();
-        const rowInput = $("#rowInput").val();
-        
-        if (!$.isNumeric(columnInput) || !$.isNumeric(rowInput)) {
-            showDangerToast("Please enter a valid value!");
-            return;
+    getSeatsObject = (seatTypeArray) => {
+        let seats = {};
+
+        for (i = 0; i < seatTypeArray.length; i++) {
+            const seat = seatTypeArray[i];
+            seats[seat.character] = {
+                category: seat.name,
+                blocked: seat.isBlocked,
+                classes: seat.cssClasses,
+            };
         }
         
-        const columns = columnInput.toNum();
-        const rows = rowInput.toNum();
-
-        if (columns < 1 || rows < 1) {
-            showDangerToast("Please enter a larger value!");
-            return;
-        }
-
-        if (columns > 40 || rows > 40) {
-            showDangerToast("Please enter a smaller value!");
-            return;
-        }
-
-        if (this.id == "rowInput") {
-            const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
-
-            resizeRow(columns, rows, sc.map); // Changes number of columns
-            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
-            resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Reduce the maps's 
-        }
-
-        if (this.id == "columnInput") {
-            resizeColumn(columns, rows, sc.map); // Changes number of rows
-            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
-            scaleContentWidth($('#tableWrapper'), $('#seatMap')); // Scale the map so the columns are all visible
-        }
-    });
-
-    $(document).on("click", ".seatCharts-legendCard", function() {
-        const highlighted = toggleHighlight($(this), ".seatCharts-legendCard");
-        
-        if (highlighted) {
-            selectedSeatType = $(this).attr("seat-character");
-        } else {
-            selectedSeatType = null;
-        }
-    });
-
-    $('#saveVenueForm').submit(async function (event) {
-        event.preventDefault();
-        
-        if (!$("#nameInput").val()) {
-            showDangerToast("Please enter a venue name!");
-            return;
-        }
-
-        const name = toTitleCase($("#nameInput").val());
-        const map = replaceMapSeatCharacters(sc.map, tempEmptySpace, emptySpace);
-
-        $('#saveVenueTypeButton').prop('disabled', true);
-
-        try {
-            await createVenue(name, map);
-            window.location.replace("/planner/venues");
-        } catch (error) {
-            handleError(error);
-        } finally {
-            $('#saveVenueTypeButton').prop('disabled', false);
-        }
-    });
+        return seats;
+    };
 </script>
 
 <!-- <script>

@@ -57,6 +57,11 @@ module.exports.getEventById = async (id) => {
                 }],
                 where: { id: id } 
             });
+
+            if (event) {
+                event.seatMap = JSON.parse(event.seatMap);
+            }
+
             resolve(event);
         } catch (error) {
             reject(error);
