@@ -167,6 +167,21 @@ getSeatTypeArray = (seats, eventId) => {
     return seatArray;
 };
 
+getSeatsObject = (seatTypeArray) => {
+    let seats = {};
+
+    for (i = 0; i < seatTypeArray.length; i++) {
+        const seat = seatTypeArray[i];
+        seats[seat.character] = {
+            category: seat.name,
+            blocked: seat.isBlocked,
+            classes: seat.cssClasses,
+        };
+    }
+    
+    return seats;
+};
+
 getSelectedEventHelperArray = (helpers, eventId) => {
     let selectedSeatArray = [];
     

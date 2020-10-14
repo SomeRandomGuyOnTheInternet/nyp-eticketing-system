@@ -156,7 +156,7 @@
                             <div class="d-flex">
                                 <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                                 <div id="seatDetailsSeatCell" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>    
-                                <div class="ml-4">
+                                <div class="ml-3">
                                     <span id="seatDetailsId" class="align-self-center h4"></span>
                                     <br>
                                     <span id="seatDetailsDescription" class="align-self-center">Reserved for Adam</span>
@@ -256,21 +256,6 @@
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         scaleContentWidth(tableWrapper, seatMap);
     });
-
-    getSeatsObject = (seatTypeArray) => {
-        let seats = {};
-
-        for (i = 0; i < seatTypeArray.length; i++) {
-            const seat = seatTypeArray[i];
-            seats[seat.character] = {
-                category: seat.name,
-                blocked: seat.isBlocked,
-                classes: seat.cssClasses,
-            };
-        }
-        
-        return seats;
-    };
 </script>
 
 <!-- <script>
