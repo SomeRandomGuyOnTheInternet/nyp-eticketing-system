@@ -112,7 +112,7 @@
                     </div>
                 </div>
                 <div class="mt-4"></div>
-                <button id="reserveSeatButton" type="submit" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
+                <button id="reserveSeatButton" type="button" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
             </form>
 
             <div class="mt-6"></div>
@@ -242,7 +242,7 @@
             sc.map = eventDetails.event.seatMap;
             sc.seats = getSeatsObject(eventDetails.seatTypes);
 
-            bindMap(sc, seatMap);
+            sc = bindMap(sc, seatMap);
             scaleContentWidth(tableWrapper, seatMap);
 
             for (const seatCharacter in sc.seats) {
@@ -255,6 +255,17 @@
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         scaleContentWidth(tableWrapper, seatMap);
+    });
+
+    //Reservation Hack
+
+    $(reserveSeatButton).click(function() {
+        sc.find('selected').status('reserved');
+    });
+
+    $(searchReservationInput).change(function(){
+        sc.get('O:14').status('highlighted');
+        sc.get('O:15').status('highlighted');
     });
 </script>
 
