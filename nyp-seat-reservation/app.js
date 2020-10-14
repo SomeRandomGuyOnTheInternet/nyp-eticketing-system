@@ -48,7 +48,7 @@ app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
 const db = require('./config/db');
-fypjapplication.setUpDB(false);
+fypjapplication.setUpDB(true);
 
 app.use(session({
 	key: 'nyp-seat-reservation',
