@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="legend" class="seatCharts-legend row">
+                <div id="editMapLegend" class="seatCharts-legend row">
                     <!-- Add Seat Type Card -->
                     <div id="addSeatCol" class="seatCharts-cardColumn col-auto">
                         <div id="addSeatTypeCard" class="seatCharts-legendCard card card-hover text-primary font-weight-medium py-2 px-4 mt-3" seat-character="G">
@@ -143,11 +143,6 @@
         getId: function (character, row, column) {
             return row + ':' + column;
         }
-    };
-
-    sc.legend = {
-        node: $('#legend'),
-        items: []					
     };
 
     sc.click = function () {

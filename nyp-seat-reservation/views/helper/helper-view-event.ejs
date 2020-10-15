@@ -62,6 +62,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-6 text-right text-secondary">
+                    <span><%= event.seatsPerReservation %> seats per reservation</span>
+                </div>
             </div>
             <div id="seatChartCard" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
@@ -115,34 +118,36 @@
                 <button id="reserveSeatButton" type="button" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
             </form>
 
-            <div class="mt-6"></div>
-            <h3>Waiting List</h3>
-            <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
-            <!-- Content  -->
-            <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
-                <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
-                    <!-- Table  -->
-                    <div class="table-responsive">
-                        <table class="table table-hover table-click table-lg"> 
-                            <thead>
-                                <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Phone No.</th>
-                                    <th scope="col">No. of additional guests</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="font-weight-medium">Lam En Qing</td>
-                                    <td class="font-weight-medium"><a href="#">90616192</a></td>
-                                    <td class="font-weight-medium">2</td>
-                                    <td class="font-weight-medium">18th April 2021</td>
-                                    <td class="font-weight-medium">9am</td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <div id="waitingListContainer" class="d-none">
+                <div class="mt-6"></div>
+                <h3>Waiting List</h3>
+                <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
+                <!-- Content  -->
+                <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
+                    <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                        <!-- Table  -->
+                        <div class="table-responsive">
+                            <table class="table table-hover table-click table-lg"> 
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Phone No.</th>
+                                        <th scope="col">No. of additional guests</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-weight-medium">Lam En Qing</td>
+                                        <td class="font-weight-medium"><a href="#">90616192</a></td>
+                                        <td class="font-weight-medium">2</td>
+                                        <td class="font-weight-medium">18th April 2021</td>
+                                        <td class="font-weight-medium">9am</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,7 +164,7 @@
                                 <div class="ml-3">
                                     <span id="seatDetailsId" class="align-self-center h4"></span>
                                     <br>
-                                    <span id="seatDetailsDescription" class="align-self-center">Reserved for Adam</span>
+                                    <span id="seatDetailsDescription" class="align-self-center"></span>
                                 </div>                       
                             </div>
                         </div>
@@ -192,6 +197,7 @@
     const seatDetailsSeatCell = '#seatDetailsSeatCell';
     const seatDetailsSeatId = '#seatDetailsId';
     const seatDetailsDescription = '#seatDetailsDescription';
+    const waitingListContainer = '#waitingListContainer';
 
     var eventDetails = {};
 
@@ -220,8 +226,20 @@
     };
 
     sc.click = function () {
-        // Temporary hack
-        if (this.settings.data.blocked) {
+        if (this.status() == 'available') {
+            return 'selected';
+        } else if (this.status() == 'selected') {
+            return 'available';
+        } else if (this.status() == 'reserved') {
+            $(seatDetailsModal).modal();
+            $(seatDetailsSeatId).text(this.settings.id);
+            $(seatDetailsDescription).text("Blocked for Lam En Qing");
+            $(seatDetailsSeatCell)
+                .removeClass()
+                .addClass('seatCharts-seat seatCharts-cell available')
+                .addClass(this.settings.data.classes);
+            return 'reserved';
+        } else if (this.status() == 'blocked') {
             $(seatDetailsModal).modal();
             $(seatDetailsSeatId).text(this.settings.id);
             $(seatDetailsDescription).text(`Blocked for ${this.settings.data.category}`);
@@ -229,12 +247,9 @@
                 .removeClass()
                 .addClass('seatCharts-seat seatCharts-cell available')
                 .addClass(this.settings.data.classes);
+            return 'blocked';
         } else {
-            if (this.status() == 'available') {
-                return 'selected';
-            } else if (this.status() == 'selected') {
-                return 'available';
-            }
+            return this.style();
         }
     };
 
@@ -245,9 +260,12 @@
             
             sc.map = eventDetails.event.seatMap;
             sc.seats = getSeatsObject(eventDetails.seatTypes);
+            sc.legend.items = getLegendArray(sc.seats);
 
             sc.activeMap = bindMap(sc, seatMap);
             scaleContentWidth(tableWrapper, seatMap);
+
+            blockSeats(sc);
         } catch (error) {
             handleError(error);
         }
@@ -257,12 +275,29 @@
         scaleContentWidth(tableWrapper, seatMap);
     });
 
-    $(searchReservationInput).change(function(){
+    $(searchReservationInput).change(function() {
         sc.activeMap.find('reserved').status('highlighted');
     });
 
     $(reserveSeatButton).click(function() {
+        if (sc.activeMap.find('selected').length == 0) {
+            showDangerToast("Please select some seats to reserve for the attendee!");
+            return;
+        }
+
+        if (!$(reservationNameInput).val()) {
+            showDangerToast("Please enter a name for the attendee!");
+            return;
+        }
+
+        if (!$(reservationPhoneNumberInput).val()) {
+            showDangerToast("Please enter a phone number for the attendee!");
+            return;
+        }
+
         sc.activeMap.find('selected').status('reserved');
+
+        $(waitingListContainer).removeClass("d-none");
     });
 
     $(zoomQuadrantSelect).change(function() {

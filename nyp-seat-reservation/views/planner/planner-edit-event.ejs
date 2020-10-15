@@ -92,7 +92,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="legend" class="seatCharts-legend row">
+                <div id="editMapLegend" class="seatCharts-legend row">
                     <!-- Add Seat Type Card -->
                     <!-- This card will always be fixed in front of all the other legend cards -->
                     <div id="addSeatTypeCol" class="seatCharts-cardColumn col-auto">
@@ -196,7 +196,7 @@
     const venueSelectInput = '#venueSelectInput';
     const tableWrapper = '#tableWrapper';
     const seatMap = '#seatMap';
-    const legend = '#legend';
+    const legend = '#editMapLegend';
     const addSeatTypeCard = '#addSeatTypeCard';
     const helperSelectInput = '#helperSelectInput';
     const helpersCardCol = '#helpersCardCol';
@@ -224,6 +224,11 @@
 
     sc.seats = {};
 
+    sc.legend = {
+        node : $(legend),
+        items : []				
+    };
+
     sc.naming = {
         rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
         getLabel : function (character, row, column) {
@@ -232,11 +237,6 @@
         getId : function (character, row, column) {
             return row + ':' + column;
         }
-    };
-
-    sc.legend = {
-        node : $(legend),
-        items : []				
     };
 
     sc.click = function () {

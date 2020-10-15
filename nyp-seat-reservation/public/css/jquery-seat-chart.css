@@ -201,7 +201,7 @@ div.seatCharts-seat.temp-space {
 /* =============================== */
 
 div.seatCharts-seat.reserved {
-    background-color: #a937b8;
+    background-color: #161e8a;
 }
 
 div.seatCharts-seat.handicapped.reserved {
@@ -209,7 +209,7 @@ div.seatCharts-seat.handicapped.reserved {
 }
 
 div.seatCharts-seat.blocked {
-    background-color: #161e8a;
+    background-color: #a937b8;
 }
 
 div.seatCharts-seat.selected {

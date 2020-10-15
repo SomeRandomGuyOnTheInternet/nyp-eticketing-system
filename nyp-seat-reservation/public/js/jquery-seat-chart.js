@@ -466,7 +466,7 @@
 						.append(
 							$('<span></span>')
 								.addClass('seatCharts-legendDescription')
-								.text(typeof settings.seats[item[0]].descriptiveCategory == "undefined" ? settings.seats[item[0]].category : settings.seats[item[0]].descriptiveCategory)
+								.text(typeof settings.seats[item[0]].descriptiveCategory == "undefined" ? item[2] : settings.seats[item[0]].descriptiveCategory)
 						)
 				);
 			});
@@ -773,13 +773,46 @@ spliceMapCol = (map, startCol, endCol) => {
 	return map;
 };
 
-reloadMap = (sc, seatMapNode) => {
+getLegendArray = (seats) => {
+	let legends = [];
+
+	for (const seatCharacter in seats) {
+		if (!seats[seatCharacter].blocked) {
+			// TODO: make this a function
+			let availableLegend = [];
+			availableLegend.push(seatCharacter);
+			availableLegend.push("available");
+			availableLegend.push(seats[seatCharacter].category);
+
+			legends.push(availableLegend);
+		}	
+	}
+
+	let blockedLegend = [];
+	blockedLegend.push("a");
+	blockedLegend.push("blocked");
+	blockedLegend.push("Blocked");
+	legends.push(blockedLegend);
+
+	return legends;
+};
+
+blockSeats = (sc) => {
+	for (const seatCharacter in sc.seats) {
+		if (sc.seats[seatCharacter].blocked) {
+			sc.activeMap.find(seatCharacter).status('blocked');
+		}	
+	}
+};
+
+reloadMap = (sc, seatMapNode, legendNode = '#legend') => {
     unbindMap(seatMapNode);
     return bindMap(sc, seatMapNode);
 };
 
-unbindMap = (seatMapNode,) => {
-    $('.seatCharts-row').remove();
+unbindMap = (seatMapNode, legendNode = '#legend') => {
+	$('.seatCharts-row').remove();
+	$(legendNode).empty();
     $(`${seatMapNode}, ${seatMapNode} *`).unbind().removeData();
     $(seatMapNode).attr('aria-activedescendant', null);
 };
