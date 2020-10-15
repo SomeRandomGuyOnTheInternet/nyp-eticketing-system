@@ -37,6 +37,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Date Created</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -46,6 +47,7 @@
                                         <td><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
                                         <td><%= planners[i].email %></td>
+                                        <td><%= moment(planners[i].createdAt).format('Do MMMM YYYY') %></td>
                                         <td>
                                             <a href="/admin/deleteplanner/<%= planners[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
                                                 <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>

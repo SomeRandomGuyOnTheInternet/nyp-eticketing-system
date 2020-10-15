@@ -51,13 +51,13 @@
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Zoom</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <select id="zoomQuadrantSelect" class="form-control card-input" id="testSelectInput" name="testSelectInput" onChange="window.location.href=this.value">
+                            <select id="zoomQuadrantSelect" class="form-control card-input" id="testSelectInput" name="testSelectInput">
                                 <!-- This is where the user actually inputs all their stuff  -->
-                                <option>Whole Venue</option>
-                                <option>Top Left</option>
-                                <option value="/helper/eventtopright">Top Right</option>
-                                <option>Bottom Left</option>
-                                <option>Bottom Right</option>
+                                <option value="whole">Whole Venue</option>
+                                <option value="topLeft">Top Left</option>
+                                <option value="topRight">Top Right</option>
+                                <option value="bottomLeft">Bottom Left</option>
+                                <option value="bottomRight">Bottom Right</option>
                             </select>
                         </div>
                     </div>
@@ -193,10 +193,14 @@
     const seatDetailsSeatId = '#seatDetailsId';
     const seatDetailsDescription = '#seatDetailsDescription';
 
+    var eventDetails = {};
+
     // Seat chart configuration
     let sc = {};
 
-    sc.map = [],
+    sc.activeMap = {};
+
+    sc.map = [];
 
     sc.seats = {};
 
@@ -237,17 +241,13 @@
     // Rest of the functions
     $(document).ready(async function() {
         try {
-            const eventDetails = await getEventDetailsForHelper(eventId, helperId);
-
+            eventDetails = await getEventDetailsForHelper(eventId, helperId);
+            
             sc.map = eventDetails.event.seatMap;
             sc.seats = getSeatsObject(eventDetails.seatTypes);
 
-            sc = bindMap(sc, seatMap);
+            sc.activeMap = bindMap(sc, seatMap);
             scaleContentWidth(tableWrapper, seatMap);
-
-            for (const seatCharacter in sc.seats) {
-                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
-            }
         } catch (error) {
             handleError(error);
         }
@@ -257,15 +257,21 @@
         scaleContentWidth(tableWrapper, seatMap);
     });
 
-    //Reservation Hack
-
-    $(reserveSeatButton).click(function() {
-        sc.find('selected').status('reserved');
+    $(searchReservationInput).change(function(){
+        sc.activeMap.find('reserved').status('highlighted');
     });
 
-    $(searchReservationInput).change(function(){
-        sc.get('O:14').status('highlighted');
-        sc.get('O:15').status('highlighted');
+    $(reserveSeatButton).click(function() {
+        sc.activeMap.find('selected').status('reserved');
+    });
+
+    $(zoomQuadrantSelect).change(function() {
+        const orgHeight = $(seatMap)[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
+        const selectedValue = $(zoomQuadrantSelect).val();
+        sc.map = getZoomedQuadrant(eventDetails.event.seatMap, selectedValue);
+        reloadMap(sc, seatMap);
+        resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
+        scaleContentWidth(tableWrapper, seatMap);
     });
 </script>
 

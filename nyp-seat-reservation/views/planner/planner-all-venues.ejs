@@ -26,7 +26,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">Date Created</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,7 +34,7 @@
                                     <tr>
                                         <td scope="row"><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="/planner/venues/<%= venues[i].id %>"><%= venues[i].name %></a></td>
-                                        <td><a href="/api/delete-venue/<%= venues[i].id %>"><i class="fa fa-trash text-danger" style="font-size: 25px;"></i></a></td>
+                                        <td><%= moment(venues[i].createdAt).format('Do MMMM YYYY') %></td>
                                     </tr>
                                 <% } %>
                             </tbody>

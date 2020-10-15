@@ -94,7 +94,14 @@
                     </div>
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-                <button id="saveEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit">Update Venue</button>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <button id="deleteVenueButton" class="btn btn-danger btn-lg w-100" href="/api/delete-venue/<%= venue.id %>" type="button">Delete Venue</button>
+                    </div>
+                    <div class="col-sm-6">
+                        <button id="saveEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
+                    </div>
+                </div>
             </form>
         </main>
     </div>
@@ -152,17 +159,17 @@
     $(document).ready(function() {
         replaceMapSeatCharacters(sc.map, emptySpace, tempEmptySpace); // Convert empty space characters to a temporary character that can be interacted with
         bindMap(sc, '#seatMap');
-        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+        scaleContentWidth('#tableWrapper', '#seatMap');
 
         $("#columnInput").val(sc.map[0].length);
         $("#rowInput").val(sc.map.length);
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth($('#tableWrapper'), $('#seatMap'));
+        scaleContentWidth('#tableWrapper', '#seatMap');
     });
 
-    $("#columnInput, #rowInput").change(function () {
+    $("#columnInput").change(function () {
         const columnInput = $("#columnInput").val();
         const rowInput = $("#rowInput").val();
         
@@ -189,13 +196,49 @@
 
             resizeRow(columns, rows, sc.map); // Changes number of columns
             reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
-            resizeParentHeight(orgHeight, $('#tableWrapper'), $('#seatMap')); // Reduce the maps's 
+            resizeParentHeight(orgHeight, '#tableWrapper', '#seatMap'); // Reduce the maps's 
         }
 
         if (this.id == "columnInput") {
             resizeColumn(columns, rows, sc.map); // Changes number of rows
             reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
-            scaleContentWidth($('#tableWrapper'), $('#seatMap')); // Scale the map so the columns are all visible
+            scaleContentWidth('#tableWrapper', '#seatMap'); // Scale the map so the columns are all visible
+        }
+    });
+
+    $("#columnInput, #rowInput").change(function () {
+        const columnInput = $("#columnInput").val();
+        const rowInput = $("#rowInput").val();
+        
+        if (!$.isNumeric(columnInput) || !$.isNumeric(rowInput)) {
+            showDangerToast("Please enter a valid value!");
+            return;
+        }
+        
+        const columns = columnInput.toNum();
+        const rows = rowInput.toNum();
+
+        if (columns < 1 || rows < 1) {
+            showDangerToast("Please enter a larger value!");
+            return;
+        }
+
+        if (columns > 40 || rows > 40) {
+            showDangerToast("Please enter a smaller value!");
+            return;
+        }
+
+        if (this.id == "rowInput") {
+            const orgHeight = $('#seatMap')[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
+            resizeRow(columns, rows, sc.map); // Changes number of columns
+            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
+            resizeParentHeight(orgHeight, '#tableWrapper', '#seatMap'); // Reduce the maps's 
+        }
+
+        if (this.id == "columnInput") {
+            resizeColumn(columns, rows, sc.map); // Changes number of rows
+            reloadMap(sc, '#seatMap'); // Reloads the map with the updated map
+            scaleContentWidth('#tableWrapper', '#seatMap'); // Scale the map so the columns are all visible
         }
     });
 
@@ -207,6 +250,18 @@
         } else {
             selectedSeatType = null;
         }
+    });
+
+    $('#deleteVenueButton').click(function (event) {
+        var check = confirm("Are you sure you want to delete this venue?");
+
+        if (check == true) {
+            window.location.replace(`/api/delete-venue/${venue.id}`);
+            return true;
+        } else {
+            return false;
+        }
+        return confirm('Are you sure?');
     });
 
     $('#saveEditedVenueForm').submit(async function (event) {

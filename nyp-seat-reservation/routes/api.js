@@ -16,7 +16,7 @@ const EventHelper = require('../models/EventHelper');
 
 
 router.get('/test', async (req, res) => {
-    const test = await Event.getAllEvents();
+    const test = await Venue.getAllEvents();
     console.log(test);
     ajax.success(res, "It works! Yay!");
 });
@@ -42,7 +42,6 @@ router.post('/create-venue', async (req, res) => {
     });
 
     ajax.success(res, "Successfully added venue!");
-    flash.success(req, "Venue has been successfully created!");
     return
 });
 
@@ -145,8 +144,6 @@ router.post('/create-event', async (req, res) => {
 router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
     const eventId = req.params.eventId;
     const helperId = req.params.helperId;
-
-    console.log(eventId, helperId)
 
     const isHelper = await EventHelper.isHelperForEvent(helperId, eventId);
 

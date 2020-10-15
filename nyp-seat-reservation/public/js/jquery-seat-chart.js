@@ -643,6 +643,14 @@
 	
 })(jQuery);
 
+const zoomQuadrants = Object.freeze({
+    "whole": 0,
+    "topLeft": 1, 
+    "topRight": 2, 
+    "bottomLeft": 3,
+    "bottomRight": 4,
+});
+
 // Helper functions
 
 scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
@@ -708,6 +716,61 @@ resizeColumn = (columns, rows, map) => {
         resizeArray(splitRow, columns, defaultSeat); // And then we use the resize function to remove or add columns with the default seat depending on the user's input 
         map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
     }
+};
+
+getZoomedQuadrant = (map, quadrant) => {
+	if (map.length == 0) {
+		return baseMap;
+	}
+
+	if (map[0].length == 0) {
+		return baseMap;
+	}
+
+	const startRow = 0;
+	const startCol = 0;
+	const middleRow = Math.ceil(map.length / 2);
+	const middleCol = Math.ceil(map[0].length / 2);
+	const endRow = map.length - 1;
+	const endCol = map[0].length -1;
+
+	switch(quadrant) {
+		case "whole":
+			break;
+		case "topLeft":
+			map = spliceMapRow(map, startRow, middleRow);
+			map = spliceMapCol(map, startCol, middleCol);
+			break;
+		case "topRight":
+			map = spliceMapRow(map, startRow, middleRow);
+			map = spliceMapCol(map, middleCol, endCol);
+			break;
+		case "bottomLeft":
+			map = spliceMapRow(map, middleRow, endRow);
+			map = spliceMapCol(map, startRow, middleCol);
+			break;
+		case "bottomRight":
+			map = spliceMapRow(map, middleRow, endCol);
+			map = spliceMapCol(map, middleCol, endCol);
+			break;
+		default:
+			break;
+	}
+
+	return map;
+};
+
+spliceMapRow = (map, startRow, endRow) => {
+	return map.splice(startRow, endRow);
+};
+
+spliceMapCol = (map, startCol, endCol) => {
+	for (i = 0; i < map.length; i++) {
+        const splitRow = [...map[i]].splice(startCol, endCol); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
+        map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
+	}
+	
+	return map;
 };
 
 reloadMap = (sc, seatMapNode) => {
