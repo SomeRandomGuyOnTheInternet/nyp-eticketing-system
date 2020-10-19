@@ -17,29 +17,26 @@
 			return this.data('seatCharts');
 		}
 		
-		var fn       = this,
+		var fn = this,
 			seats    = {},
 			seatIds  = [],
-			legend,
 			settings = {
 				animate : false, //requires jQuery UI
 				naming  : {
-					top    : true,
-					left   : true,
-					getId  : function(character, row, column) {
-						return row + '_' + column;
+					top      : true,
+					left     : true,
+					getId    : function(character, row, column) {
+						return row + ':' + column;
 					},
 					getLabel : function (character, row, column) {
-						return column;
-					}
-					
-				},
-				legend : {
-					node   : null,
-					items  : []
+						return row + ':' + column;
+					}	
+				}, 
+				legend  : {
+					node     : null,
+					items    : []
 				},
 				click   : function() {
-
 					if (this.status() == 'available') {
 						return 'selected';
 					} else if (this.status() == 'selected') {
@@ -47,23 +44,21 @@
 					} else {
 						return this.style();
 					}
-					
 				},
-				focus  : function() {
-
+				focus   : function() {
 					if (this.status() == 'available') {
 						return 'focused';
 					} else  {
 						return this.style();
 					}
 				},
-				blur   : function() {
+				blur    : function() {
 					return this.status();
 				},
 				seats   : {}
 			
 			},
-			//seat will be basically a seat object which we'll when generating the map
+			// seat will be basically a seat object which we'll when generating the map
 			seat = (function(seatCharts, seatChartsSettings) {
 				return function (setup) {
 					var fn = this;
@@ -82,14 +77,14 @@
 						.attr({
 							id               : fn.settings.id,
 							role             : 'checkbox',
-              'data-toggle'    : 'tooltip',
-              'data-placement' : 'top',
-              title            : fn.settings.id,
+							'data-toggle'    : 'tooltip',
+							'data-placement' : 'top',
+							title            : fn.settings.id,
 							'aria-checked'   : false,
 							focusable        : true,
 							tabIndex         : -1 //manual focus
 						})
-					  // .text(fn.settings.label) // to remove numbers in seats
+						// .text(fn.settings.label) // to remove numbers in seats
 						.addClass(['seatCharts-seat', 'seatCharts-cell', 'available'].concat(
 							//let's merge custom user defined classes with standard JSC ones
 							fn.settings.classes, 
@@ -118,7 +113,6 @@
 					 * If you pass an argument, it will update seat's style
 					 */
 					fn.style = function() {
-
 						return arguments.length == 1 ?
 							(function(newStyle) {
 								var oldStyle = fn.settings.style;
@@ -144,7 +138,6 @@
 					
 					//either set or retrieve
 					fn.status = function() {
-	
 						return fn.settings.status = arguments.length == 1 ? 
 							fn.style(arguments[0]) : fn.settings.status;
 					};
@@ -343,7 +336,6 @@
 			if (settings.naming.left) {
 				$headerRow.append($('<div></div>').addClass('seatCharts-cell'));
 			}
-			
 				
 			$.each(settings.naming.columns, function(index, value) {
 				$headerRow.append(
@@ -401,23 +393,23 @@
 				$row.append(character != '_' ?
 					//if the character is not an underscore (empty space)
 					(function(naming) {
-	
 						//so users don't have to specify empty objects
 						settings.seats[character] = character in settings.seats ? settings.seats[character] : {};
 	
 						var id = overrideId ? overrideId : naming.getId(character, naming.rows[row], naming.columns[column]);
+
 						seats[id] = new seat({
-							id        : id,
-							label     : overrideLabel ?
-								overrideLabel : naming.getLabel(character, naming.rows[row], naming.columns[column]),
-							row       : row,
-							column    : column,
-							character : character
+							id        	  : id,
+							label         : overrideLabel ?
+							overrideLabel : naming.getLabel(character, naming.rows[row], naming.columns[column]),
+							row           : row,
+							column        : column,
+							character     : character
 						});
 
 						seatIds.push(id);
+
 						return seats[id].node();
-						
 					})(settings.naming) :
 					//this is just an empty space (_)
 					$('<div></div>').addClass('seatCharts-cell seatCharts-space')	
@@ -442,7 +434,7 @@
 				var $card = $('<div></div>')
 					.addClass('seatCharts-legendCard')
 					.addClass('card')
-					.addClass(typeof settings.seats[item[0]].legendClasses == "undefined" ? "" : settings.seats[item[0]].legendClasses)
+					.addClass(typeof item[3] == "undefined" ? "" : item[3])
 					.addClass('mt-3')
 					.attr("seat-character", settings.legend.items[index][0])
 					.appendTo($column);
@@ -466,7 +458,7 @@
 						.append(
 							$('<span></span>')
 								.addClass('seatCharts-legendDescription')
-								.text(typeof settings.seats[item[0]].descriptiveCategory == "undefined" ? item[2] : settings.seats[item[0]].descriptiveCategory)
+								.text(item[2])
 						)
 				);
 			});
@@ -495,7 +487,7 @@
 			seats   : seats,
 			seatIds : seatIds,
 			//set for one, set for many, get for one
-			status: function() {
+			status  : function() {
 				var fn = this;
 			
 				return arguments.length == 1 ? fn.seats[arguments[0]].status() : (function(seatsIds, newStatus) {
@@ -507,7 +499,7 @@
 					})();
 				})(arguments[0], arguments[1]);
 			},
-			each  : function(callback) {
+			each    : function(callback) {
 				var fn = this;
 			
 				for (var seatId in fn.seats) {
@@ -518,73 +510,73 @@
 				
 				return true;
 			},
-			node       : function() {
+			node    : function() {
 				var fn = this;
 				//basically create a CSS query to get all seats by their DOM ids
 				return $('#' + fn.seatIds.join(',#'));
 			},
 
-			find       : function(query) {//D, a.available, unavailable
+			find    : function(query) {//D, a.available, unavailable
 				var fn = this;
 			
 				var seatSet = fn.set();
 			
 				//is RegExp
-		                return query instanceof RegExp ?
-		                    (function () {
-		                        fn.each(function (id) {
-		                            if (id.match(query)) {
-		                                seatSet.push(id, this);
-		                            }
-		                        });
-		                        return seatSet;
-		                    })() :
-		                    (query.length == 1 ?
-		                            (function (character) {
-		                                //user searches just for a particual character
-		                                fn.each(function () {
-		                                    if (this.char() == character) {
-		                                        seatSet.push(this.settings.id, this);
-		                                    }
-		                                });
-		
-		                                return seatSet;
-		                            })(query) :
-		                            (function () {
-		                                //user runs a more sophisticated query, so let's see if there's a dot
-		                                return query.indexOf('.') > -1 ?
-		                                    (function () {
-		                                        //there's a dot which separates character and the status
-		                                        var parts = query.split('.');
-		
-		                                        fn.each(function (seatId) {
-		                                            if (this.char() == parts[0] && this.status() == parts[1]) {
-		                                                seatSet.push(this.settings.id, this);
-		                                            }
-		                                        });
-		
-		                                        return seatSet;
-		                                    })() :
-		                                    (function () {
-		                                        fn.each(function () {
-		                                            if (this.status() == query) {
-		                                                seatSet.push(this.settings.id, this);
-		                                            }
-		                                        });
-		                                        return seatSet;
-		                                    })();
-		                            })()
-		                    );
+				return query instanceof RegExp ?
+					(function () {
+						fn.each(function (id) {
+							if (id.match(query)) {
+								seatSet.push(id, this);
+							}
+						});
+						return seatSet;
+					})() :
+					(query.length == 1 ?
+							(function (character) {
+								//user searches just for a particual character
+								fn.each(function () {
+									if (this.char() == character) {
+										seatSet.push(this.settings.id, this);
+									}
+								});
+
+								return seatSet;
+							})(query) :
+							(function () {
+								//user runs a more sophisticated query, so let's see if there's a dot
+								return query.indexOf('.') > -1 ?
+									(function () {
+										//there's a dot which separates character and the status
+										var parts = query.split('.');
+
+										fn.each(function (seatId) {
+											if (this.char() == parts[0] && this.status() == parts[1]) {
+												seatSet.push(this.settings.id, this);
+											}
+										});
+
+										return seatSet;
+									})() :
+									(function () {
+										fn.each(function () {
+											if (this.status() == query) {
+												seatSet.push(this.settings.id, this);
+											}
+										});
+										return seatSet;
+									})();
+							})()
+					);
 				
 			},
-			set        : function set() {//inherits some methods
+			set     : function set() {//inherits some methods
 				var fn = this;
 				
 				return {
-					seats      : [],
-					seatIds    : [],
-					length     : 0,
-					status     : function() {
+					seats   : [],
+					seatIds : [],
+					length  : 0,
+					status  : function() {
 						var args = arguments,
 							that = this;
 						//if there's just one seat in the set and user didn't pass any params, return current status
@@ -595,22 +587,22 @@
 							});
 						})();
 					},
-					node       : function() {
+					node    : function() {
 						return fn.node.call(this);
 					},
-					each       : function() {
+					each    : function() {
 						return fn.each.call(this, arguments[0]);
 					},
-					get        : function() {
+					get     : function() {
 						return fn.get.call(this, arguments[0]);
 					},
-					find       : function() {
+					find    : function() {
 						return fn.find.call(this, arguments[0]);
 					},
-					set       : function() {
+					set     : function() {
 						return set.call(fn);
 					},
-					push       : function(id, seat) {
+					push    : function(id, seat) {
 						this.seats.push(seat);
 						this.seatIds.push(id);
 						++this.length;
@@ -618,7 +610,7 @@
 				};
 			},
 			//get one object or a set of objects
-			get   : function(seatsIds) {
+			get     : function(seatsIds) {
 				var fn = this;
 
 				return typeof seatsIds == 'string' ? 
@@ -652,6 +644,20 @@ const zoomQuadrants = Object.freeze({
 });
 
 // Helper functions
+
+resizeArray = (arr, size, defval) => {
+    var delta = arr.length - size;
+
+    if (delta > 0) {
+        arr.length = size;
+    } else {
+        while (delta++ < 0) { 
+            arr.push(defval); 
+        }
+    }
+
+    return arr;
+};
 
 scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
     const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
@@ -707,57 +713,16 @@ replaceMapSeatCharacters = (map, characterToReplace, newCharacter) => {
 
 resizeRow = (columns, rows, map) => {
     const defaultRow = defaultSeat.repeat(columns); // The default row is just the one that gets assigned to any new row that's created. We take the number of columns the user input and multiply it by the default seat type (general, G) to get it
-    resizeArray(map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
+	return resizeArray(map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
 };
 
 resizeColumn = (columns, rows, map) => {
     for (i = 0; i < rows; i++) { // To change the number of columns we have to loop through each row indvidually and resize them
         const splitRow = [...map[i]]; // Since rows are stored as strings in the map, we have to split them into an array
-        resizeArray(splitRow, columns, defaultSeat); // And then we use the resize function to remove or add columns with the default seat depending on the user's input 
-        map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
-    }
-};
-
-getZoomedQuadrant = (map, quadrant) => {
-	if (map.length == 0) {
-		return baseMap;
+        map[i] = resizeArray(splitRow, columns, defaultSeat).join(""); // Then we just have to join the array into a string and then put them back into the map
 	}
 
-	if (map[0].length == 0) {
-		return baseMap;
-	}
-
-	const startRow = 0;
-	const startCol = 0;
-	const middleRow = Math.ceil(map.length / 2);
-	const middleCol = Math.ceil(map[0].length / 2);
-	const endRow = map.length - 1;
-	const endCol = map[0].length -1;
-
-	switch(quadrant) {
-		case "whole":
-			break;
-		case "topLeft":
-			map = spliceMapRow(map, startRow, middleRow);
-			map = spliceMapCol(map, startCol, middleCol);
-			break;
-		case "topRight":
-			map = spliceMapRow(map, startRow, middleRow);
-			map = spliceMapCol(map, middleCol, endCol);
-			break;
-		case "bottomLeft":
-			map = spliceMapRow(map, middleRow, endRow);
-			map = spliceMapCol(map, startRow, middleCol);
-			break;
-		case "bottomRight":
-			map = spliceMapRow(map, middleRow, endCol);
-			map = spliceMapCol(map, middleCol, endCol);
-			break;
-		default:
-			break;
-	}
-
-	return map;
+	return map
 };
 
 spliceMapRow = (map, startRow, endRow) => {
@@ -773,44 +738,12 @@ spliceMapCol = (map, startCol, endCol) => {
 	return map;
 };
 
-getLegendArray = (seats) => {
-	let legends = [];
-
-	for (const seatCharacter in seats) {
-		if (!seats[seatCharacter].blocked) {
-			// TODO: make this a function
-			let availableLegend = [];
-			availableLegend.push(seatCharacter);
-			availableLegend.push("available");
-			availableLegend.push(seats[seatCharacter].category);
-
-			legends.push(availableLegend);
-		}	
-	}
-
-	let blockedLegend = [];
-	blockedLegend.push("a");
-	blockedLegend.push("blocked");
-	blockedLegend.push("Blocked");
-	legends.push(blockedLegend);
-
-	return legends;
-};
-
-blockSeats = (sc) => {
-	for (const seatCharacter in sc.seats) {
-		if (sc.seats[seatCharacter].blocked) {
-			sc.activeMap.find(seatCharacter).status('blocked');
-		}	
-	}
-};
-
-reloadMap = (sc, seatMapNode, legendNode = '#legend') => {
-    unbindMap(seatMapNode);
+reloadMap = (sc, seatMapNode, legendNode) => {
+    unbindMap(seatMapNode, legendNode);
     return bindMap(sc, seatMapNode);
 };
 
-unbindMap = (seatMapNode, legendNode = '#legend') => {
+unbindMap = (seatMapNode, legendNode) => {
 	$('.seatCharts-row').remove();
 	$(legendNode).empty();
     $(`${seatMapNode}, ${seatMapNode} *`).unbind().removeData();

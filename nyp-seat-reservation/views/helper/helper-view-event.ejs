@@ -199,19 +199,19 @@
     const seatDetailsDescription = '#seatDetailsDescription';
     const waitingListContainer = '#waitingListContainer';
 
-    var eventDetails = {};
+    let eventDetails = {};
+
+    let scActive = {};
 
     // Seat chart configuration
     let sc = {};
-
-    sc.activeMap = {};
 
     sc.map = [];
 
     sc.seats = {};
 
     sc.naming = {
-        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
+        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
         getLabel: function (character, row, column) {
             return row + ':' + column;
         },
@@ -220,36 +220,20 @@
         }
     };
 
-    sc.legend = {
-        node: $(legend),
-        items: []					
-    };
-
     sc.click = function () {
-        if (this.status() == 'available') {
-            return 'selected';
-        } else if (this.status() == 'selected') {
-            return 'available';
-        } else if (this.status() == 'reserved') {
-            $(seatDetailsModal).modal();
-            $(seatDetailsSeatId).text(this.settings.id);
-            $(seatDetailsDescription).text("Blocked for Lam En Qing");
-            $(seatDetailsSeatCell)
-                .removeClass()
-                .addClass('seatCharts-seat seatCharts-cell available')
-                .addClass(this.settings.data.classes);
-            return 'reserved';
-        } else if (this.status() == 'blocked') {
-            $(seatDetailsModal).modal();
-            $(seatDetailsSeatId).text(this.settings.id);
-            $(seatDetailsDescription).text(`Blocked for ${this.settings.data.category}`);
-            $(seatDetailsSeatCell)
-                .removeClass()
-                .addClass('seatCharts-seat seatCharts-cell available')
-                .addClass(this.settings.data.classes);
-            return 'blocked';
-        } else {
-            return this.style();
+        switch (this.status()) {
+            case 'available':
+                return 'selected';
+            case 'selected':
+                return 'available';
+            case 'reserved':
+                populateSeatDetailsModal(this.settings.id, "Lam En Qing", this.settings.data.classes);
+                return 'reserved';
+            case 'blocked':
+                populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);
+                return 'blocked';
+            default:
+                return this.style();
         }
     };
 
@@ -260,10 +244,15 @@
             
             sc.map = eventDetails.event.seatMap;
             sc.seats = getSeatsObject(eventDetails.seatTypes);
-            sc.legend.items = getLegendArray(sc.seats);
 
-            sc.activeMap = bindMap(sc, seatMap);
+            activeSeatChart = bindMap(sc, seatMap);
             scaleContentWidth(tableWrapper, seatMap);
+
+            for (const seatCharacter in sc.seats) {
+                if (!sc.seats[seatCharacter].blocked) {
+                    renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
+                }	
+            }
 
             blockSeats(sc);
         } catch (error) {
@@ -296,8 +285,6 @@
         }
 
         sc.activeMap.find('selected').status('reserved');
-
-        $(waitingListContainer).removeClass("d-none");
     });
 
     $(zoomQuadrantSelect).change(function() {
@@ -308,6 +295,59 @@
         resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
         scaleContentWidth(tableWrapper, seatMap);
     });
+
+    populateSeatDetailsModal = (seatId, description, cssClasses) => {
+        $(seatDetailsSeatId).text(seatId);
+        $(seatDetailsDescription).text(description);
+        $(seatDetailsSeatCell)
+            .removeClass()
+            .addClass('seatCharts-seat seatCharts-cell available')
+            .addClass(cssClasses);
+            
+        $(seatDetailsModal).modal();
+    };
+
+    getZoomedQuadrant = (map, quadrant) => {
+        if (map.length == 0) {
+            return baseMap;
+        }
+
+        if (map[0].length == 0) {
+            return baseMap;
+        }
+
+        const startRow = 0;
+        const startCol = 0;
+        const middleRow = Math.ceil(map.length / 2);
+        const middleCol = Math.ceil(map[0].length / 2);
+        const endRow = map.length - 1;
+        const endCol = map[0].length -1;
+
+        switch(quadrant) {
+            case "whole":
+                break;
+            case "topLeft":
+                map = spliceMapRow(map, startRow, middleRow);
+                map = spliceMapCol(map, startCol, middleCol);
+                break;
+            case "topRight":
+                map = spliceMapRow(map, startRow, middleRow);
+                map = spliceMapCol(map, middleCol, endCol);
+                break;
+            case "bottomLeft":
+                map = spliceMapRow(map, middleRow, endRow);
+                map = spliceMapCol(map, startRow, middleCol);
+                break;
+            case "bottomRight":
+                map = spliceMapRow(map, middleRow, endCol);
+                map = spliceMapCol(map, middleCol, endCol);
+                break;
+            default:
+                break;
+        }
+
+        return map;
+    };
 </script>
 
 <!-- <script>

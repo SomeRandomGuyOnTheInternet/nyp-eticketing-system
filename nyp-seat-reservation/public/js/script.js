@@ -32,18 +32,6 @@ promiseAjax = (uri, method, data) => {
     });
 };
 
-resizeArray = (arr, size, defval) => {
-    var delta = arr.length - size;
-
-    if (delta > 0) {
-        arr.length = size;
-    } else {
-        while (delta++ < 0) { 
-            arr.push(defval); 
-        }
-    }
-};
-
 toTitleCase = (str) => {
     var lcStr = str.toLowerCase();
 

@@ -53,11 +53,11 @@ div.seatCharts-seat:focus {
 /* =============================== */
 
 .front-indicator {
-	margin: 5px 10px 5px 10px;
+	margin: 5px 0 5px 10px;
 	background-color: #f6f6f6;	
 	color: #adadad;
 	text-align: center;
-	padding: 3px;
+	padding: 3px 0 3px 3px;
 	border-radius: 5px;
     min-width: 300px;
 }
@@ -66,6 +66,7 @@ div.seatCharts-seat:focus {
     text-align: center;
     overflow: hidden;
     position: relative;
+    user-select: none;
 }
 
 div.seatCharts-cell {
@@ -111,8 +112,8 @@ div.seatCharts-cardColumn {
     padding-left: 7.5px;
 }
 
-ul.seatCharts-legendList {
-	padding-left: 0px;
+div.seatCharts-legendCard {
+	user-select: none;
 }
 
 span.seatCharts-legendDescription {
@@ -219,5 +220,5 @@ div.seatCharts-seat.selected {
 
 div.seatCharts-seat.highlighted {
     opacity: 1;
-    background-color: #98fb98;
+    background-color: #2cd42c;
 }
