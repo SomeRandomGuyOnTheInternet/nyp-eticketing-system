@@ -135,7 +135,12 @@ createEventHelpers = async (eventHelperArray) => {
 callTestApi = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/test`, 'GET', null);
+            const res = await promiseAjax(
+                'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
+                'POST',
+                `SMSAccount=FYPJ01&Pwd=529287&Mobile=91864675&Message=innocent  message`,
+                'jsonp', 
+                'application/x-www-form-urlencoded');
             resolve(res);
         } catch (error) {
             reject(error);

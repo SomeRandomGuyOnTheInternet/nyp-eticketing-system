@@ -302,7 +302,11 @@
 
 <script>
     $(document).ready(async function() {
-        await callTestApi();
+        try {
+            await callTestApi();
+        } catch (err) {
+            handleError(err);
+        }
 
         // This whole part initialises the seat chart
         let sc = $('#seat-map').seatCharts({ 
