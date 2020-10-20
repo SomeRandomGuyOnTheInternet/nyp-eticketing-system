@@ -432,10 +432,11 @@
 					.appendTo($rowContainer);
 
 				var $card = $('<div></div>')
-					.addClass('seatCharts-legendCard')
+					.addClass('seatCharts-legendCard clickable-div')
 					.addClass('card')
 					.addClass(typeof item[3] == "undefined" ? "" : item[3])
 					.addClass('mt-3')
+					.attr("tabindex", 0)
 					.attr("seat-character", settings.legend.items[index][0])
 					.appendTo($column);
 

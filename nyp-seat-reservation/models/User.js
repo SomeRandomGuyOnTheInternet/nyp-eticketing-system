@@ -95,7 +95,8 @@ module.exports.getHelpers = async () => {
             let helpers = await User.findAll({ 
                 where: { 
                     isHelper: true
-                } 
+                },
+                order: [['name', 'ASC']]
             });
 
             resolve(helpers)
@@ -111,7 +112,8 @@ module.exports.getPlanners = async () => {
             let user = await User.findAll({ 
                 where: { 
                     isPlanner: true
-                } 
+                },
+                order: [['name', 'ASC']]
             });
 
             resolve(user)

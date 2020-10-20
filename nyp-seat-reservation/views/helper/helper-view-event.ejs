@@ -348,6 +348,10 @@
 
         return map;
     };
+
+    $(window).on('beforeunload', function() {
+        return confirm();
+    });
 </script>
 
 <!-- <script>

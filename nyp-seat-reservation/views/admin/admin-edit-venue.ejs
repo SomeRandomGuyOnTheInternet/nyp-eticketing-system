@@ -229,6 +229,10 @@
             $(saveEditedVenueButton).prop('disabled', false);
         }
     });
+
+    $(window).on('beforeunload', function() {
+        return confirm();
+    });
 </script>
 
 <%- include('../templates/footer')-%>

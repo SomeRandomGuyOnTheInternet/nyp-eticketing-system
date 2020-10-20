@@ -51,8 +51,9 @@ module.exports.getHelpersByEventId = async (eventId) => {
                 include: [{
                     model: EventHelper,
                     where: { eventId: eventId },
-                    required: true,
+                    required: true
                 }],
+                order: [['name', 'ASC']],
                 raw: true
             });
             resolve(eventHelpers);

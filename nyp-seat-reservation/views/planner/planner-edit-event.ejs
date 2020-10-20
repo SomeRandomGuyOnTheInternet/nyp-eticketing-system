@@ -343,6 +343,8 @@
             await createEventSeatTypes(seatTypeArray);
             await createEventHelpers(eventHelperArray);
             
+            $(window).unbind('beforeunload');
+            
             window.location.replace("/planner/events");
         } catch (error) {
             handleError(error);
@@ -358,6 +360,10 @@
     setEventMap = (venue) => {
         sc.map = JSON.parse(venue.seatMap);
     };
+
+    $(window).on('beforeunload', function() {
+        return confirm();
+    });
 </script>
 
 <%- include('../templates/footer')-%>

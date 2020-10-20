@@ -14,6 +14,15 @@ String.prototype.replaceAll = function(str1, str2, ignore) {
     return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
 };
 
+class AppException extends Error {
+    constructor(description) {
+        super();
+        this.name = "AppException";
+        this.message = description;
+        this.description = description;
+    }
+};
+
 promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/json') => {
     if (data) {
         if (typeof data === 'object') {
@@ -46,6 +55,16 @@ promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/
     });
 };
 
+function onBeforeUnload(e) {
+    if (thereAreUnsavedChanges()) {
+        e.preventDefault();
+        e.returnValue = '';
+        return;
+    }
+
+    delete e['returnValue'];
+}
+
 toTitleCase = (str) => {
     var lcStr = str.toLowerCase();
     return lcStr.replace(/(?:^|\s)\w/g, function(match) {
@@ -53,19 +72,22 @@ toTitleCase = (str) => {
     });
 };
 
-throwAsyncError = (message) => {
-    throw { 
-        responseText: message 
-    };
+throwException = (description) => { // DO NOT USE THIS EVERYWHERE. Use this function whenever there's a rare error or you get unsatisfactory results from an asynchronous call. For normal stuff like validation, just showDangerToast
+    throw new AppException(description); // description should be user-readable
 };
 
-handleError = (error) => {
-    if (error.responseText) {
-        console.error(error);
+handleError = (error) => { // Use inside the catch block of a try catch
+    // Logs the error
+    console.error(error);
+
+    if (error && error.description) { // description is the attribute that stores a user-readable description of the AppException error, so if that exists, flash that to the user
+        showDangerToast(error.description);
+    } else if (error && error.responseText) { // responseText is the attribute that stores a user-readable description of an ajax error, so if that exists, flash that to the user
         showDangerToast(error.responseText);
     } else {
-        showDangerToast("Something went wrong. Please try again later!");
+        showDangerToast("Something went wrong. Please try again later!"); // if no user readable description exists, just flash a generic error
     }
+
     return false;
 };
 
@@ -94,6 +116,20 @@ showToast = (notification) => {
     let toastNode = renderToastTemplate(notification); // Upon clicking each toast's buttons, we call pass the template string we defined in template.js and the variables required in the templates to ejs so it gives us a complete html element with all the data filled in
     $("#toastContainer").append(toastNode); // Then we append the resulting toast html to the toast container defined in footer.ejs
     $('.toast').not('.hide').toast('show'); // Show the unhidden toasts in the toast container, which includes the one we just appended
+};
+
+getSelectedObjectFromSelectNode = (objects, selectNode) => {
+    const selectedValue = $(selectNode).val();
+
+    if (!selectedValue) {
+        throwException('The selected option is not valid. Please try again later!');
+    }
+
+    if (!$.isNumeric(selectedValue)) {
+        throwException('The selected option is not valid. Please try again later!');
+    }
+
+    return objects[selectedValue.toNum()];
 };
 
 
@@ -155,18 +191,18 @@ populateSelectedHelperColumn = (helpers, selectedHelpersColNode) => {
         }
     }
 
-    if($(selectedHelpersColNode).is(':empty')) {
+    if ($(selectedHelpersColNode).is(':empty')) {
         $(selectedHelpersColNode).append(renderNoStudentHelpersSelectedTemplate());
     }
 };
 
+getSelectedHelper = (helpers, selectNode) => {
+    return getSelectedObjectFromSelectNode(helpers, selectNode);
+}
+
 
 populateVenueSelect = (venues, venueSelectNode) => {
     $(`${venueSelectNode} option`).remove();
-
-    if (venues.length < 1) {
-        return showDangerToast('There are no venues available. Please try again later!');
-    }
     
     for (i = 0; i < venues.length; i++) {
         $(venueSelectNode).append($('<option>', {
@@ -178,16 +214,6 @@ populateVenueSelect = (venues, venueSelectNode) => {
     $(venueSelectNode).val($(`${venueSelectNode} option:first`).val());
 };
 
-getSelectedVenue = (venues, venueSelectNode) => {
-    const selectedValue = $(venueSelectNode).val();
-
-    if (!selectedValue) {
-        throwError('The selected option is not valid. Please try again later!');
-    }
-
-    if (!$.isNumeric(selectedValue)) {
-        throwError('The selected option is not valid. Please try again later!');
-    }
-
-    return venues[selectedValue.toNum()];
-};
+getSelectedVenue = (venues, selectNode) => {
+    return getSelectedObjectFromSelectNode(venues, selectNode);
+}

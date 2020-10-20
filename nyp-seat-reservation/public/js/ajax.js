@@ -1,4 +1,4 @@
-const baseRoute = "/api/";
+const baseRoute = "/api";
 
 createVenue = async (name, map) => {
     return new Promise(async (resolve, reject) => {

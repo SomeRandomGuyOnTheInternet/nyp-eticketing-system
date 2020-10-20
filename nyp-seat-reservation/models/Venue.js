@@ -60,7 +60,10 @@ module.exports.getVenueById = async (id) => {
 module.exports.getAllVenues = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            let venues = await Venue.findAll({ raw: true });
+            let venues = await Venue.findAll({
+                order: [['name', 'ASC']],
+                raw: true
+            });
             resolve(venues)
         } catch (error) {
             reject(error);
