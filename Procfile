@@ -1,3 +1,3 @@
-web: node ./nyp-seat-reservation/app.js
+web: node ./nyp-eticketing-system/app.js
 
 
