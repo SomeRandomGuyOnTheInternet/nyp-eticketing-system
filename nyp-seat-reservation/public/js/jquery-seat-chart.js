@@ -725,7 +725,6 @@ resizeColumns = (columns, rows, map) => {
 };
 
 // Quadrant zoom functions
-
 getQuadrantDimensions = (map, quadrant) => {
 	if (map.length == 0) {
 		return throwException("The given map has no rows!");

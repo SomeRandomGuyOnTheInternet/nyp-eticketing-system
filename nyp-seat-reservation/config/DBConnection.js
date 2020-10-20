@@ -9,7 +9,7 @@ const Events = require('../../nyp-seat-reservation/models/Event');
 const Users = require('../../nyp-seat-reservation/models/User');
 const Venues = require('../../nyp-seat-reservation/models/Venue');
 const EventHelpers = require('../../nyp-seat-reservation/models/EventHelper');
-const EventSeats = require('../../nyp-seat-reservation/models/EventSeat');
+const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeat');
 const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendee');
 const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
 
@@ -35,8 +35,8 @@ const setUpDB = (drop) => {
         EventSeatTypes.belongsTo(Events, { foreignKey: 'eventId' });
 
         // Each seat type of an event can belong to many seats in the venue
-        EventSeatTypes.hasMany(EventSeats, { foreignKey: 'seatTypeId' });
-        EventSeats.belongsTo(EventSeatTypes, { foreignKey: 'seatTypeId' });
+        EventSeatTypes.hasMany(EventReservedSeats, { foreignKey: 'seatTypeId' });
+        EventReservedSeats.belongsTo(EventSeatTypes, { foreignKey: 'seatTypeId' });
 
         // Each event can have many helpers
         Events.hasMany(EventHelpers, { foreignKey: 'eventId' });
@@ -51,16 +51,16 @@ const setUpDB = (drop) => {
         EventAttendees.belongsTo(Events, { foreignKey: 'eventId' });
 
         // Each attendee can reserve many seats in an event
-        EventAttendees.hasMany(EventSeats, { foreignKey: 'attendeeId' });
-        EventSeats.belongsTo(EventAttendees, { foreignKey: 'attendeeId' });
+        EventAttendees.hasMany(EventReservedSeats, { foreignKey: 'attendeeId' });
+        EventReservedSeats.belongsTo(EventAttendees, { foreignKey: 'attendeeId' });
 
         mySQLDB.sync({ 
             force: drop 
         }).then(() => {
-            if (drop == true) {
-                createUsers(Users);
-                createVenues(Venues);
-            }
+            // if (drop == true) {
+            //     createUsers(Users);
+            //     createVenues(Venues);
+            // }
         });
     });
 };
