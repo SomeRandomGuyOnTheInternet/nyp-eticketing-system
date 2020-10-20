@@ -436,7 +436,7 @@
 					.addClass('card')
 					.addClass(typeof item[3] == "undefined" ? "" : item[3])
 					.addClass('mt-3')
-					.attr("tabindex", 0)
+					.attr("tabindex", -1)
 					.attr("seat-character", settings.legend.items[index][0])
 					.appendTo($column);
 
@@ -467,9 +467,9 @@
 			return $rowContainer;
 		})(settings.legend) : null;
 	
-		fn.attr({
-			tabIndex : 0
-		});
+		// fn.attr({
+		// 	tabIndex : 0
+		// });
 		
 		
 		//when container's focused, move focus to the first seat
@@ -645,7 +645,7 @@ const zoomQuadrants = Object.freeze({
 });
 
 // Helper functions
-
+// General dependency functions
 resizeArray = (arr, size, defval) => {
     var delta = arr.length - size;
 
@@ -660,11 +660,12 @@ resizeArray = (arr, size, defval) => {
     return arr;
 };
 
+// Responsive functions
 scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
     const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
     if ($(content).width() > $(parent).width()) {
-        const scale = $(parent).width() / ($(content).width() + 35); // This equation get us the scale of the parent's width in relation to the container's width. The 40 is just a magic number that ensures that the content doesn't go out of bounds. Idk why that number works lol.
+        const scale = $(parent).width() / ($(content).width()); // This equation get us the scale of the parent's width in relation to the container's width
         $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
         $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
     } else {
@@ -680,6 +681,7 @@ resizeParentHeight = (orgHeight, parent, content) => { // This function resizes 
     $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is.
 };
 
+// Seat map editing functions
 replaceMapSeat = (map, seat, selectedSeatType, selectedSeatTypeDetails) => {
     if (selectedSeatTypeDetails) {
         seat.settings.character = selectedSeatType;
@@ -726,23 +728,29 @@ resizeColumns = (columns, rows, map) => {
 	return map
 };
 
-spliceMapRow = (map, startRow, endRow) => {
-	return map.splice(startRow, endRow);
+function spliceMapRow(map, startRow, endRow) {
+	return map.splice(startRow, Math.max(1, endRow));
 };
 
-spliceMapCol = (map, startCol, endCol) => {
+function spliceMapCol(map, startCol, endCol) {
 	for (i = 0; i < map.length; i++) {
-        const splitRow = [...map[i]].splice(startCol, endCol); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
+        const splitRow = [...map[i]].splice(startCol, Math.max(1, endCol)); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
         map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
 	}
 	
 	return map;
 };
 
-getLegendArray = (seats) => {
-	return Object.entries(seats).map(([char, details]) => ([char, "available", details.category]));
+// Others
+disableBlockedSeats = (activeMap, seats) => {
+	for (const char in seats) {
+		if (seats[char].blocked) {
+			activeMap.find(char).status('blocked');
+		}	
+	}
 };
 
+// Binding and reloading map stuff
 reloadMap = (sc, tableWrapperNode, seatMapNode, legendNode = '#legend') => {
 	const orgHeight = $(seatMapNode)[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
 

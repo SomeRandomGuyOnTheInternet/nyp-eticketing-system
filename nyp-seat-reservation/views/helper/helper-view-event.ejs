@@ -40,10 +40,10 @@
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Content  -->
             <h3 id="venueNameHeading"><%= event['Venue.name'] %></h3>
-            <div class="row">
-                <div class="col-sm-6">
+            <div class="row mt-3">
+                <div class="col-sm-6 col-8 mt-3">
                     <!-- Used for spacing between sections  -->
-                    <div class="card input-card mt-3">
+                    <div class="card input-card">
                         <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
                             <label for="testSelectInput" class="card-input-label">
@@ -62,9 +62,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 text-right text-secondary">
-                    <span><%= event.seatsPerReservation %> seats per reservation</span>
-                </div>
             </div>
             <div id="seatChartCard" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                 <div class="card-body">
@@ -75,7 +72,13 @@
                     </div>
                 </div>
             </div>
-            <div id="legend" class="seatCharts-legend row"></div>
+            <div id="legend" class="seatCharts-legend row">
+            </div>
+            <% if (event.seatsPerReservation !== null) { %>
+            <div class="text-secondary mt-3 text-break">
+                <span><%= event.seatsPerReservation %> seats per reservation</span>
+            </div>
+            <% } %>
 
             <form id="reserveSeatForm" action="/" method="post">
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
@@ -199,11 +202,14 @@
     const seatDetailsDescription = '#seatDetailsDescription';
     const waitingListContainer = '#waitingListContainer';
 
-    let eventDetails = {};
+    const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
-    let scActive = {};
+    let eventDetails;
 
     // Seat chart configuration
+    const colLabels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
+    const rowLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'];
+
     let sc = {};
 
     sc.map = [];
@@ -211,13 +217,18 @@
     sc.seats = {};
 
     sc.naming = {
-        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
+        rows: rowLabels,
         getLabel: function (character, row, column) {
             return row + ':' + column;
         },
         getId: function (character, row, column) {
             return row + ':' + column;
         }
+    };
+
+    sc.legend = {
+        node: $(legend),
+        items: []				
     };
 
     sc.click = function () {
@@ -237,27 +248,24 @@
         }
     };
 
+    let activeMap;
+
     // Rest of the functions
     $(document).ready(async function() {
         try {
             eventDetails = await getEventDetailsForHelper(eventId, helperId);
-            
-            sc.map = eventDetails.event.seatMap;
-            sc.seats = getSeatsObject(eventDetails.seatTypes);
-
-            activeSeatChart = bindMap(sc, seatMap);
-            scaleContentWidth(tableWrapper, seatMap);
-
-            for (const seatCharacter in sc.seats) {
-                if (!sc.seats[seatCharacter].blocked) {
-                    renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
-                }	
-            }
-
-            blockSeats(sc);
         } catch (error) {
-            handleError(error);
+            return handleError(error);
         }
+            
+        sc.map = eventDetails.event.seatMap;
+        sc.seats = getSeatsObject(eventDetails.seatTypes);
+        sc.legend.items = getLegendArray(sc.seats);
+
+        activeMap = bindMap(sc, seatMap);
+        scaleContentWidth(tableWrapper, seatMap);
+
+        disableBlockedSeats(activeMap, sc.seats);
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -269,7 +277,7 @@
     });
 
     $(reserveSeatButton).click(function() {
-        if (sc.activeMap.find('selected').length == 0) {
+        if (activeMap.find('selected').length == 0) {
             showDangerToast("Please select some seats to reserve for the attendee!");
             return;
         }
@@ -288,12 +296,18 @@
     });
 
     $(zoomQuadrantSelect).change(function() {
-        const orgHeight = $(seatMap)[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
-        const selectedValue = $(zoomQuadrantSelect).val();
-        sc.map = getZoomedQuadrant(eventDetails.event.seatMap, selectedValue);
-        reloadMap(sc, seatMap);
-        resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.map = Array.from(eventDetails.event.seatMap);
+
+        const dimensions = getQuadrantDimensions(sc.map, $(zoomQuadrantSelect).val());
+
+        sc.map = spliceMapRow(sc.map, dimensions[0][0], dimensions[0][1]);
+        sc.map = spliceMapCol(sc.map, dimensions[1][0], dimensions[1][1]);
+
+        sc.naming.rows = rowLabels.slice(dimensions[0][0], dimensions[0][1]);
+        sc.naming.columns = colLabels.slice(dimensions[1][0], dimensions[1][1]);
+
+        activeMap = reloadMap(sc, tableWrapper, seatMap, legend);
+        disableBlockedSeats(activeMap, sc.seats);
     });
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {
@@ -307,47 +321,50 @@
         $(seatDetailsModal).modal();
     };
 
-    getZoomedQuadrant = (map, quadrant) => {
+    getQuadrantDimensions = (map, quadrant) => {
         if (map.length == 0) {
-            return baseMap;
+            return throwException("The given map has no rows!");
         }
 
         if (map[0].length == 0) {
-            return baseMap;
+            return throwException("The given map has no columns!");
         }
 
-        const startRow = 0;
-        const startCol = 0;
-        const middleRow = Math.ceil(map.length / 2);
-        const middleCol = Math.ceil(map[0].length / 2);
-        const endRow = map.length - 1;
-        const endCol = map[0].length -1;
+        const rowStart = 0;
+        const colStart = 0;
+        const rowMid = Math.floor(map.length / 2);
+        const colMid = Math.floor(map[0].length / 2);
+        const rowEnd = map.length;
+        const colEnd = map[0].length;
 
-        switch(quadrant) {
+        switch (quadrant) {
             case "whole":
-                break;
+                return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
             case "topLeft":
-                map = spliceMapRow(map, startRow, middleRow);
-                map = spliceMapCol(map, startCol, middleCol);
-                break;
+                return [[rowStart, Math.max(1, rowMid)], [colStart, Math.max(1, colMid)]];
             case "topRight":
-                map = spliceMapRow(map, startRow, middleRow);
-                map = spliceMapCol(map, middleCol, endCol);
-                break;
+                return [[rowStart, Math.max(1, rowMid)], [colMid, Math.max(1, colEnd)]];
             case "bottomLeft":
-                map = spliceMapRow(map, middleRow, endRow);
-                map = spliceMapCol(map, startRow, middleCol);
-                break;
+                return [[rowMid, Math.max(1, rowEnd)], [colStart, Math.max(1, colMid)]];
             case "bottomRight":
-                map = spliceMapRow(map, middleRow, endCol);
-                map = spliceMapCol(map, middleCol, endCol);
-                break;
+                return [[rowMid, Math.max(1, rowEnd)], [colMid, Math.max(1, colEnd)]];
             default:
-                break;
+                return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
         }
-
-        return map;
     };
+
+    getLegendArray = (seats) => {
+        let legends = Object.keys(seats).reduce(function(legends, char) {
+            if (!seats[char].blocked){
+                legends.push([char, "available", seats[char].category]);
+            }
+            return legends;
+        }, []);
+
+        legends.push(["G", "blocked", "Blocked"]);
+
+        return legends;
+    }
 
     $(window).on('beforeunload', function() {
         return confirm();

@@ -55,16 +55,6 @@ promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/
     });
 };
 
-function onBeforeUnload(e) {
-    if (thereAreUnsavedChanges()) {
-        e.preventDefault();
-        e.returnValue = '';
-        return;
-    }
-
-    delete e['returnValue'];
-}
-
 toTitleCase = (str) => {
     var lcStr = str.toLowerCase();
     return lcStr.replace(/(?:^|\s)\w/g, function(match) {
@@ -140,8 +130,8 @@ getSeatsObject = (seatsArray) => {
             blocked: seat.isBlocked,
             classes: seat.cssClasses,
         }; 
-        return obj;
-    },{});
+        return seats;
+    }, {});
 };
 
 getSeatTypeArray = (seats, eventId) => {
@@ -156,7 +146,7 @@ getSeatTypeArray = (seats, eventId) => {
 
 
 getSelectedEventHelperArray = (helpers, eventId) => {
-    return helpers.reduce(function(selectedHelpers, helper){
+    return helpers.reduce(function(selectedHelpers, helper) {
         if (helper.selected){
             selectedHelpers.push({
                 userId: helper.id,
