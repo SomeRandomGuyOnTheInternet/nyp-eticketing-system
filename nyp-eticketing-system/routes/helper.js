@@ -1,4 +1,3 @@
-// TODO: Rename seat reservation to e-ticketing
 // TODO: show message if html table contains no rows
 
 // All helper's webpages are contained here
