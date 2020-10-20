@@ -3,7 +3,9 @@ const baseRoute = "/api/";
 createVenue = async (name, map) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/create-venue`, 'POST', 
+            const res = await promiseAjax(
+                `${baseRoute}/create-venue`, 
+                'POST', 
                 {
                     name: name,
                     seatMap: map
@@ -30,7 +32,9 @@ getAllVenues = async () => {
 updateVenue = async (venue) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/update-venue`, 'POST', 
+            const res = await promiseAjax(
+                `${baseRoute}/update-venue`, 
+                'POST', 
                 {
                     venue: venue
                 }
@@ -45,7 +49,9 @@ updateVenue = async (venue) => {
 deleteVenue = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/delete-venue`, 'POST', 
+            const res = await promiseAjax(
+                `${baseRoute}/delete-venue`, 
+                'POST', 
                 {
                     id: id
                 }
@@ -71,7 +77,9 @@ getAllHelpers = async () => {
 createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows, venueId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/create-event`, 'POST', 
+            const res = await promiseAjax(
+                `${baseRoute}/create-event`, 
+                'POST', 
                 {
                     name: name,
                     seatMap: seatMap,
@@ -91,7 +99,9 @@ createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioriti
 getEventDetailsForHelper = async (eventId, helperId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/helpers/${helperId}/events/${eventId}`, 'GET');
+            const res = await promiseAjax(
+                `${baseRoute}/helpers/${helperId}/events/${eventId}`, 'GET');
+
             resolve(res.data);
         } catch (error) {
             reject(error);
@@ -102,7 +112,9 @@ getEventDetailsForHelper = async (eventId, helperId) => {
 createEventSeatTypes = async (seatTypeArray) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/create-event-seat-types`, 'POST', 
+            const res = await promiseAjax(
+                `${baseRoute}/create-event-seat-types`, 
+                'POST', 
                 {
                     seatTypes: seatTypeArray
                 }
@@ -117,7 +129,9 @@ createEventSeatTypes = async (seatTypeArray) => {
 createEventHelpers = async (eventHelperArray) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await promiseAjax(`${baseRoute}/create-event-helpers`, 'POST', 
+            const res = await promiseAjax(
+                `${baseRoute}/create-event-helpers`, 
+                'POST', 
                 {
                     eventHelpers: eventHelperArray
                 }
@@ -129,6 +143,7 @@ createEventHelpers = async (eventHelperArray) => {
     });
 };
 
+// TODO: make the actual post on the server-side
 sendSMS = async (number, message) => {
     return new Promise(async (resolve, reject) => {
         try {

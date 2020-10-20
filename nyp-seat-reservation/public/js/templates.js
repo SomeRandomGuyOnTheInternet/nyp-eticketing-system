@@ -58,44 +58,9 @@ function renderToastTemplate(notification) {
     return $toast;
 };
 
-function renderSeatChartLegendCardTemplate(seatChar, seatDetails) {
-    var $column = $('<div></div>')
-        .addClass('seatCharts-cardColumn')
-        .addClass('col-auto');
-
-    var $card = $('<div></div>')
-        .addClass('seatCharts-legendCard')
-        .addClass('card')
-        .addClass(seatDetails.legendClasses == "undefined" ? "" : seatDetails.legendClasses)
-        .addClass('mt-3')
-        .attr("seat-character", seatChar)
-        .appendTo($column);
-
-    var $cardBody = $('<div></div>')
-        .addClass('seatCharts-cardBody')
-        .addClass('card-body')
-        .appendTo($card);
-
-    $cardBody.append(
-        $('<div></div>')
-            .addClass('seatCharts-legendItem')
-            .append(
-                $('<div></div>')
-                    .addClass(['seatCharts-seat', 'seatCharts-cell', seatDetails.classes])
-            )
-            .append(
-                $('<span></span>')
-                    .addClass('seatCharts-legendDescription')
-                    .text((seatDetails.descriptiveCategory) ? seatDetails.descriptiveCategory : seatDetails.category)
-            )
-    );
-
-    return $column;
-};
-
 function renderStudentHelperCardTemplate(helper) {
     var $card = $('<div></div>')
-        .addClass('card mb-2')
+        .addClass('card mb-3')
         .attr("helper-id", helper.id);
 
     var $cardBody = $('<div></div>')

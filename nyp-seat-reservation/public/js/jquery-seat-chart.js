@@ -711,12 +711,12 @@ replaceMapSeatCharacters = (map, characterToReplace, newCharacter) => {
     return map;
 };
 
-resizeRow = (columns, rows, map) => {
+resizeRows = (columns, rows, map) => {
     const defaultRow = defaultSeat.repeat(columns); // The default row is just the one that gets assigned to any new row that's created. We take the number of columns the user input and multiply it by the default seat type (general, G) to get it
 	return resizeArray(map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
 };
 
-resizeColumn = (columns, rows, map) => {
+resizeColumns = (columns, rows, map) => {
     for (i = 0; i < rows; i++) { // To change the number of columns we have to loop through each row indvidually and resize them
         const splitRow = [...map[i]]; // Since rows are stored as strings in the map, we have to split them into an array
         map[i] = resizeArray(splitRow, columns, defaultSeat).join(""); // Then we just have to join the array into a string and then put them back into the map
@@ -738,9 +738,20 @@ spliceMapCol = (map, startCol, endCol) => {
 	return map;
 };
 
-reloadMap = (sc, seatMapNode, legendNode) => {
-    unbindMap(seatMapNode, legendNode);
-    return bindMap(sc, seatMapNode);
+getLegendArray = (seats) => {
+	return Object.entries(seats).map(([char, details]) => ([char, "available", details.category]));
+};
+
+reloadMap = (sc, tableWrapperNode, seatMapNode, legendNode = '#legend') => {
+	const orgHeight = $(seatMapNode)[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
+
+	unbindMap(seatMapNode, legendNode);
+	const activeMap = bindMap(sc, seatMapNode);
+
+	resizeParentHeight(orgHeight, tableWrapperNode, seatMapNode);
+	scaleContentWidth(tableWrapperNode, seatMapNode); // Scale the map so the columns are all visible
+
+	return activeMap;
 };
 
 unbindMap = (seatMapNode, legendNode) => {

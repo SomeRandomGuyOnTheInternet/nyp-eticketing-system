@@ -190,6 +190,7 @@
 </body>
 
 <script>
+    // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
     const addEventForm = '#addEventForm';
     const eventNameInput = '#eventNameInput';
     const eventDateTimeInput = '#eventDateTimeInput';
@@ -207,15 +208,16 @@
     const seatTypeNameInput = '#seatTypeNameInput';
     const blockSeatTypeCheck = '#blockSeatTypeCheck';
     const addSeatTypeButton = '#addSeatTypeButton';
+
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
 
-    let venues = [];
-    let helpers = [];
-
     let selectedSeatType; // This variable will contain the character of the seat type we've selected
     let selectedVenue;
+
+    let venues = [];
+    let helpers = [];
 
     // Seat chart configuration
     let sc = {};
@@ -227,58 +229,55 @@
             category: 'General',
             blocked: false,
             classes : 'general',
-            legendClasses: selectableLegendClasses,
         },
         'H': {
             category: 'Handicapped',
             blocked: false,
             classes : 'handicapped',
-            legendClasses: selectableLegendClasses,
         }
     };
 
     sc.naming = {
         rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-        getLabel : function (character, row, column) {
+        getLabel: function (character, row, column) {
             return row + ':' + column;
         },
-        getId : function (character, row, column) {
+        getId: function (character, row, column) {
             return row + ':' + column;
         }
     };
 
     sc.legend = {
-        node : $(legend),
-        items : []				
+        node: $(legend),
+        items: []				
     };
 
     sc.click = function () {
-        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
+        if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
+            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
+        }
     };
 
     $(document).ready(async function() {
         try {
             venues = await getAllVenues();
             helpers = await getAllHelpers();
-            helpers.forEach(function (helper) {
-                helper.selected = false;
-            });
-
-            populateSelect(venues, venueSelectInput);
-            populateHelperSelect(helpers, helperSelectInput);
-            populateSelectedHelperColumn(helpers, helpersCardCol);
-
-            // Bind map
-            setEventMap(getSelectedObject(venues, venueSelectInput));
-            bindMap(sc, seatMap);
-            scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
-
-            for (const seatCharacter in sc.seats) {
-                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
-            }
         } catch (error) {
-            handleError(error);
+            return handleError(error);
         }
+        
+        helpers.forEach(function (helper) {
+            helper.selected = false;
+        });
+
+        populateVenueSelect(venues, venueSelectInput);
+        populateHelperSelect(helpers, helperSelectInput);
+        populateSelectedHelperColumn(helpers, helpersCardCol);
+
+        // Bind map
+        setEventMap(getSelectedVenue(venues, venueSelectInput));
+        bindMap(sc, seatMap);
+        scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -286,15 +285,12 @@
     });
 
     $(venueSelectInput).on('change', function() {
-        setEventMap(getSelectedObject(venues, venueSelectInput));
-        const orgHeight = $(seatMap)[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
-        reloadMap(sc, seatMap);
-        resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
-        scaleContentWidth(tableWrapper, seatMap);
+        setEventMap(getSelectedVenue(venues, venueSelectInput));
+        reloadMap(sc, tableWrapper, seatMap, legend);
     });
 
     $(helperSelectInput).on('change', function() {
-        getSelectedObject(helpers, helperSelectInput).selected = true;
+        getSelectedVenue(helpers, helperSelectInput).selected = true;
         populateHelperSelect(helpers, helperSelectInput);
         populateSelectedHelperColumn(helpers, helpersCardCol);
     });
@@ -306,8 +302,7 @@
         const descriptiveCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
 
         if (!seatName) {
-            showDangerToast("Please enter a seat name!");
-            return;
+            return showDangerToast("Please enter a seat name!");
         }
 
         sc.seats[seatCharacter] = {
@@ -319,7 +314,8 @@
         };
 
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
-        renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend)); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
+        reloadMap(sc, tableWrapper, seatMap, legend);
+        
         
         $(addSeatTypeModal).modal('hide'); // Hides the modal
         $(seatTypeNameInput).val(''); // Reset input to default state
@@ -327,12 +323,12 @@
     });
 
     $(document).on("click", `.seatCharts-legendCard:not(${addSeatTypeCard})`, function() {
-        const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-        
-        if (highlighted) {
-            selectedSeatType = $(this).attr("seat-character");
+        const seatCharAttr = $(this).attr("seat-character");
+        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
+            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
+            selectedSeatType = (highlighted === true) ? seatCharAttr : null;
         } else {
-            selectedSeatType = null;
+            $(this).removeClass("highlighted");
         }
     });
 
@@ -340,22 +336,21 @@
         e.preventDefault();
         $(createEventButton).prop('disabled', true);
         
-        try {
-            const event = await createEvent(
-                $(eventNameInput).val(),
-                sc.map,
-                $(eventDateTimeInput).val(),
-                $(maxSeatsPerReservationInput).val(),
-                $(prioritiseBackCheck).is(':checked'),
-                getSelectedObject(venues, venueSelectInput).id
-            );
-            
-            const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
-            const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
+        const event = await createEvent(
+            $(eventNameInput).val(),
+            sc.map,
+            $(eventDateTimeInput).val(),
+            $(maxSeatsPerReservationInput).val(),
+            $(prioritiseBackCheck).is(':checked'),
+            getSelectedObject(venues, venueSelectInput).id
+        );
+        
+        const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
+        const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
 
+        try {
             await createEventSeatTypes(seatTypeArray);
             await createEventHelpers(eventHelperArray);
-            
             window.location.replace("/planner/events");
         } catch (error) {
             handleError(error);

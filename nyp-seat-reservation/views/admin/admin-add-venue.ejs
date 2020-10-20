@@ -87,13 +87,13 @@
     const legend = '#legend';
     const saveVenueTypeButton = '#saveVenueTypeButton';
 
-    const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-4'; // These are the css class belonging to legends that can be clicked on by the user
-
     // Declare the default seat type characters over here
     const defaultSeat = "G";
     const emptySpace = "_"; // The actual empty space character (_) creates a seat cell that cannot be interacted with
     const tempEmptySpace = "E"; // We have to use a temporary character (E) that can be interacted with to denote empty space while the user is editing the seat map
     // We will convert the temporary characters in the map to the actual empty space character when we're submitting the seat map
+
+    const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-4'; // These are the css class belonging to legends that can be clicked on by the user
 
     let selectedSeatType; // This variable will contain the character of the seat type the user's selected
 
@@ -142,7 +142,7 @@
 
     sc.click = function () {
         if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
-            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
+            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
         }
     };
 
@@ -205,7 +205,7 @@
         
         try {
             await createVenue(name, map);
-            window.location.replace("/planner/venues");
+            window.location.replace("/admin/venues");
         } catch (error) {
             handleError(error);
         } finally {

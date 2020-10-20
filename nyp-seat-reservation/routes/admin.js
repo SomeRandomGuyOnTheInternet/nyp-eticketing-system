@@ -1,11 +1,13 @@
 // All admin's webpages are contained here
 
 const express = require('express');
-const User = require('../models/User');
 const router = express.Router();
 
 const flash = require('../utils/flash');
 const auth = require('../utils/check-auth');
+
+const User = require('../models/User');
+const Venue = require('../models/Venue');
 
 // When creating new routes avoid using the route's name in the webpage's name
 // Eg: Use router.get('/planners', ...) instead of router.get('/admin-planners', ...) cause then the url will be '/admin/admin-planners' which is super redundant
@@ -160,6 +162,40 @@ router.get('/deletehelper/:id', async (req, res) => {
 	await User.deleteuSers(id);
 	flash.success(req, 'Successfully deleted helper account');
 	res.redirect('/admin/helpers');
+});
+
+router.get('/venues', auth.isAdmin, async (req, res) => {
+	const venues = await Venue.getAllVenues();
+
+	res.render('admin/admin-all-venues', { 
+		title: "Venues", 
+		user: req.user,
+		venues: venues,
+	});
+});
+
+router.get('/venues/:id', auth.isAdmin, async (req, res) => {
+	const id = req.params.id;
+	const venue = await Venue.getVenueById(id);
+
+	if (!venue) {
+		flash.error(req, "That ID does not belong to any venue!");
+		res.redirect('/admin/venues');
+		return;
+	}
+	
+	res.render('admin/admin-edit-venue', { 
+		title: venue.name, 
+		user: req.user,
+		venue: venue,
+	});
+});
+
+router.get('/add-venue', auth.isAdmin, async (req, res) => {
+	res.render('admin/admin-add-venue', { 
+		title: "Add Venue", 
+		user: req.user  
+	});
 });
 
 module.exports = router;

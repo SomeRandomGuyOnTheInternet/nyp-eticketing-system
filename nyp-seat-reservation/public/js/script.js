@@ -1,4 +1,6 @@
 // TODO: Improve ajax error handling by using switch case on error codes
+// TODO: Put all entity specific stuff in their own class (https://stackoverflow.com/questions/41367259/populating-a-select-from-list-of-objects)
+// TODO: Replace anonymous functions with proper ones
 
 String.prototype.replaceAt = function(index, replacement) {
     return this.substr(0, index) + replacement + this.substr(index + replacement.length);
@@ -29,10 +31,14 @@ promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/
             contentType: contentType,
             data: data,
             success: function (data) {
-                resolve(data)
+                resolve(data);
             },
             error: function (error) {
-                reject(error)
+                if (error.status == 200) {
+                    resolve(true);
+                } else {
+                    reject(error);
+                }
             },
         }).fail(function (jqXHR, textStatus, errorThrown) {
             reject(errorThrown);
@@ -42,26 +48,25 @@ promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/
 
 toTitleCase = (str) => {
     var lcStr = str.toLowerCase();
-
     return lcStr.replace(/(?:^|\s)\w/g, function(match) {
         return match.toUpperCase();
     });
 };
 
-throwError = (message) => {
+throwAsyncError = (message) => {
     throw { 
         responseText: message 
     };
 };
 
 handleError = (error) => {
-    console.error(error);
-
     if (error.responseText) {
+        console.error(error);
         showDangerToast(error.responseText);
     } else {
         showDangerToast("Something went wrong. Please try again later!");
     }
+    return false;
 };
 
 toggleHighlight = (node, nodeCssClass) => {
@@ -77,10 +82,12 @@ toggleHighlight = (node, nodeCssClass) => {
 
 showSuccessToast = (message) => {
     showToast({ message: message, type: "success" });
+    return true;
 };
 
 showDangerToast = (message) => {
     showToast({ message: message, type: "danger" });
+    return false;
 };
 
 showToast = (notification) => {
@@ -89,19 +96,39 @@ showToast = (notification) => {
     $('.toast').not('.hide').toast('show'); // Show the unhidden toasts in the toast container, which includes the one we just appended
 };
 
-populateSelect = (objects, selectNode) => {
-    if (objects.length < 1) {
-        throwError('There are no objects available. Please try again later!');
-    }
-    
-    for (i = 0; i < objects.length; i++) {
-        $(selectNode).append($('<option>', {
-            value: i,
-            text: objects[i].name
-        }));
-    }
 
-    $(selectNode).val($(`${selectNode} option:first`).val());
+getSeatsObject = (seatsArray) => {
+    return seatsArray.reduce(function(seats, seat) {
+        seats[seat.character] = {
+            category: seat.name,
+            blocked: seat.isBlocked,
+            classes: seat.cssClasses,
+        }; 
+        return obj;
+    },{});
+};
+
+getSeatTypeArray = (seats, eventId) => {
+    return Object.keys(seats).map((char) => ({
+        name: seats[char].category,
+        character: char,
+        isBlocked: seats[char].blocked,
+        cssClasses: seats[char].classes,
+        eventId: eventId
+    }));
+};
+
+
+getSelectedEventHelperArray = (helpers, eventId) => {
+    return helpers.reduce(function(selectedHelpers, helper){
+        if (helper.selected){
+            selectedHelpers.push({
+                userId: helper.id,
+                eventId: eventId
+            });
+        }
+        return selectedHelpers;
+    }, []);;
 };
 
 populateHelperSelect = (helpers, helperSelectNode) => {
@@ -133,8 +160,26 @@ populateSelectedHelperColumn = (helpers, selectedHelpersColNode) => {
     }
 };
 
-getSelectedObject = (objects, selectNode) => {
-    const selectedValue = $(selectNode).val();
+
+populateVenueSelect = (venues, venueSelectNode) => {
+    $(`${venueSelectNode} option`).remove();
+
+    if (venues.length < 1) {
+        return showDangerToast('There are no venues available. Please try again later!');
+    }
+    
+    for (i = 0; i < venues.length; i++) {
+        $(venueSelectNode).append($('<option>', {
+            value: i,
+            text: venues[i].name
+        }));
+    }
+
+    $(venueSelectNode).val($(`${venueSelectNode} option:first`).val());
+};
+
+getSelectedVenue = (venues, venueSelectNode) => {
+    const selectedValue = $(venueSelectNode).val();
 
     if (!selectedValue) {
         throwError('The selected option is not valid. Please try again later!');
@@ -144,51 +189,5 @@ getSelectedObject = (objects, selectNode) => {
         throwError('The selected option is not valid. Please try again later!');
     }
 
-    return objects[selectedValue.toNum()];
-};
-
-getSeatTypeArray = (seats, eventId) => {
-    let seatArray = [];
-    
-    for (const seatCharacter in seats) {
-        seatArray.push({
-            name: seats[seatCharacter].category,
-            character: seatCharacter,
-            isBlocked: seats[seatCharacter].blocked,
-            cssClasses: seats[seatCharacter].classes,
-            eventId: eventId
-        });
-    }
-
-    return seatArray;
-};
-
-getSeatsObject = (seatTypeArray) => {
-    let seats = {};
-
-    for (i = 0; i < seatTypeArray.length; i++) {
-        const seat = seatTypeArray[i];
-        seats[seat.character] = {
-            category: seat.name,
-            blocked: seat.isBlocked,
-            classes: seat.cssClasses,
-        };
-    }
-    
-    return seats;
-};
-
-getSelectedEventHelperArray = (helpers, eventId) => {
-    let selectedSeatArray = [];
-    
-    for (i = 0; i < helpers.length; i++) {
-        if (helpers[i].selected) {
-            selectedSeatArray.push({
-                userId: helpers[i].id,
-                eventId: eventId
-            });
-        }
-    }
-
-    return selectedSeatArray;
+    return venues[selectedValue.toNum()];
 };

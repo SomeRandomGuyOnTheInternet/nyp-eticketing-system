@@ -25,11 +25,11 @@
                         <li class="nav-item text-center"> <!-- the active class is used to indicate which of the tab pages is currently active -->
                             <a class="nav-link" href="/planner/events">Events</a>
                         </li>
-                        <li class="nav-item mx-4">
+                        <!-- <li class="nav-item mx-4">
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="/planner/venues">Venues</a>
-                        </li>
+                        </li> -->
                     <% } %>
 
                     <% if (user.isHelper) { %> <!-- If user is a helper, show links to events avaliable to them -->
@@ -46,6 +46,11 @@
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="/admin/helpers">Helpers</a>
+                        </li>
+                        <li class="nav-item mx-4">
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="/admin/venues">Venues</a>
                         </li>
                     <% } %>
 
