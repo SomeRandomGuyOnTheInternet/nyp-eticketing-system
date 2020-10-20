@@ -1,12 +1,12 @@
 {
-  "name": "nyp-seat-reservation",
+  "name": "nyp-eticketing-system",
   "version": "3.0.0",
-  "description": "A really cool seat booking system that'll blow your socks off man woah",
+  "description": "A really cool seat ticketing system that'll blow your socks off man woah",
   "main": "app.js",
   "scripts": {
-    "mst": "cd ./nyp-seat-reservation && open-cli http://localhost:5000 -- 'google chrome' && nodemon app",
-    "wst": "cd ./nyp-seat-reservation & open-cli http://localhost:5000 -- 'google chrome' & nodemon app",
-    "scss": "node-sass --watch nyp-seat-reservation/public/scss -o nyp-seat-reservation/public/css"
+    "mst": "cd ./nyp-eticketing-system && open-cli http://localhost:5000 -- 'google chrome' && nodemon app",
+    "wst": "cd ./nyp-eticketing-system & open-cli http://localhost:5000 -- 'google chrome' & nodemon app",
+    "scss": "node-sass --watch nyp-eticketing-system/public/scss -o nyp-eticketing-system/public/css"
   },
   "engines": {
     "node": ">= 6.0.0",

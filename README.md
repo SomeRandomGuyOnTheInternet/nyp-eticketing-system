@@ -1,7 +1,7 @@
 NYP eTicketing System
 ======
 
-A really cool seat booking system that'll blow your socks off woah
+A really cool seat ticketing system that'll blow your socks off woah
 
 Run
 ---

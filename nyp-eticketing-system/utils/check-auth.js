@@ -1,4 +1,4 @@
-const flash = require('../utils/flash');
+const flash = require('./flash');
 
 module.exports.isUser = (req, res, next) => {
     if (req.user) {

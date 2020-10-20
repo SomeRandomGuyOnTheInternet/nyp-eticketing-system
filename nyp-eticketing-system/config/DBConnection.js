@@ -5,13 +5,13 @@ const mySQLDB = require('./DBConfig'); // We import the sequelize object we conf
 // We wrote models without primary keys or foreign keys while defining them as sequelize automatically creates them
 // However, we need to the various specify relationships between models to sequelize so it can create foreign keys accordingly
 // These are the various models that have relationships with each other
-const Events = require('../../nyp-seat-reservation/models/Event');
-const Users = require('../../nyp-seat-reservation/models/User');
-const Venues = require('../../nyp-seat-reservation/models/Venue');
-const EventHelpers = require('../../nyp-seat-reservation/models/EventHelper');
-const EventReservedSeats = require('../../nyp-seat-reservation/models/EventReservedSeat');
-const EventAttendees = require('../../nyp-seat-reservation/models/EventAttendee');
-const EventSeatTypes = require('../../nyp-seat-reservation/models/EventSeatType');
+const Events = require('../models/Event');
+const Users = require('../models/User');
+const Venues = require('../models/Venue');
+const EventHelpers = require('../models/EventHelper');
+const EventReservedSeats = require('../models/EventReservedSeat');
+const EventAttendees = require('../models/EventAttendee');
+const EventSeatTypes = require('../models/EventSeatType');
 
 const createUsers = require('./dataset/create-users');
 const createVenues = require('./dataset/create-venues');
