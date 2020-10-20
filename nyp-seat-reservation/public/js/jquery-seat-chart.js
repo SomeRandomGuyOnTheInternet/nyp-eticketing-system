@@ -664,13 +664,9 @@ resizeArray = (arr, size, defval) => {
 scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
     const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
-    if ($(content).width() > $(parent).width()) {
-        const scale = $(parent).width() / ($(content).width()); // This equation get us the scale of the parent's width in relation to the container's width
-        $(content).css('transform', 'scale('+scale+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
-        $(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
-    } else {
-        $(content).css('transform', 'scale('+1+')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
-    }
+	const scale = $(parent).width() / ($(content).width()); // This equation get us the scale of the parent's width in relation to the container's width
+	$(content).css('transform', 'scale(' + Math.min(1.5, scale) + ')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
+	$(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
     
     resizeParentHeight(orgHeight, parent, content);
 };
@@ -728,11 +724,45 @@ resizeColumns = (columns, rows, map) => {
 	return map
 };
 
-function spliceMapRow(map, startRow, endRow) {
+// Quadrant zoom functions
+
+getQuadrantDimensions = (map, quadrant) => {
+	if (map.length == 0) {
+		return throwException("The given map has no rows!");
+	}
+
+	if (map[0].length == 0) {
+		return throwException("The given map has no columns!");
+	}
+
+	const rowStart = 0;
+	const colStart = 0;
+	const rowMid = Math.floor(map.length / 2);
+	const colMid = Math.floor(map[0].length / 2);
+	const rowEnd = map.length;
+	const colEnd = map[0].length;
+
+	switch (quadrant) {
+		case "whole":
+			return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
+		case "topLeft":
+			return [[rowStart, Math.max(1, rowMid)], [colStart, Math.max(1, colMid)]];
+		case "topRight":
+			return [[rowStart, Math.max(1, rowMid)], [colMid, Math.max(1, colEnd)]];
+		case "bottomLeft":
+			return [[rowMid, Math.max(1, rowEnd)], [colStart, Math.max(1, colMid)]];
+		case "bottomRight":
+			return [[rowMid, Math.max(1, rowEnd)], [colMid, Math.max(1, colEnd)]];
+		default:
+			return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
+	}
+};
+
+spliceMapRow = (map, startRow, endRow) => {
 	return map.splice(startRow, Math.max(1, endRow));
 };
 
-function spliceMapCol(map, startCol, endCol) {
+spliceMapCol = (map, startCol, endCol) => {
 	for (i = 0; i < map.length; i++) {
         const splitRow = [...map[i]].splice(startCol, Math.max(1, endCol)); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
         map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map

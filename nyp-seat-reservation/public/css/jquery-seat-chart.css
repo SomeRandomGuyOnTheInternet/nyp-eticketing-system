@@ -67,6 +67,7 @@ div.seatCharts-seat:focus {
     overflow: hidden;
     position: relative;
     user-select: none;
+    -webkit-user-select: none;
 }
 
 div.seatCharts-cell {
@@ -112,7 +113,8 @@ div.seatCharts-cardColumn {
 }
 
 div.seatCharts-legendCard {
-	user-select: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 span.seatCharts-legendDescription {

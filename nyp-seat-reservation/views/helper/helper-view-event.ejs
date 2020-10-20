@@ -273,7 +273,7 @@
     });
 
     $(searchReservationInput).change(function() {
-        sc.activeMap.find('reserved').status('highlighted');
+        activeMap.find('reserved').status('highlighted');
     });
 
     $(reserveSeatButton).click(function() {
@@ -292,7 +292,7 @@
             return;
         }
 
-        sc.activeMap.find('selected').status('reserved');
+        activeMap.find('selected').status('reserved');
     });
 
     $(zoomQuadrantSelect).change(function() {
@@ -319,38 +319,6 @@
             .addClass(cssClasses);
             
         $(seatDetailsModal).modal();
-    };
-
-    getQuadrantDimensions = (map, quadrant) => {
-        if (map.length == 0) {
-            return throwException("The given map has no rows!");
-        }
-
-        if (map[0].length == 0) {
-            return throwException("The given map has no columns!");
-        }
-
-        const rowStart = 0;
-        const colStart = 0;
-        const rowMid = Math.floor(map.length / 2);
-        const colMid = Math.floor(map[0].length / 2);
-        const rowEnd = map.length;
-        const colEnd = map[0].length;
-
-        switch (quadrant) {
-            case "whole":
-                return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
-            case "topLeft":
-                return [[rowStart, Math.max(1, rowMid)], [colStart, Math.max(1, colMid)]];
-            case "topRight":
-                return [[rowStart, Math.max(1, rowMid)], [colMid, Math.max(1, colEnd)]];
-            case "bottomLeft":
-                return [[rowMid, Math.max(1, rowEnd)], [colStart, Math.max(1, colMid)]];
-            case "bottomRight":
-                return [[rowMid, Math.max(1, rowEnd)], [colMid, Math.max(1, colEnd)]];
-            default:
-                return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
-        }
     };
 
     getLegendArray = (seats) => {

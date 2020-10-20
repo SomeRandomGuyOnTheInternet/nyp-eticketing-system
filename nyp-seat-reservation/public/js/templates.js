@@ -60,7 +60,7 @@ function renderToastTemplate(notification) {
 
 function renderStudentHelperCardTemplate(helper) {
     var $card = $('<div></div>')
-        .addClass('card mb-3')
+        .addClass('card mb-2')
         .attr("helper-id", helper.id);
 
     var $cardBody = $('<div></div>')
