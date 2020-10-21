@@ -636,14 +636,6 @@
 	
 })(jQuery);
 
-const zoomQuadrants = Object.freeze({
-    "whole": 0,
-    "topLeft": 1, 
-    "topRight": 2, 
-    "bottomLeft": 3,
-    "bottomRight": 4,
-});
-
 // Helper functions
 // General dependency functions
 resizeArray = (arr, size, defval) => {
