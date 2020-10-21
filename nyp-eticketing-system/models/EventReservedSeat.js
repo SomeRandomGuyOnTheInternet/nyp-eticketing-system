@@ -5,7 +5,7 @@ const db = require('../config/DBConfig');
 // Go to DBConnection.js for more details
 
 const EventReservedSeat = db.define('EventReservedSeat', {
-    seatId: {
+    seatNumber: {
         type: Sequelize.STRING
     },
 });

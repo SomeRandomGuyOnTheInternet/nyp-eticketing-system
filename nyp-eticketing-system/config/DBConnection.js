@@ -13,8 +13,8 @@ const EventReservedSeats = require('../models/EventReservedSeat');
 const EventAttendees = require('../models/EventAttendee');
 const EventSeatTypes = require('../models/EventSeatType');
 
-const createUsers = require('./dataset/create-users');
-const createVenues = require('./dataset/create-venues');
+// const createUsers = require('./dataset/create-users');
+// const createVenues = require('./dataset/create-venues');
 
 // This function carries out the actual connection to the database while specifying all the relationships between the models
 const setUpDB = (drop) => {
@@ -34,9 +34,9 @@ const setUpDB = (drop) => {
         Events.hasMany(EventSeatTypes, { foreignKey: 'eventId' });
         EventSeatTypes.belongsTo(Events, { foreignKey: 'eventId' });
 
-        // Each seat type of an event can belong to many seats in the venue
-        EventSeatTypes.hasMany(EventReservedSeats, { foreignKey: 'seatTypeId' });
-        EventReservedSeats.belongsTo(EventSeatTypes, { foreignKey: 'seatTypeId' });
+        // Each event can have many reserved seats
+        Events.hasMany(EventReservedSeats, { foreignKey: 'eventId' });
+        EventReservedSeats.belongsTo(Events, { foreignKey: 'eventId' });
 
         // Each event can have many helpers
         Events.hasMany(EventHelpers, { foreignKey: 'eventId' });

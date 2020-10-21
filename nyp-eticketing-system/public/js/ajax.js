@@ -1,6 +1,6 @@
 const baseRoute = "/api";
 
-createVenue = async (name, map) => {
+async function createVenue(name, map) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -18,7 +18,7 @@ createVenue = async (name, map) => {
     });
 };
 
-getAllVenues = async () => {
+async function getAllVenues() {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(`${baseRoute}/get-all-venues`, 'GET', null);
@@ -29,7 +29,7 @@ getAllVenues = async () => {
     });
 };
 
-updateVenue = async (venue) => {
+async function updateVenue(venue) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -46,7 +46,7 @@ updateVenue = async (venue) => {
     });
 };
 
-deleteVenue = async (id) => {
+async function deleteVenue(id) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -63,7 +63,7 @@ deleteVenue = async (id) => {
     });
 };
 
-getAllHelpers = async () => {
+async function getAllHelpers() {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(`${baseRoute}/get-all-helpers`, 'GET', null);
@@ -74,7 +74,7 @@ getAllHelpers = async () => {
     });
 };
 
-createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows, venueId) => {
+async function createEvent(name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows, venueId) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -96,7 +96,7 @@ createEvent = async (name, seatMap, startDateTime, seatsPerReservation, prioriti
     });
 };
 
-getEventDetailsForHelper = async (eventId, helperId) => {
+async function getEventDetailsForHelper(eventId, helperId) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -109,7 +109,7 @@ getEventDetailsForHelper = async (eventId, helperId) => {
     });
 };
 
-createEventSeatTypes = async (seatTypeArray) => {
+async function createEventSeatTypes(seatTypeArray) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -126,7 +126,7 @@ createEventSeatTypes = async (seatTypeArray) => {
     });
 };
 
-createEventHelpers = async (eventHelperArray) => {
+async function createEventHelpers (eventHelperArray) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -142,6 +142,44 @@ createEventHelpers = async (eventHelperArray) => {
         }
     });
 };
+
+async function createEventAttendee (name, phoneNumber, eventId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/create-event-attendee`, 
+                'POST', 
+                {
+                    name: name,
+                    phoneNumber: phoneNumber,
+                    eventId: eventId
+                }
+            );
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+async function* createEventSeatReservations(seatNumbers, eventId, attendeeId) {
+    for (let i = 0; i < seatNumbers.length; ++i) {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/create-event-seat-reservation`, 
+                'POST', 
+                {
+                    seatNumber: seatNumbers[i],
+                    eventId: eventId,
+                    attendeeId: attendeeId,
+                }
+            );
+            yield res;
+        } catch (error) {
+            throwException(error);
+        }
+    }
+}
 
 // TODO: make the actual post on the server-side
 sendSMS = async (number, message) => {

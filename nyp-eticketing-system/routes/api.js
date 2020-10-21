@@ -12,7 +12,9 @@ const User = require('../models/User');
 const Venue = require('../models/Venue');
 const Event = require('../models/Event');
 const EventSeatType = require('../models/EventSeatType');
+const EventAttendee = require('../models/EventAttendee');
 const EventHelper = require('../models/EventHelper');
+const EventReservedSeat = require('../models/EventReservedSeat');
 
 
 router.get('/test', async (req, res) => {
@@ -187,5 +189,50 @@ router.post('/create-event-helpers', async (req, res) => {
     
     ajax.success(res, "Successfully created event helpers!");
 });
+
+
+router.post('/create-event-attendee', async (req, res) => {
+    const name = req.body.name;
+    const phoneNumber = req.body.phoneNumber;
+    const eventId = req.body.eventId;
+
+    if (name === "") {
+        return ajax.error(res, "Please enter an attendee name!");
+    }
+
+    if (phoneNumber === "") {
+        return ajax.error(res, "Please enter an attendee phone number!");
+    }
+        
+    const phoneNumberInt = parseInt(phoneNumber, 10);
+
+    if (!(/^[0-9]{8}$/.test(phoneNumberInt))) {
+        return ajax.error(res, "Please enter a valid attendee phone number!");
+    }
+    
+    const eventAttendee = await EventAttendee.create({
+        name: name,
+        phoneNumber: phoneNumberInt,
+        eventId: eventId
+    });
+    
+    ajax.success(res, "Successfully created event attendee!", eventAttendee);
+});
+
+router.post('/create-event-seat-reservation', async (req, res) => {
+    const seatNumber = req.body.seatNumber;
+    const eventId = req.body.eventId;
+    const attendeeId = req.body.attendeeId
+
+    // TODO: validation
+    const seatReservation = await EventReservedSeat.create({
+        seatNumber: seatNumber,
+        eventId: eventId,
+        attendeeId: attendeeId
+    });
+    
+    ajax.success(res, "Successfully created reservattion!", seatReservation);
+});
+
 
 module.exports = router;

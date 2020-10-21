@@ -273,20 +273,22 @@
         activeMap.find('reserved').status('highlighted');
     });
 
-    $(reserveSeatButton).click(function() {
+    $(reserveSeatButton).click(async function() { 
         if (activeMap.find('selected').length == 0) {
             return showDangerToast("Please select some seats to reserve for the attendee!");
         }
 
-        if ($(reservationNameInput).val() === "") {
-            return showDangerToast("Please enter a name for the attendee!");
+        const selectedSeats = activeMap.find('selected');
+        
+        try {
+            const attendee = await createEventAttendee($(reservationNameInput).val(), $(reservationPhoneNumberInput).val(), eventId);
+            console.log(attendee);
+            for await (const val of createEventSeatReservations(selectedSeats.seatIds, eventId, attendee.id)) {
+                
+            }
+        } catch (error) {
+            return handleError(error);
         }
-
-        if (!$(reservationPhoneNumberInput).val()) {
-            return showDangerToast("Please enter a phone number for the attendee!");
-        }
-
-        activeMap.find('selected').status('reserved');
     });
 
     $(zoomQuadrantSelect).change(function() {
