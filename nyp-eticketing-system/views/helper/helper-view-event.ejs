@@ -116,9 +116,8 @@
                     </div>
                 </div>
                 <div class="mt-4"></div>
-                <button id="reserveSeatButton" type="button" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
+                <button id="reserveSeatButton" type="button" class="btn btn-lg btn-primary responsive-float w-100" data-toggle="modal" data-target="#Modal">Reserve Seats</button>
             </form>
-
             <div id="waitingListContainer" class="d-none">
                 <div class="mt-6"></div>
                 <h3>Waiting List</h3>
@@ -172,6 +171,23 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="reservationDetailsModal" tabindex="-1" role="dialog" aria-labelledby="reservationDetailsModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="d-flex">
+                                <div id="seatDetailsSeatCell" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>    
+                                <div class="ml-3">
+                                    <span id="seatDetailsId" class="align-self-center h4"></span>
+                                    <br>
+                                    <span id="seatDetailsDescription" class="align-self-center"></span>
+                                </div>                       
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </body>
@@ -199,6 +215,9 @@
     const seatDetailsSeatId = '#seatDetailsId';
     const seatDetailsDescription = '#seatDetailsDescription';
     const waitingListContainer = '#waitingListContainer';
+    const seatnumberlabel = '#seatnumberlabel';
+    const attendeename = '#attendeename';
+    const attendeenumber = '#attendeenumber';
 
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
@@ -279,10 +298,17 @@
         }
 
         const selectedSeats = activeMap.find('selected');
+
+        $(seatnumberlabel).text(selectedseats.seatIds);
+        $(attendeename).text($(reservationNameInput).val());
+        $(attendeenumber).text($(reservationPhoneNumberInput).val());
         
         try {
             const attendee = await createEventAttendee($(reservationNameInput).val(), $(reservationPhoneNumberInput).val(), eventId);
-            console.log(attendee);
+            console.log("start");
+            for (let i = 0; i < seatNumbers.length; ++i) {
+
+            }
             for await (const val of createEventSeatReservations(selectedSeats.seatIds, eventId, attendee.id)) {
                 
             }
@@ -290,6 +316,31 @@
             return handleError(error);
         }
     });
+
+    // $(reserveSeatButton).click(async function() { 
+    //     if (activeMap.find('selected').length == 0) {
+    //         return showDangerToast("Please select some seats to reserve for the attendee!");
+    //     }
+
+    //     const selectedSeats = activeMap.find('selected');
+
+    //     $(seatnumberlabel).text(selectedseats.seatIds);
+    //     $(attendeename).text($(reservationNameInput).val());
+    //     $(attendeenumber).text($(reservationPhoneNumberInput).val());
+        
+    //     try {
+    //         const attendee = await createEventAttendee($(reservationNameInput).val(), $(reservationPhoneNumberInput).val(), eventId);
+    //         console.log("start");
+    //         for (let i = 0; i < seatNumbers.length; ++i) {
+
+    //         }
+    //         for await (const val of createEventSeatReservations(selectedSeats.seatIds, eventId, attendee.id)) {
+                
+    //         }
+    //     } catch (error) {
+    //         return handleError(error);
+    //     }
+    // });
 
     $(zoomQuadrantSelect).change(function() {
         sc.map = Array.from(eventDetails.event.seatMap);
