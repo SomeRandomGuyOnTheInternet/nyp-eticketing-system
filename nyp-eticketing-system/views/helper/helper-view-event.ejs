@@ -139,10 +139,10 @@
                                 <div class="card input-card">
                                     <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                                     <div class="card-body input-card-body">
-                                        <label for="seatnumber" class="card-input-label">
+                                        <label for="seatnumberlabel" class="card-input-label">
                                             <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                             <span class="card-subtitle mb-2 text-secondary font-weight-normal">Seat Numbers:</span>
-                                            <span class="card-subtitle mb-2 text-secondary font-weight-normal">Q8, Q9, Q10</span>
+                                            <span id="seatnumberlabel" class="card-subtitle mb-2 text-secondary font-weight-normal">Q8, Q9, Q10</span>
                                         </label>
                                         <!-- <input id="seatnumber" name="seatnumber" class="form-control card-input" type="text" placeholder="Q8, Q9, Q10"> -->
                                     </div>
@@ -153,7 +153,7 @@
                                         <label for="name" class="card-input-label">
                                             <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                             <span class="card-subtitle mb-2 text-secondary font-weight-normal">Name of Attendee:</span>
-                                            <span class="card-subtitle mb-2 text-secondary font-weight-normal">Lam En Qing</span>
+                                            <span id="attendeename" class="card-subtitle mb-2 text-secondary font-weight-normal">Lam En Qing</span>
                                             <!-- The small element is where we actually write down what the input does  -->
                                         </label>
                                         <!-- <input id="name" name="name" class="form-control card-input" type="text" placeholder="Lam En Qing"> -->
@@ -168,7 +168,7 @@
                                                 class="card-subtitle mb-2 text-secondary font-weight-normal">Phone number:</span>
                                             <!-- The small element is where we actually write down what the input does  -->
                                             <span
-                                            class="card-subtitle mb-2 text-secondary font-weight-normal">95179116</span>
+                                            id="attendeenumber" class="card-subtitle mb-2 text-secondary font-weight-normal">95179116</span>
                                         </label>
                                         <!-- <input id="phonenum" name="phonenum" class="form-control card-input" type="text" placeholder="95179116"> -->
                                         <!-- This is where the user actually inputs all their stuff  -->
@@ -263,6 +263,9 @@
     const seatDetailsSeatId = '#seatDetailsId';
     const seatDetailsDescription = '#seatDetailsDescription';
     const waitingListContainer = '#waitingListContainer';
+    const seatnumberlabel = '#seatnumberlabel';
+    const attendeename = '#attendeename';
+    const attendeenumber = '#attendeenumber';
 
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
@@ -350,7 +353,12 @@
             return showDangerToast("Please enter a phone number for the attendee!");
         }
 
-        // activeMap.find('selected').status('reserved');
+        const selectedseats = activeMap.find('selected');
+        $(seatnumberlabel).text(selectedseats.seatIds);
+        $(attendeename).text($(reservationNameInput).val());
+        $(attendeenumber).text($(reservationPhoneNumberInput).val());
+         
+        console.log(activeMap.find('selected'));
     });
 
     $(zoomQuadrantSelect).change(function() {
