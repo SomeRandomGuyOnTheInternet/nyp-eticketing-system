@@ -85,6 +85,16 @@ select {
     content: "\f068";
 }
 
+div.row-small-margin {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+div.col-small-margin {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
 @media only screen and (max-width: 768px) {
     .responsive-float {
         float: none !important;

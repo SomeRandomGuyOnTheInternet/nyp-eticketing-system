@@ -156,10 +156,12 @@ router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
 
     const event = await Event.getEventById(eventId);
     const seatTypes = await EventSeatType.getEventSeatTypes(eventId);
+    const reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
     
     ajax.success(res, "Successfully gotten event details for the helper!", {
         event: event,
         seatTypes: seatTypes,
+        reservedSeats: reservedSeats
     });
 
     return
@@ -197,17 +199,17 @@ router.post('/create-event-attendee', async (req, res) => {
     const eventId = req.body.eventId;
 
     if (name === "") {
-        return ajax.error(res, "Please enter an attendee name!");
+        return ajax.error(res, "Please provide an attendee name!");
     }
 
     if (phoneNumber === "") {
-        return ajax.error(res, "Please enter an attendee phone number!");
+        return ajax.error(res, "Please provide an attendee phone number!");
     }
         
     const phoneNumberInt = parseInt(phoneNumber, 10);
 
     if (!(/^[0-9]{8}$/.test(phoneNumberInt))) {
-        return ajax.error(res, "Please enter a valid attendee phone number!");
+        return ajax.error(res, "Please provide a valid attendee phone number!");
     }
     
     const eventAttendee = await EventAttendee.create({
@@ -224,14 +226,27 @@ router.post('/create-event-seat-reservation', async (req, res) => {
     const eventId = req.body.eventId;
     const attendeeId = req.body.attendeeId
 
-    // TODO: validation
+    if (seatNumber === "") {
+        return ajax.error(res, "Please provide a seat number to reserve!");
+    }
+
+    // TODO: Validate whether seat number is valid
+
+    if (eventId === "") {
+        return ajax.error(res, "Please provide a event id to reserve the seat for!");
+    }
+
+    if (attendeeId === "") {
+        return ajax.error(res, "Please provide the id of the attendee the seats belong to!");
+    }
+
     const seatReservation = await EventReservedSeat.create({
         seatNumber: seatNumber,
         eventId: eventId,
         attendeeId: attendeeId
     });
     
-    ajax.success(res, "Successfully created reservattion!", seatReservation);
+    ajax.success(res, "Successfully created reservation!", seatReservation);
 });
 
 

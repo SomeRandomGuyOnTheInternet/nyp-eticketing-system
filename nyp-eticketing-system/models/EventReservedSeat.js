@@ -11,3 +11,24 @@ const EventReservedSeat = db.define('EventReservedSeat', {
 });
 
 module.exports = EventReservedSeat;
+
+// Event Reserved Seat Table Service Methods
+// We use this to do CRUD and basically communicate with the database
+
+// Every model should have their own version of this
+
+module.exports.getEventReservedSeat = async (eventId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const reservedSeats = await EventReservedSeat.findAll({
+                where: { 
+                    eventId: eventId 
+                },
+                raw: true
+            });
+            resolve(reservedSeats);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};

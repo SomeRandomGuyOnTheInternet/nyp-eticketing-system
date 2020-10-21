@@ -317,7 +317,7 @@
         const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
         
         if (highlighted) {
-            selectedSeatType = $(this).attr("seat-character");
+            selectedSeatType = $(this).attr("data-seat-character");
         } else {
             selectedSeatType = null;
         }

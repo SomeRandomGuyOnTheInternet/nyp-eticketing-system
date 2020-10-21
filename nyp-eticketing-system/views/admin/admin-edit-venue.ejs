@@ -197,7 +197,7 @@
     });
 
     $(document).on("click", ".seatCharts-legendCard", function() {
-        const seatCharAttr = $(this).attr("seat-character");
+        const seatCharAttr = $(this).attr("data-seat-character");
         if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
             const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
             selectedSeatType = (highlighted) ? seatCharAttr : null;

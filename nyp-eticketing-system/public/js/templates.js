@@ -58,6 +58,41 @@ function renderToastTemplate(notification) {
     return $toast;
 };
 
+function renderSelectedSeatConfirmationTemplate(category, seats) {
+    let $parentDiv = $('<div></div>')
+        .addClass('mb-3');
+
+    $parentDiv.append($('<span></span>')
+        .addClass('h5 text-muted')
+        .text(category)
+    );
+
+    let $seatRow = $('<div></div>')
+        .addClass('row-small-margin row mt-2')
+        .appendTo($parentDiv);
+
+    for (let i = 0; i < seats.length; ++i) {
+        var $seatCol = $('<div></div>')
+            .addClass('col-small-margin col-auto mb-2')
+            .appendTo($seatRow);
+
+        var $card = $('<div></div>')
+            .addClass('card')
+            .appendTo($seatCol);
+
+        var $cardBody = $('<div></div>')
+            .addClass('card-body py-2 px-3')
+            .appendTo($card);
+
+        $cardBody.append($('<span></span>')
+            .addClass('h6')
+            .text(seats[i].settings.id)
+        );
+    }
+
+    return $parentDiv;
+};
+
 function renderStudentHelperCardTemplate(helper) {
     var $card = $('<div></div>')
         .addClass('card mb-2')

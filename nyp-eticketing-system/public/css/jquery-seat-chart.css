@@ -103,13 +103,13 @@ div.seatCharts-legend {
 	bottom: 16px;
 }
 
-div.seatCharts-cardBody {
-    padding: 0.6rem;
-}
-
 div.seatCharts-cardColumn {
     padding-right: 7.5px;
     padding-left: 7.5px;
+}
+
+div.seatCharts-cardBody {
+    padding: 0.6rem;
 }
 
 div.seatCharts-legendCard {

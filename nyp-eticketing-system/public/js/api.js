@@ -162,24 +162,43 @@ async function createEventAttendee (name, phoneNumber, eventId) {
     });
 };
 
-async function* createEventSeatReservations(seatNumbers, eventId, attendeeId) {
-    for (let i = 0; i < seatNumbers.length; ++i) {
+async function createEventSeatReservation(seatNumber, eventId, attendeeId) {
+    return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
                 `${baseRoute}/create-event-seat-reservation`, 
                 'POST', 
                 {
-                    seatNumber: seatNumbers[i],
+                    seatNumber: seatNumber,
                     eventId: eventId,
                     attendeeId: attendeeId,
                 }
             );
-            yield res;
+            resolve(res.data);
         } catch (error) {
-            throwException(error);
+            reject(error);
         }
-    }
-}
+    });
+};
+
+// async function* createEventSeatReservations(seatNumbers, eventId, attendeeId) {
+//     for (let i = 0; i < seatNumbers.length; ++i) {
+//         try {
+//             const res = await promiseAjax(
+//                 `${baseRoute}/create-event-seat-reservation`, 
+//                 'POST', 
+//                 {
+//                     seatNumber: seatNumbers[i],
+//                     eventId: eventId,
+//                     attendeeId: attendeeId,
+//                 }
+//             );
+//             yield res.data;
+//         } catch (error) {
+//             throwException(error);
+//         }
+//     }
+// }
 
 // TODO: make the actual post on the server-side
 sendSMS = async (number, message) => {

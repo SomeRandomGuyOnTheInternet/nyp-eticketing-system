@@ -437,7 +437,7 @@
 					.addClass(typeof item[3] == "undefined" ? "" : item[3])
 					.addClass('mt-3')
 					.attr("tabindex", -1)
-					.attr("seat-character", settings.legend.items[index][0])
+					.attr("data-seat-character", settings.legend.items[index][0])
 					.appendTo($column);
 
 				var $cardBody = $('<div></div>')
@@ -768,6 +768,12 @@ disableBlockedSeats = (activeMap, seats) => {
 		if (seats[char].blocked) {
 			activeMap.find(char).status('blocked');
 		}	
+	}
+};
+
+disableReservedSeats = (activeMap, reservedSeats) => {
+	for (i = 0; i < reservedSeats.length; i++) {
+		activeMap.get(reservedSeats[i].seatNumber).status('reserved');
 	}
 };
 
