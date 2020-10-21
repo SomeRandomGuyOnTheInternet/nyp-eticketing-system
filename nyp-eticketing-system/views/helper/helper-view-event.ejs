@@ -108,8 +108,7 @@
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Phone Number</small>
                                     <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="reservationPhoneNumberInput" name="reservationPhoneNumberInput" class="form-control card-input" type="number"
-                                    placeholder="e.g. 95179116">
+                                <input id="reservationPhoneNumberInput" name="reservationPhoneNumberInput" class="form-control card-input" type="tel" placeholder="e.g. 95179116">
                                 <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
@@ -313,6 +312,7 @@
 
         activeMap = reloadMap(sc, tableWrapper, seatMap, legend);
         disableBlockedSeats(activeMap, sc.seats);
+        disableReservedSeats(activeMap, eventDetails.reservedSeats);
     });
 
     $(reserveSeatButton).click(async function() {
@@ -355,7 +355,7 @@
         
         try {
             const attendee = await createEventAttendee(reservationNameInputVal, reservationPhoneNumberInputVal, eventId);
-            for (let i = 0; i < selectedSeats.seatIds.length; ++i) {
+            for (let i = 0; i < selectedSeats.seatIds.length; i++) {
                 await createEventSeatReservation(selectedSeats.seatIds[i], eventId, attendee.id);
             }
             

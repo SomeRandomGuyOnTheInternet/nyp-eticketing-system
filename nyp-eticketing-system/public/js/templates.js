@@ -71,7 +71,7 @@ function renderSelectedSeatConfirmationTemplate(category, seats) {
         .addClass('row-small-margin row mt-2')
         .appendTo($parentDiv);
 
-    for (let i = 0; i < seats.length; ++i) {
+    for (let i = 0; i < seats.length; i++) {
         var $seatCol = $('<div></div>')
             .addClass('col-small-margin col-auto mb-2')
             .appendTo($seatRow);

@@ -773,7 +773,10 @@ disableBlockedSeats = (activeMap, seats) => {
 
 disableReservedSeats = (activeMap, reservedSeats) => {
 	for (i = 0; i < reservedSeats.length; i++) {
-		activeMap.get(reservedSeats[i].seatNumber).status('reserved');
+		const reservedSeat = activeMap.get(reservedSeats[i].seatNumber);
+		if (typeof reservedSeat !== 'undefined' && reservedSeat !== null) {
+			reservedSeat.status('reserved');
+		}
 	}
 };
 

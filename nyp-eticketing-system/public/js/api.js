@@ -182,7 +182,7 @@ async function createEventSeatReservation(seatNumber, eventId, attendeeId) {
 };
 
 // async function* createEventSeatReservations(seatNumbers, eventId, attendeeId) {
-//     for (let i = 0; i < seatNumbers.length; ++i) {
+//     for (let i = 0; i < seatNumbers.length; i++) {
 //         try {
 //             const res = await promiseAjax(
 //                 `${baseRoute}/create-event-seat-reservation`, 
