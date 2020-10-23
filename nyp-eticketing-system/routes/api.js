@@ -154,17 +154,11 @@ router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
         return;
     }
 
-    const event = await Event.getEventById(eventId);
-    const seatTypes = await EventSeatType.getEventSeatTypes(eventId);
-    const reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
+    let event = await Event.getEventById(eventId);
+    event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
+    event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
     
-    ajax.success(res, "Successfully gotten event details for the helper!", {
-        event: event,
-        seatTypes: seatTypes,
-        reservedSeats: reservedSeats
-    });
-
-    return
+    return ajax.success(res, "Successfully gotten event details for the helper!", event);
 });
 
 
@@ -197,6 +191,7 @@ router.post('/create-event-attendee', async (req, res) => {
     const name = req.body.name;
     const phoneNumber = req.body.phoneNumber;
     const eventId = req.body.eventId;
+    let eventAttendee;
 
     if (name === "") {
         return ajax.error(res, "Please provide an attendee name!");
@@ -211,12 +206,16 @@ router.post('/create-event-attendee', async (req, res) => {
     if (!(/^[0-9]{8}$/.test(phoneNumberInt))) {
         return ajax.error(res, "Please provide a valid attendee phone number!");
     }
+
+    eventAttendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
     
-    const eventAttendee = await EventAttendee.create({
-        name: name,
-        phoneNumber: phoneNumberInt,
-        eventId: eventId
-    });
+    if (typeof eventAttendee === 'undefined' || eventAttendee === null) {
+        eventAttendee = await EventAttendee.create({
+            name: name,
+            phoneNumber: phoneNumberInt,
+            eventId: eventId
+        });
+    }
     
     ajax.success(res, "Successfully created event attendee!", eventAttendee);
 });
@@ -226,11 +225,11 @@ router.post('/create-event-seat-reservation', async (req, res) => {
     const eventId = req.body.eventId;
     const attendeeId = req.body.attendeeId
 
+    // TODO: Validate whether seat number is valid
+
     if (seatNumber === "") {
         return ajax.error(res, "Please provide a seat number to reserve!");
     }
-
-    // TODO: Validate whether seat number is valid
 
     if (eventId === "") {
         return ajax.error(res, "Please provide a event id to reserve the seat for!");

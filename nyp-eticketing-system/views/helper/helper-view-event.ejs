@@ -17,7 +17,7 @@
                     <h5 id="startDateTimeHeading"><%= moment(event.startDateTime).format('Do MMMM YYYY') %> • <%= moment(event.startDateTime).format('h:mm a') %></h5>
                 </div>
                 <!-- Select (combo box) Input Card  -->
-                <div class="col-sm-6">
+                <div class="col-sm-6 mt-2">
                     <div class="card input-card">
                         <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="mt-4"></div>
-                <button id="reserveSeatButton" type="button" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
+                <button id="reserveSeatButton" type="submit" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
             </form>
             <div id="waitingListContainer" class="d-none">
                 <div class="mt-6"></div>
@@ -175,12 +175,15 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="row p-3">
-                                <div class="col-auto mb-3">
-                                    <span id="reservationConfirmName" class="h2 text-primary">Vignesh</span><br>
-                                    <span id="reservationConfirmPhNo" class="h5">91864675</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <div class="row">
+                                <div class="col-5 mb-3 pl-0">
+                                    <span id="reservationConfirmName" class="h2 text-primary text-break-hyphen"></span><br>
+                                    <span id="reservationConfirmPhNo" class="h5"></span>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-7 pr-0">
                                     <div id="selectedSeatConfirmationWrapper" class="mb-3">
                                     </div>
                                 </div>
@@ -227,7 +230,7 @@
 
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
-    let eventDetails;
+    let event;
 
     // Seat chart configuration
     let activeMap;
@@ -276,19 +279,19 @@
     // Rest of the functions
     $(document).ready(async function() {
         try {
-            eventDetails = await getEventDetailsForHelper(eventId, helperId);
+            event = await getEventDetailsForHelper(eventId, helperId);
         } catch (error) {
             return handleError(error);
         }
-            
-        sc.map = eventDetails.event.seatMap;
-        sc.seats = getSeatsObject(eventDetails.seatTypes);
+
+        sc.map = event.seatMap;
+        sc.seats = getSeatsObject(event.seatTypes);
         sc.legend.items = getLegendArray(sc.seats);
 
         activeMap = bindMap(sc, seatMap);
         scaleContentWidth(tableWrapper, seatMap);
         disableBlockedSeats(activeMap, sc.seats);
-        disableReservedSeats(activeMap, eventDetails.reservedSeats);
+        disableReservedSeats(activeMap, event.reservedSeats);
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -300,7 +303,7 @@
     });
 
     $(zoomQuadrantSelect).change(function() {
-        sc.map = Array.from(eventDetails.event.seatMap);
+        sc.map = Array.from(event.seatMap);
 
         const dimensions = getQuadrantDimensions(sc.map, $(zoomQuadrantSelect).val());
 
@@ -312,10 +315,11 @@
 
         activeMap = reloadMap(sc, tableWrapper, seatMap, legend);
         disableBlockedSeats(activeMap, sc.seats);
-        disableReservedSeats(activeMap, eventDetails.reservedSeats);
+        disableReservedSeats(activeMap, event.reservedSeats);
     });
 
-    $(reserveSeatButton).click(async function() {
+    $(reserveSeatForm).submit(async function (event) {
+        event.preventDefault();
         const reservationNameInputVal = $(reservationNameInput).val();
         const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
         const selectedSeats = activeMap.find('selected');
@@ -337,10 +341,9 @@
             [seat.settings.data.category]: [...(sortedSeats[seat.settings.data.category] || []), seat]
         }), {});
 
+        $(selectedSeatConfirmationWrapper).empty();
         $(reservationConfirmName).text(reservationNameInputVal);
         $(reservationConfirmPhNo).text(reservationPhoneNumberInputVal);
-        $(selectedSeatConfirmationWrapper).empty();
-
         for (const category in sortedSeats) {
             $(selectedSeatConfirmationWrapper).append(renderSelectedSeatConfirmationTemplate(category, sortedSeats[category]));
         }
@@ -358,12 +361,12 @@
             for (let i = 0; i < selectedSeats.seatIds.length; i++) {
                 await createEventSeatReservation(selectedSeats.seatIds[i], eventId, attendee.id);
             }
-            
-            $(window).unbind('beforeunload');
-            window.location.reload();
         } catch (error) {
             return handleError(error);
         }
+
+        $(window).unbind('beforeunload');
+        window.location.reload();
     });
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {

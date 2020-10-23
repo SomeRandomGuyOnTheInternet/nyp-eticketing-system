@@ -1,3 +1,4 @@
+const { truncate } = require('lodash');
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
 
@@ -55,7 +56,8 @@ module.exports.getEventById = async (id) => {
                     model: Venue,
                     required: true,
                 }],
-                where: { id: id } 
+                where: { id: id },
+                raw: true,
             });
 
             if (event) {

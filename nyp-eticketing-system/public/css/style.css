@@ -95,15 +95,32 @@ div.col-small-margin {
     padding-left: 5px;
 }
 
-@media only screen and (max-width: 768px) {
+.text-break-hyphen {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+}
+
+@media only screen and (max-width: 767px) {
     .responsive-float {
         float: none !important;
     }
+
+    .toast {
+        width: 90vw;
+    }
 }
 
-@media only screen and (max-width: 576px) {
+@media only screen and (max-width: 575px) {
     .nav-user-info {
         text-align: center !important;
         width: 100% !important;
+    }
+
+    .notification-message {
+        font-size: 120%;
     }
 }

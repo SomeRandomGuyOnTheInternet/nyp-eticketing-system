@@ -31,40 +31,39 @@ function renderToastTemplate(notification) {
 
     var $messageCol = $('<div></div>')
         .addClass('col-10')
-        .appendTo($row)
-        .append(
-            $('<span></span>')
-                .addClass('h5 text-white font-weight-medium')
-                .text(notification.message)
-        );
+        .appendTo($row);
+
+    $messageCol.append($('<span></span>')
+        .addClass('h5 text-white font-weight-medium notification-message')
+        .text(notification.message)
+    );
 
     var $closeBtnCol = $('<div></div>')
         .addClass('col-2')
         .appendTo($row);
 
-    var $closeBtn = $('<button></button>')
-        .attr('type', 'button')
+    $closeBtnCol.append($('<button></button>')
         .addClass('close')
+        .attr('type', 'button')
         .attr('data-dismiss', 'toast')
         .attr('aria-label', 'Close')
-        .appendTo($closeBtnCol)
-        .append(
-            $('<span></span>')
-                .attr('aria-hidden', 'Close')
-                .addClass('text-white')
-                .text('x')
-        );
+        .append($('<span></span>')
+            .addClass('text-white')
+            .attr('aria-hidden', 'Close')
+            .text('x')
+        )
+    );
 
     return $toast;
 };
 
 function renderSelectedSeatConfirmationTemplate(category, seats) {
     let $parentDiv = $('<div></div>')
-        .addClass('mb-3');
+        .addClass('mt-1 mb-2');
 
     $parentDiv.append($('<span></span>')
-        .addClass('h5 text-muted')
-        .text(category)
+        .addClass('h6 text-muted')
+        .text(`${category} Seats`)
     );
 
     let $seatRow = $('<div></div>')

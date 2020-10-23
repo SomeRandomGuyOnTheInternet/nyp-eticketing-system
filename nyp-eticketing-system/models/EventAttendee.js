@@ -35,3 +35,20 @@ module.exports.getEventAttendees = async (eventId) => {
         }
     });
 };
+
+module.exports.getEventAttendeeByPhoneNumber = async (eventId, phoneNumber) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const attendees = await EventAttendee.findOne({
+                where: { 
+                    eventId: eventId,
+                    phoneNumber: phoneNumber
+                },
+                raw: true
+            });
+            resolve(attendees);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};

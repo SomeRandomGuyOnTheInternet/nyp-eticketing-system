@@ -1,8 +1,8 @@
 <!-- locals.user enables us to check if the variable exists without throwing an error -->
 <% if (locals.user) { %>
-    <nav class="navbar navbar-light navbar-expand-sm bg-white justify-content-between">
+<nav class="navbar navbar-light navbar-expand-sm bg-white justify-content-between">
 <% } else { %> 
-    <nav class="navbar navbar-light navbar-expand-sm bg-transparent justify-content-between">
+<nav class="navbar navbar-light navbar-expand-sm bg-transparent justify-content-between">
 <% } %> 
     <div class="container">
         <a class="navbar-brand" href="/">
@@ -10,7 +10,7 @@
                 alt="NYP Logo">
         </a>
         <% if (locals.user) { %>
-            <span class="h5 font-weight-light m-0"><b>eTicketing</b> System</span>
+        <span class="h5 font-weight-light m-0"><b>eTicketing</b> System</span>
         <% } %> 
         
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsingNavbar" aria-controls="collapsingNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,45 +19,43 @@
         
         <!-- locals.user enables us to check if the variable exists without throwing an error -->
         <% if (locals.user) { %> <!-- If user exists, show navigation options -->
-            <div class="navbar-collapse collapse justify-content-center" id="collapsingNavbar">
+            <div id="collapsingNavbar" class="navbar-collapse collapse justify-content-center">
                 <ul class="navbar-nav">
                     <% if (user.isPlanner) { %> <!-- If user is a planner, show links to them to all events and all venues -->
-                        <li class="nav-item text-center"> <!-- the active class is used to indicate which of the tab pages is currently active -->
-                            <a class="nav-link" href="/planner/events">Events</a>
-                        </li>
-                        <!-- <li class="nav-item mx-4">
-                        </li>
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="/planner/venues">Venues</a>
-                        </li> -->
+                    <li class="nav-item text-center"> <!-- the active class is used to indicate which of the tab pages is currently active -->
+                        <a class="nav-link" href="/planner/events">Events</a>
+                    </li>
+                    <!-- <li class="nav-item mx-4">
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="/planner/venues">Venues</a>
+                    </li> -->
                     <% } %>
 
                     <% if (user.isHelper) { %> <!-- If user is a helper, show links to events avaliable to them -->
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="/helper/">Events</a>
-                        </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="/helper/">Events</a>
+                    </li>
                     <% } %>
 
                     <% if (user.isAdmin) { %> <!-- If user is an admin, show links to planners and helpers -->
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="/admin/planners">Planners</a>
-                        </li>
-                        <li class="nav-item mx-4">
-                        </li>
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="/admin/helpers">Helpers</a>
-                        </li>
-                        <li class="nav-item mx-4">
-                        </li>
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="/admin/venues">Venues</a>
-                        </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="/admin/planners">Planners</a>
+                    </li>
+                    <li class="nav-item mx-4">
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="/admin/helpers">Helpers</a>
+                    </li>
+                    <li class="nav-item mx-4">
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="/admin/venues">Venues</a>
+                    </li>
                     <% } %>
-
                     <!-- Everybody else will get no navigation options -->
                 </ul>
             </div>
-
             <ul class="nav navbar-nav flex-row nav-user-info">
                 <li class="nav-item text-right nav-user-info">
                     <span class="font-weight-medium text-dark">
