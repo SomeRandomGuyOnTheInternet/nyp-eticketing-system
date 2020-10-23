@@ -204,6 +204,7 @@
         
         try {
             await createVenue(name, map);
+            await flashSuccess("Successfully created a new venue!");
             $(window).unbind('beforeunload');
             window.location.replace("/admin/venues");
         } catch (error) {

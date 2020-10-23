@@ -1,5 +1,39 @@
 const baseRoute = "/api";
 
+async function flashSuccess(message) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/success-flash`, 
+                'POST', 
+                {
+                    message: message,
+                }
+            );
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+async function flashError(message) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/error-flash`, 
+                'POST', 
+                {
+                    message: message,
+                }
+            );
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 async function createVenue(name, map) {
     return new Promise(async (resolve, reject) => {
         try {

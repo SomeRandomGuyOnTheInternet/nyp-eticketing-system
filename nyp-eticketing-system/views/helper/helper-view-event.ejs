@@ -361,11 +361,13 @@
             for (let i = 0; i < selectedSeats.seatIds.length; i++) {
                 await createEventSeatReservation(selectedSeats.seatIds[i], eventId, attendee.id);
             }
+            await flashSuccess("Successfully created a new reservation!");
         } catch (error) {
             return handleError(error);
         }
 
         $(window).unbind('beforeunload');
+        
         window.location.reload();
     });
 
@@ -387,9 +389,7 @@
             }
             return legends;
         }, []);
-
         legends.push(["G", "blocked", "Blocked"]);
-
         return legends;
     }
 

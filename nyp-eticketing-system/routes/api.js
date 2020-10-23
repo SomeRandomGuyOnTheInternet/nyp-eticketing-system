@@ -23,19 +23,27 @@ router.get('/test', async (req, res) => {
     ajax.success(res, "It works! Yay!");
 });
 
+router.post('/success-flash', async (req, res) => {
+    flash.success(req, req.body.message)
+    ajax.success(res);
+});
+
+router.post('/error-flash', async (req, res) => {
+    flash.error(req, req.body.message)
+    ajax.success(res);
+});
+
 
 router.post('/create-venue', async (req, res) => {
     const name = req.body.name;
     const seatMap = JSON.stringify(req.body.seatMap);
 
     if (!name) {
-        ajax.error(res, "Please enter a venue name!");
-        return;
+        return ajax.error(res, "Please enter a venue name!");
     }
 
     if (!seatMap) {
-        ajax.error(res, "Please enter a seat map for the venue!");
-        return;
+        return ajax.error(res, "Please enter a seat map for the venue!");
     }
 
     await Venue.createVenue({
@@ -43,8 +51,7 @@ router.post('/create-venue', async (req, res) => {
         seatMap: seatMap
     });
 
-    ajax.success(res, "Successfully added venue!");
-    return
+    return ajax.success(res, "Successfully added venue!");
 });
 
 router.get('/get-all-venues', async (req, res) => {
@@ -189,7 +196,7 @@ router.post('/create-event-helpers', async (req, res) => {
 
 router.post('/create-event-attendee', async (req, res) => {
     const name = req.body.name;
-    const phoneNumber = req.body.phoneNumber;
+    const phoneNumber = parseInt(req.body.phoneNumber, 10);
     const eventId = req.body.eventId;
     let eventAttendee;
 
@@ -200,11 +207,9 @@ router.post('/create-event-attendee', async (req, res) => {
     if (phoneNumber === "") {
         return ajax.error(res, "Please provide an attendee phone number!");
     }
-        
-    const phoneNumberInt = parseInt(phoneNumber, 10);
 
-    if (!(/^[0-9]{8}$/.test(phoneNumberInt))) {
-        return ajax.error(res, "Please provide a valid attendee phone number!");
+    if (!(/^[0-9]{8}$/.test(phoneNumber))) {
+        return ajax.error(res, "Please provide a valid eight digit attendee phone number!");
     }
 
     eventAttendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
@@ -212,11 +217,11 @@ router.post('/create-event-attendee', async (req, res) => {
     if (typeof eventAttendee === 'undefined' || eventAttendee === null) {
         eventAttendee = await EventAttendee.create({
             name: name,
-            phoneNumber: phoneNumberInt,
+            phoneNumber: phoneNumber,
             eventId: eventId
         });
     }
-    
+
     ajax.success(res, "Successfully created event attendee!", eventAttendee);
 });
 
