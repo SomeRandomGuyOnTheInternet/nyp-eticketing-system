@@ -657,7 +657,7 @@ scaleContentWidth = (parent, content) => { // This function scales the content's
     const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
 
 	const scale = $(parent).width() / ($(content).width()); // This equation get us the scale of the parent's width in relation to the container's width
-	$(content).css('transform', 'scale(' + Math.min(1.5, scale) + ')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
+	$(content).css('transform', 'scale(' + Math.min(1.75, scale) + ')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
 	$(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
     
     resizeParentHeight(orgHeight, parent, content);

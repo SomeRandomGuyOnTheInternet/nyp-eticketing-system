@@ -1,5 +1,3 @@
-// TODO: Make toasts more responsive
-
 // The functions you see here take in some values and insert them into a jquery template. We can use the html that's returned so we can to create html on the fly easily for stuff like ajax
 // Some of these templates, like toast, are exact copies of the ones you see in the templates folder on the server, just adapted to jquery syntax
 

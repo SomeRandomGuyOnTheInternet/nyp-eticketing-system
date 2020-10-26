@@ -46,7 +46,6 @@ app.use(flash());
 app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
-const db = require('./config/db');
 fypjapplication.setUpDB(false);
 
 
@@ -54,11 +53,11 @@ app.use(session({
 	key: 'nyp-seat-reservation',
 	secret: 'totallysecretpassword',
 	store: new MySQLStore({
-		host: db.host,
-		port: db.port,
-		user: db.username,
-		password: db.password,
-		database: db.database,
+		host: process.env.DB_HOST,
+		port: undefined,
+		user: process.env.DB_USERNAME,
+		password: process.env.DB_PASSWORD,
+		database: process.env.DB_DATABASE,
 		clearExpired: true,
 		checkExpirationInterval: 900000,
 		expiration: 900000,
