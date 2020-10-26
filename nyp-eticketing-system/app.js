@@ -54,7 +54,7 @@ app.use(session({
 	secret: 'totallysecretpassword',
 	store: new MySQLStore({
 		host: process.env.DB_HOST,
-		port: undefined,
+		port: 3306,
 		user: process.env.DB_USERNAME,
 		password: process.env.DB_PASSWORD,
 		database: process.env.DB_DATABASE,
