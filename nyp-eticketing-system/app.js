@@ -87,5 +87,5 @@ app.use('/planner', plannerRoute);
 app.use('/admin', adminRoute);
 app.use('/api', apiRoute);
 
-const port = process.env.DB_PORT || 5000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => { });
