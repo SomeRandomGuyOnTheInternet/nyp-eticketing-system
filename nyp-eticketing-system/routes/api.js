@@ -237,7 +237,7 @@ router.post('/create-event-helpers', async (req, res) => {
 
 router.post('/create-event-attendee', async (req, res) => {
     const name = req.body.name;
-    const phoneNumber = parseInt(req.body.phoneNumber, 8);
+    const phoneNumber = parseInt(req.body.phoneNumber, 10);
     const eventId = req.body.eventId;
 
     if (!name) {
@@ -340,7 +340,7 @@ router.post('/sms-reservation-confirm', async (req, res) => {
         const reservedSeats = await EventReservedSeat.getAttendeeReservedSeat(attendee.id);
         const event = await Event.getEventById(attendee.eventId);
 
-        const message = `You have reserved ${reservedSeats.length} seats (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
+        const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
 
         const sms = await axios.post(
             'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
@@ -363,14 +363,6 @@ router.post('/sms-reservation-confirm', async (req, res) => {
         console.error(error);
         return ajax.error(res, "Something went wrong while getting the attendee details for sending the SMS. Please try again later!", 500);
     }
-});
-
-
-// SMS POST
-router.post('/sms-attendee', async (req, res) => {
-    
-
-    ajax.success(res, "Successfully sent a SMS confirmation to Attendee!");
 });
 
 module.exports = router;    
