@@ -46,7 +46,7 @@ app.use(flash());
 app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
-fypjapplication.setUpDB(false);
+fypjapplication.setUpDB(true);
 
 
 app.use(session({
