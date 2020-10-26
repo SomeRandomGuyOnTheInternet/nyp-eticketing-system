@@ -343,7 +343,7 @@ router.post('/sms-reservation-confirm', async (req, res) => {
         const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
 
         const sms = await axios.post(
-            'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
+            'sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
             `SMSAccount=${process.env.SMS_USERNAME}&Pwd=${process.env.SMS_PASSWORD}&Mobile=${attendee.phoneNumber}&Message=${message}`, 
             {
                 headers: {

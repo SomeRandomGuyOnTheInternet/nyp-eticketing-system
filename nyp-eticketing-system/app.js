@@ -43,10 +43,10 @@ app.use(methodOverride('_method'));
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(flash());
+app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
 fypjapplication.setUpDB(true);
-
 
 app.use(session({
 	key: 'nyp-seat-reservation',
@@ -64,8 +64,6 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false,
 }));
-
-app.locals.moment = require('moment');
 
 app.use((req, res, next) => {
     res.locals.message = req.flash('message');
