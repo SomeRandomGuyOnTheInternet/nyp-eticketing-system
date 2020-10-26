@@ -4,8 +4,8 @@ const Sequelize = require('sequelize'); // Sequelize is used as a database wrapp
 const db = require('./db'); // Bring in the db.js which contains database's name, username and password
 
 // Creates a sequelize object with database parameters to enable connection to the database and other settings
-const sequelize = new Sequelize(db.database, db.username, db.password, {
-    host: db.host, // Specifies the IP address of the database
+const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST, // Specifies the IP address of the database
     dialect: 'mysql', // Specifies that we're using a MySQL database
     define: {
         timestamps: true // Automatically creates timestamp fields in tables
