@@ -9,10 +9,10 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
+const passport = require('passport');
 const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
-const passport = require('passport');
 require('dotenv').config();
 
 // Importing all the routes 
@@ -43,7 +43,6 @@ app.use(methodOverride('_method'));
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(flash());
-app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
 fypjapplication.setUpDB(true);
@@ -54,7 +53,7 @@ app.use(session({
 	secret: 'totallysecretpassword',
 	store: new MySQLStore({
 		host: process.env.DB_HOST,
-		port: 3306,
+		port: undefined,
 		user: process.env.DB_USERNAME,
 		password: process.env.DB_PASSWORD,
 		database: process.env.DB_DATABASE,
@@ -65,6 +64,8 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false,
 }));
+
+app.locals.moment = require('moment');
 
 app.use((req, res, next) => {
     res.locals.message = req.flash('message');

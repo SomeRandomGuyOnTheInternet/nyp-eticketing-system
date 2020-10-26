@@ -1,7 +1,6 @@
 // Configure sequelize settings here
 
 const Sequelize = require('sequelize'); // Sequelize is used as a database wrapper so that communcation between MySQL and the app is easier and faster by using better syntax
-const db = require('./db'); // Bring in the db.js which contains database's name, username and password
 
 // Creates a sequelize object with database parameters to enable connection to the database and other settings
 const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
