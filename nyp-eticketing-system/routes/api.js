@@ -196,7 +196,7 @@ router.post('/create-event-helpers', async (req, res) => {
 
 router.post('/create-event-attendee', async (req, res) => {
     const name = req.body.name;
-    const phoneNumber = parseInt(req.body.phoneNumber, 10);
+    const phoneNumber = parseInt(req.body.phoneNumber, 8);
     const eventId = req.body.eventId;
     let eventAttendee;
 
@@ -253,5 +253,12 @@ router.post('/create-event-seat-reservation', async (req, res) => {
     ajax.success(res, "Successfully created reservation!", seatReservation);
 });
 
+
+// SMS POST
+router.post('/sms-attendee', async (req, res) => {
+    
+
+    ajax.success(res, "Successfully sent a SMS confirmation to Attendee!");
+});
 
 module.exports = router;
