@@ -58,6 +58,7 @@ router.post('/create-venue', async (req, res) => {
             name: name,
             seatMap: seatMap
         });
+
         return ajax.success(res, "Successfully added venue!");
     } catch (error) {
         console.error(error);
@@ -339,11 +340,11 @@ router.post('/sms-reservation-confirm', async (req, res) => {
         const attendee = await EventAttendee.getEventAttendeeById(attendeeId);
         const reservedSeats = await EventReservedSeat.getAttendeeReservedSeat(attendee.id);
         const event = await Event.getEventById(attendee.eventId);
-
+        
         const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
 
         const sms = await axios.post(
-            'sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
+            'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
             `SMSAccount=${process.env.SMS_USERNAME}&Pwd=${process.env.SMS_PASSWORD}&Mobile=${attendee.phoneNumber}&Message=${message}`, 
             {
                 headers: {

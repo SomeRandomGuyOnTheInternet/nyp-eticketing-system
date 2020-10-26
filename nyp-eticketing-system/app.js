@@ -46,7 +46,7 @@ app.use(flash());
 app.locals.moment = require('moment');
 
 const fypjapplication = require('./config/DBConnection');
-fypjapplication.setUpDB(true);
+fypjapplication.setUpDB(false);
 
 app.use(session({
 	key: 'nyp-seat-reservation',

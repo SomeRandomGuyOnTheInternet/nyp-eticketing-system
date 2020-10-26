@@ -352,6 +352,7 @@
     });
 
     $(confirmReservationButton).click(async function() {
+        $(confirmReservationButton).prop('disabled', true);
         const reservationNameInputVal = $(reservationNameInput).val();
         const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
         const selectedSeats = activeMap.find('selected');
@@ -364,6 +365,7 @@
                 await createEventSeatReservation(selectedSeats.seatIds[i], eventId, attendee.id);
             }
         } catch (error) {
+            $(confirmReservationButton).prop('disabled', false);
             return handleError(error);
         }
 
