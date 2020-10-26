@@ -1,6 +1,10 @@
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
 
+const Venue = require('./Venue');
+const Event = require('./Event');
+const EventReservedSeat = require('./EventReservedSeat');
+
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
@@ -19,6 +23,22 @@ module.exports = EventAttendee;
 // We use this to do CRUD and basically communicate with the database
 
 // Every model should have their own version of this
+
+module.exports.getEventAttendeeById = async (attendeeId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const attendee = await EventAttendee.findOne({
+                where: { 
+                    id: attendeeId 
+                },
+                raw: true
+            });
+            resolve(attendee);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 
 module.exports.getEventAttendees = async (eventId) => {
     return new Promise(async (resolve, reject) => {

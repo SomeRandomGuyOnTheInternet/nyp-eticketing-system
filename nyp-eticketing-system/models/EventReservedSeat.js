@@ -32,3 +32,19 @@ module.exports.getEventReservedSeat = async (eventId) => {
         }
     });
 };
+
+module.exports.getAttendeeReservedSeat = async (attendeeId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const reservedSeats = await EventReservedSeat.findAll({
+                where: { 
+                    attendeeId: attendeeId 
+                },
+                raw: true
+            });
+            resolve(reservedSeats);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};

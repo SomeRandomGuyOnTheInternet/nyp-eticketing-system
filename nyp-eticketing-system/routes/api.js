@@ -1,8 +1,9 @@
-// TODO: Make message flashing an API
-
 // All APIs are contained here
 
 const express = require('express');
+const axios = require('axios');
+const moment = require('moment');
+const XML = require('pixl-xml');
 const router = express.Router();
 
 const flash = require('../utils/flash');
@@ -18,19 +19,25 @@ const EventReservedSeat = require('../models/EventReservedSeat');
 
 
 router.get('/test', async (req, res) => {
-    const test = await Venue.getAllEvents();
-    console.log(test);
-    ajax.success(res, "It works! Yay!");
+    try {
+        const test = await Venue.getAllVenues();
+        console.log(test);
+        return ajax.success(res, "It works! Yay!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while doing the test api noooooo!");
+    }
 });
 
+
 router.post('/success-flash', async (req, res) => {
-    flash.success(req, req.body.message)
-    ajax.success(res);
+    flash.success(req, req.body.message);
+    return ajax.success(res);
 });
 
 router.post('/error-flash', async (req, res) => {
-    flash.error(req, req.body.message)
-    ajax.success(res);
+    flash.error(req, req.body.message);
+    return ajax.success(res);
 });
 
 
@@ -46,44 +53,60 @@ router.post('/create-venue', async (req, res) => {
         return ajax.error(res, "Please enter a seat map for the venue!");
     }
 
-    await Venue.createVenue({
-        name: name,
-        seatMap: seatMap
-    });
-
-    return ajax.success(res, "Successfully added venue!");
+    try {
+        await Venue.createVenue({
+            name: name,
+            seatMap: seatMap
+        });
+        return ajax.success(res, "Successfully added venue!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating this venue!", 500);
+    }
 });
 
 router.get('/get-all-venues', async (req, res) => {
-    const venues = await Venue.getAllVenues();
-    ajax.success(res, "Successfully gotten all venues!", venues);
-    return
+    try {
+        const venues = await Venue.getAllVenues();
+        return ajax.success(res, "Successfully gotten all venues!", venues);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while getting all venues!", 500);
+    }
 });
 
 router.post('/update-venue', async (req, res) => {
     let venue = req.body.venue;
 
     if (!venue.name) {
-        ajax.error(res, "Please enter a venue name!");
-        return;
+        return ajax.error(res, "Please enter a venue name!");
     }
 
     if (!venue.seatMap) {
-        ajax.error(res, "Please enter a seat map for the venue!");
-        return;
+        return ajax.error(res, "Please enter a seat map for the venue!");
     }
 
     venue.seatMap = JSON.stringify(venue.seatMap);
 
-    await Venue.updateVenue(venue);
-
-    ajax.success(res, "Successfully updated venue!");
+    try {
+        await Venue.updateVenue(venue);
+        return ajax.success(res, "Successfully updated venue!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while updating this venue!", 500);
+    }
 });
 
 router.get('/delete-venue/:id', async (req, res) => {
-	const id = req.params.id;
-	await Venue.deleteVenue(id);
-	res.redirect('/planner/venues');
+    const id = req.params.id;
+    
+    try {
+        await Venue.deleteVenue(id);
+        return ajax.success(res, "Successfully deleted venue!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while deleting this venue!", 500);
+    }
 });
 
 
@@ -96,57 +119,54 @@ router.post('/create-event', async (req, res) => {
     const venueId = req.body.venueId == '' ? null : req.body.venueId;
 
     if (!name) {
-        ajax.error(res, "Please enter a event name!");
-        return;
+        return ajax.error(res, "Please enter a event name!");
     }
 
     if (!seatMap) {
-        ajax.error(res, "Please enter a seat map for the event!");
-        return;
+        return ajax.error(res, "Please enter a seat map for the event!");
     }
 
     if (!startDateTime) {
-        ajax.error(res, "Please enter a valid start date/time for the event!");
-        return;
+        return ajax.error(res, "Please enter a valid start date/time for the event!");
     }
 
     if (seatsPerReservation) {
         if (isNaN(seatsPerReservation)) {
-            ajax.error(res, "Please enter a valid max number of seats per reservation!");
-            return;
+            return ajax.error(res, "Please enter a valid max number of seats per reservation!");
         } else {
             if (seatsPerReservation < 1) {
-                ajax.error(res, "Please enter a higher number of seats per reservation!");
-                return;
+                return ajax.error(res, "Please enter a higher number of seats per reservation!");
             }
 
             if (seatsPerReservation > 10) {
-                ajax.error(res, "Please enter a lower number of seats per reservation!");
-                return;
+                return ajax.error(res, "Please enter a lower number of seats per reservation!");
             }
         }
     }
 
     if (!venueId) {
-        ajax.error(res, "Please enter a valid id for the venue!");
-        return;
+        return ajax.error(res, "Please enter a valid id for the venue!");
     }
 
     if (isNaN(venueId)) {
-        ajax.error(res, "Please enter a valid id for the venue!");
-        return;
+        return ajax.error(res, "Please enter a valid id for the venue!");
     }
 
-    const event = await Event.createEvent({
-        name: name,
-        seatMap: seatMap,
-        startDateTime: startDateTime,
-        seatsPerReservation: seatsPerReservation,
-        prioritiseBackRows: prioritiseBackRows,
-        venueId: venueId
-    });
-
-    ajax.success(res, "Successfully created event!", event);
+    try {
+        const event = await Event.createEvent({
+            name: name,
+            seatMap: seatMap,
+            startDateTime: startDateTime,
+            seatsPerReservation: seatsPerReservation,
+            prioritiseBackRows: prioritiseBackRows,
+            venueId: venueId
+        });
+        
+        return ajax.success(res, "Successfully created event!", event);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating this event. Please try again later!", 500);
+    }
 });
 
 
@@ -154,43 +174,64 @@ router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
     const eventId = req.params.eventId;
     const helperId = req.params.helperId;
 
-    const isHelper = await EventHelper.isHelperForEvent(helperId, eventId);
+    try {
+        const isHelper = await EventHelper.isHelperForEvent(helperId, eventId);
 
-	if (!isHelper) {
-        ajax.error(res, "This helper is not authorised to help for this event!");
-        return;
+        if (!isHelper) {
+            return ajax.error(res, "This helper is not authorised to help for this event!");
+        }
+
+        let event = await Event.getEventById(eventId);
+        event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
+        event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
+        event.venue = await Venue.getVenueById(event.venueId);
+
+        return ajax.success(res, "Successfully gotten event details for the helper!", event);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while getting the event details. Please try again later!", 500);
     }
-
-    let event = await Event.getEventById(eventId);
-    event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
-    event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
-    
-    return ajax.success(res, "Successfully gotten event details for the helper!", event);
 });
 
 
 router.get('/get-all-helpers', async (req, res) => {
-    const helpers = await User.getHelpers();
-    ajax.success(res, "Successfully gotten all helpers!", helpers);
-    return
+    try {
+        const helpers = await User.getHelpers();
+        return ajax.success(res, "Successfully gotten all helpers!", helpers);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while getting all the helpers. Please try again later!", 500);
+    }
 });
 
 
 router.post('/create-event-seat-types', async (req, res) => {
     const seatTypes = req.body.seatTypes;
-    // TODO: Do validation for each seat type in array
-    await EventSeatType.createEventSeatTypes(seatTypes);
 
-    ajax.success(res, "Successfully created event seat types!");
+    // TODO: Do validation for each seat type in array
+
+    try {
+        await EventSeatType.createEventSeatTypes(seatTypes);
+        return ajax.success(res, "Successfully created event seat types!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating the event's seat types. Please try again later!", 500);
+    }
 });
 
 
 router.post('/create-event-helpers', async (req, res) => {
     const eventHelpers = req.body.eventHelpers;
+
     // TODO: Do validation for each event helper in array
-    await EventHelper.createEventHelpers(eventHelpers);
-    
-    ajax.success(res, "Successfully created event helpers!");
+
+    try {
+        await EventHelper.createEventHelpers(eventHelpers);
+        return ajax.success(res, "Successfully created event helpers!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating the event's helpers. Please try again later!", 500);
+    }
 });
 
 
@@ -198,31 +239,60 @@ router.post('/create-event-attendee', async (req, res) => {
     const name = req.body.name;
     const phoneNumber = parseInt(req.body.phoneNumber, 10);
     const eventId = req.body.eventId;
-    let eventAttendee;
 
-    if (name === "") {
+    if (!name) {
         return ajax.error(res, "Please provide an attendee name!");
     }
 
-    if (phoneNumber === "") {
+    if (!eventId) {
+        return ajax.error(res, "Please provide an event id!");
+    }
+
+    if (!phoneNumber) {
         return ajax.error(res, "Please provide an attendee phone number!");
     }
 
     if (!(/^[0-9]{8}$/.test(phoneNumber))) {
         return ajax.error(res, "Please provide a valid eight digit attendee phone number!");
     }
-
-    eventAttendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
     
-    if (typeof eventAttendee === 'undefined' || eventAttendee === null) {
-        eventAttendee = await EventAttendee.create({
-            name: name,
-            phoneNumber: phoneNumber,
-            eventId: eventId
-        });
+    try {
+        const existingEventAttendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
+        if (!existingEventAttendee) {
+            const eventAttendee = await EventAttendee.create({
+                name: name,
+                phoneNumber: phoneNumber,
+                eventId: eventId
+            });
+            return ajax.success(res, "Successfully created event attendee!", eventAttendee);
+        } else {
+            return ajax.success(res, "Successfully gotten exisiting event attendee!", existingEventAttendee);
+        }
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating the event attendee. Please try again later!", 500);
+    }
+});
+
+router.post('/get-event-attendee', async (req, res) => {
+    const eventId = req.body.eventId;
+    const phoneNumber = parseInt(req.body.phoneNumber, 10);
+
+    if (!eventId) {
+        return ajax.error(res, "Please provide an event id!");
     }
 
-    ajax.success(res, "Successfully created event attendee!", eventAttendee);
+    if (!phoneNumber) {
+        return ajax.error(res, "Please provide an attendee phone number!");
+    }
+    
+    try {
+        const existingEventAttendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
+        return ajax.success(res, "Successfully gotten exisiting event attendee!", existingEventAttendee ? existingEventAttendee : null);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating the event attendee. Please try again later!", 500);
+    }
 });
 
 router.post('/create-event-seat-reservation', async (req, res) => {
@@ -232,25 +302,67 @@ router.post('/create-event-seat-reservation', async (req, res) => {
 
     // TODO: Validate whether seat number is valid
 
-    if (seatNumber === "") {
+    if (!seatNumber) {
         return ajax.error(res, "Please provide a seat number to reserve!");
     }
 
-    if (eventId === "") {
+    if (!eventId) {
         return ajax.error(res, "Please provide a event id to reserve the seat for!");
     }
 
-    if (attendeeId === "") {
+    if (!attendeeId) {
         return ajax.error(res, "Please provide the id of the attendee the seats belong to!");
     }
 
-    const seatReservation = await EventReservedSeat.create({
-        seatNumber: seatNumber,
-        eventId: eventId,
-        attendeeId: attendeeId
-    });
+    try {
+        const seatReservation = await EventReservedSeat.create({
+            seatNumber: seatNumber,
+            eventId: eventId,
+            attendeeId: attendeeId
+        });
+
+        return ajax.success(res, "Successfully created reservation!", seatReservation);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating the event attendee. Please try again later!", 500);
+    }
+});
+
+router.post('/sms-reservation-confirm', async (req, res) => {
+    const attendeeId = req.body.attendeeId;
+
+    if (!attendeeId) {
+        return ajax.error(res, "Please provide an attendee id to send the confirmation to!");
+    }
+
+    try {
+        const attendee = await EventAttendee.getEventAttendeeById(attendeeId);
+        const reservedSeats = await EventReservedSeat.getAttendeeReservedSeat(attendee.id);
+        const event = await Event.getEventById(attendee.eventId);
+
+        const message = `You have reserved ${reservedSeats.length} seats (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
+
+        const sms = await axios.post(
+            'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
+            `SMSAccount=${process.env.SMS_USERNAME}&Pwd=${process.env.SMS_PASSWORD}&Mobile=${attendee.phoneNumber}&Message=${message}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        );
     
-    ajax.success(res, "Successfully created reservation!", seatReservation);
+        const dataRes = XML.parse(sms.data);
+    
+        if (dataRes._Data == "Success") {
+            return ajax.success(res, "Successfully sent confirmation!");
+        } else {
+            return ajax.error(res, "Please provide a valid eight digit mobile number!");
+        }
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while getting the attendee details for sending the SMS. Please try again later!", 500);
+    }
 });
 
 

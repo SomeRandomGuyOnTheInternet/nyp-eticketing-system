@@ -13,7 +13,7 @@ const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
 const passport = require('passport');
-const moment = require('moment');
+require('dotenv').config();
 
 // Importing all the routes 
 // We split the webpages by routes for clarity and security purposes
@@ -87,5 +87,5 @@ app.use('/planner', plannerRoute);
 app.use('/admin', adminRoute);
 app.use('/api', apiRoute);
 
-const port = process.env.PORT || 5000;
+const port = process.env.DB_PORT || 5000;
 app.listen(port, () => { });

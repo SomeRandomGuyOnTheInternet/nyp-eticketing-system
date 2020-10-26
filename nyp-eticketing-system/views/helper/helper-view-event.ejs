@@ -181,7 +181,7 @@
                             <div class="row">
                                 <div class="col-5 mb-3 pl-0">
                                     <span id="reservationConfirmName" class="h2 text-primary text-break-hyphen"></span><br>
-                                    <span id="reservationConfirmPhNo" class="h5"></span>
+                                    <span id="reservationConfirmPhNo" class="h5 text-break-hyphen"></span>
                                 </div>
                                 <div class="col-7 pr-0">
                                     <div id="selectedSeatConfirmationWrapper" class="mb-3">
@@ -355,20 +355,27 @@
         const reservationNameInputVal = $(reservationNameInput).val();
         const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
         const selectedSeats = activeMap.find('selected');
+
+        let attendee;
         
         try {
-            const attendee = await createEventAttendee(reservationNameInputVal, reservationPhoneNumberInputVal, eventId);
+            attendee = await createEventAttendee(reservationNameInputVal, reservationPhoneNumberInputVal, eventId);
             for (let i = 0; i < selectedSeats.seatIds.length; i++) {
                 await createEventSeatReservation(selectedSeats.seatIds[i], eventId, attendee.id);
             }
-            await flashSuccess("Successfully created a new reservation!");
         } catch (error) {
             return handleError(error);
         }
 
-        $(window).unbind('beforeunload');
-        
-        window.location.reload();
+        try {
+            await sendReservationConfirmSMS(attendee.id);
+            await flashSuccess("Successfully created a new reservation!");
+        } catch (error) {
+            await flashError("Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
+        } finally {
+            $(window).unbind('beforeunload');
+            window.location.reload();
+        }
     });
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {

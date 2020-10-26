@@ -23,38 +23,6 @@ class AppException extends Error {
     }
 };
 
-promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/json') => {
-    if (data) {
-        if (typeof data === 'object') {
-            data = JSON.stringify(data);
-        }
-    } else {
-        data = null;
-    }
-
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            type: method,
-            url: uri,
-            dataType: dataType,
-            contentType: contentType,
-            data: data,
-            success: function (data) {
-                resolve(data);
-            },
-            error: function (error) {
-                if (error.status == 200) {
-                    resolve(true);
-                } else {
-                    reject(error);
-                }
-            },
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            reject(errorThrown);
-        });
-    });
-};
-
 toTitleCase = (str) => {
     var lcStr = str.toLowerCase();
     return lcStr.replace(/(?:^|\s)\w/g, function(match) {
@@ -70,10 +38,12 @@ handleError = (error) => { // Use inside the catch block of a try catch
     // Logs the error
     console.error(error);
 
-    if (error && error.description) { // description is the attribute that stores a user-readable description of the AppException error, so if that exists, flash that to the user
-        showDangerToast(error.description);
-    } else if (error && error.responseText) { // responseText is the attribute that stores a user-readable description of an ajax error, so if that exists, flash that to the user
-        showDangerToast(error.responseText);
+    if (error.status) {
+        if (error.status == 400) {
+            showDangerToast(error.responseJSON.message);
+        } else if (error.status == 500) {
+            showDangerToast(error.responseText);
+        }
     } else {
         showDangerToast("Something went wrong. Please try again later!"); // if no user readable description exists, just flash a generic error
     }

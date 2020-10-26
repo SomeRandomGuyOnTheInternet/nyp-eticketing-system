@@ -1,3 +1,35 @@
+promiseAjax = (uri, method, data, dataType = 'json', contentType = 'application/json') => {
+    if (data) {
+        if (typeof data === 'object') {
+            data = JSON.stringify(data);
+        }
+    } else {
+        data = null;
+    }
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: method,
+            url: uri,
+            dataType: dataType,
+            contentType: contentType,
+            data: data,
+            success: function (data) {
+                resolve(data);
+            },
+            error: function (error) {
+                if (error.status == 200) {
+                    resolve(true);
+                } else {
+                    reject(error);
+                }
+            },
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            reject(errorThrown);
+        });
+    });
+};
+
 const baseRoute = "/api";
 
 async function flashSuccess(message) {
@@ -160,7 +192,7 @@ async function createEventSeatTypes(seatTypeArray) {
     });
 };
 
-async function createEventHelpers (eventHelperArray) {
+async function createEventHelpers(eventHelperArray) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -177,7 +209,7 @@ async function createEventHelpers (eventHelperArray) {
     });
 };
 
-async function createEventAttendee (name, phoneNumber, eventId) {
+async function createEventAttendee(name, phoneNumber, eventId) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
@@ -185,6 +217,24 @@ async function createEventAttendee (name, phoneNumber, eventId) {
                 'POST', 
                 {
                     name: name,
+                    phoneNumber: phoneNumber,
+                    eventId: eventId
+                }
+            );
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+async function getEventAttendee(phoneNumber, eventId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/get-event-attendee`, 
+                'POST', 
+                {
                     phoneNumber: phoneNumber,
                     eventId: eventId
                 }
@@ -234,17 +284,17 @@ async function createEventSeatReservation(seatNumber, eventId, attendeeId) {
 //     }
 // }
 
-// TODO: make the actual post on the server-side
-sendSMS = async (number, message) => {
+async function sendReservationConfirmSMS(attendeeId) {
     return new Promise(async (resolve, reject) => {
         try {
             const res = await promiseAjax(
-                'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
-                'POST',
-                `SMSAccount=FYPJ01&Pwd=529287&Mobile=${number}&Message=${message}`,
-                'jsonp', 
-                'application/x-www-form-urlencoded');
-            resolve(res);
+                `${baseRoute}/sms-reservation-confirm`, 
+                'POST', 
+                {
+                    attendeeId: attendeeId
+                }
+            );
+            resolve(res.data);
         } catch (error) {
             reject(error);
         }
