@@ -257,8 +257,8 @@ router.post('/create-event-seat-reservation', async (req, res) => {
 // SMS POST
 router.post('/sms-attendee', async (req, res) => {
     
-    
+
     ajax.success(res, "Successfully sent a SMS confirmation to Attendee!");
 });
 
-module.exports = router;
+module.exports = router;    
