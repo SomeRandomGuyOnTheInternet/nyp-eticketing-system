@@ -149,10 +149,6 @@ router.post('/create-event', async (req, res) => {
         return ajax.error(res, "Please enter a valid id for the venue!");
     }
 
-    if (isNaN(venueId)) {
-        return ajax.error(res, "Please enter a valid id for the venue!");
-    }
-
     try {
         const event = await Event.createEvent({
             name: name,
@@ -167,6 +163,94 @@ router.post('/create-event', async (req, res) => {
     } catch (error) {
         console.error(error);
         return ajax.error(res, "Something went wrong while creating this event. Please try again later!", 500);
+    }
+});
+
+router.post('/update-event', async (req, res) => {
+    const eventId = req.body.eventId;
+    const name = req.body.name;
+    const seatMap = JSON.stringify(req.body.seatMap);
+    const startDateTime = req.body.startDateTime;
+    const prioritiseBackRows = req.body.prioritiseBackRows;
+    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
+    const venueId = req.body.venueId == '' ? null : req.body.venueId;
+
+    if (!eventId) {
+        return ajax.error(res, "Please provide an event id!");
+    }
+
+    if (!name) {
+        return ajax.error(res, "Please enter a event name!");
+    }
+
+    if (!seatMap) {
+        return ajax.error(res, "Please enter a seat map for the event!");
+    }
+
+    if (!startDateTime) {
+        return ajax.error(res, "Please enter a valid start date/time for the event!");
+    }
+
+    if (seatsPerReservation) {
+        if (isNaN(seatsPerReservation)) {
+            return ajax.error(res, "Please enter a valid max number of seats per reservation!");
+        } else {
+            if (seatsPerReservation < 1) {
+                return ajax.error(res, "Please enter a higher number of seats per reservation!");
+            }
+
+            if (seatsPerReservation > 10) {
+                return ajax.error(res, "Please enter a lower number of seats per reservation!");
+            }
+        }
+    }
+
+    if (!venueId) {
+        return ajax.error(res, "Please enter a valid id for the venue!");
+    }
+
+    try {
+        const event = await Event.update(
+			{
+                name: name,
+                seatMap: seatMap,
+                startDateTime: startDateTime,
+                seatsPerReservation: seatsPerReservation,
+                prioritiseBackRows: prioritiseBackRows,
+                venueId: venueId
+            },
+            { 
+                where: { 
+                    id: eventId 
+                } 
+            },
+		);
+        
+        return ajax.success(res, "Successfully created event!", event);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating this event. Please try again later!", 500);
+    }
+});
+
+router.get('/events/:eventId/', async (req, res) => {
+    const eventId = req.params.eventId;
+
+    if (!eventId) {
+        return ajax.error(res, "Please enter a valid id for the venue!");
+    }
+
+    try {
+        let event = await Event.getEventById(eventId);
+        event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
+        event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
+        event.venue = await Venue.getVenueById(event.venueId);
+        event.helpers = await EventHelper.getHelpersByEventId(eventId);
+
+        return ajax.success(res, "Successfully gotten event details!", event);
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while getting the event details. Please try again later!", 500);
     }
 });
 
@@ -213,6 +297,20 @@ router.post('/create-event-seat-types', async (req, res) => {
 
     try {
         await EventSeatType.createEventSeatTypes(seatTypes);
+        return ajax.success(res, "Successfully created event seat types!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while creating the event's seat types. Please try again later!", 500);
+    }
+});
+
+router.post('/update-event-seat-types', async (req, res) => {
+    const seatTypes = req.body.seatTypes;
+
+    // TODO: Do validation for each seat type in array
+
+    try {
+        await EventSeatType.updateEventSeatTypes(seatTypes);
         return ajax.success(res, "Successfully created event seat types!");
     } catch (error) {
         console.error(error);

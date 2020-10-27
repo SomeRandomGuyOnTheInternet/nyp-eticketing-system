@@ -162,6 +162,40 @@ async function createEvent(name, seatMap, startDateTime, seatsPerReservation, pr
     });
 };
 
+async function updateEvent(eventId, name, seatMap, startDateTime, seatsPerReservation, prioritiseBackRows, venueId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/update-event`, 
+                'POST', 
+                {
+                    eventId: eventId,
+                    name: name,
+                    seatMap: seatMap,
+                    startDateTime: startDateTime,
+                    seatsPerReservation: seatsPerReservation,
+                    prioritiseBackRows: prioritiseBackRows,
+                    venueId: venueId,
+                }
+            );
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+async function getEventDetails(eventId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(`${baseRoute}/events/${eventId}`, 'GET');
+            resolve(res.data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 async function getEventDetailsForHelper(eventId, helperId) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -192,6 +226,24 @@ async function createEventSeatTypes(seatTypeArray) {
     });
 };
 
+async function updateEventSeatTypes(eventId, seatTypeArray) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/update-event-seat-types`, 
+                'POST', 
+                {
+                    eventId: eventId,
+                    seatTypes: seatTypeArray
+                }
+            );
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 async function createEventHelpers(eventHelperArray) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -203,6 +255,41 @@ async function createEventHelpers(eventHelperArray) {
                 }
             );
             resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+async function updateEventHelpers(eventId, eventHelperArray) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/update-event-helpers`, 
+                'POST', 
+                {
+                    eventId: eventId,
+                    eventHelpers: eventHelperArray
+                }
+            );
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+async function getEventHelpers(eventId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await promiseAjax(
+                `${baseRoute}/get-event-helpers`, 
+                'POST', 
+                {
+                    eventId: eventId
+                }
+            );
+            resolve(res.data);
         } catch (error) {
             reject(error);
         }

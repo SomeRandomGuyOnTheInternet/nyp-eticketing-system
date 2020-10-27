@@ -38,8 +38,7 @@ router.get('/events/:id', auth.isPlanner, async (req, res) => {
 
 	if (!event) {
 		flash.error(req, "That ID does not belong to any event!");
-		res.redirect('/planner/events');
-		return;
+		return res.redirect('/planner/events');
 	}
 
 	res.render('planner/planner-edit-event', { 
@@ -72,8 +71,7 @@ router.get('/venues/:id', auth.isPlanner, async (req, res) => {
 
 	if (!venue) {
 		flash.error(req, "That ID does not belong to any venue!");
-		res.redirect('/planner/venues');
-		return;
+		return res.redirect('/planner/venues');
 	}
 	
 	res.render('planner/planner-edit-venue', { 

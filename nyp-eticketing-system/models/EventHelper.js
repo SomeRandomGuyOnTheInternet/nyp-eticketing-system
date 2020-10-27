@@ -53,6 +53,9 @@ module.exports.getHelpersByEventId = async (eventId) => {
                     where: { eventId: eventId },
                     required: true
                 }],
+                attributes: {
+                    exclude: ['password']
+                },
                 order: [['name', 'ASC']],
                 raw: true
             });

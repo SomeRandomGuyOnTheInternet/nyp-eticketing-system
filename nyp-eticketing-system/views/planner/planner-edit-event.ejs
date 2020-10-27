@@ -1,3 +1,9 @@
+<!-- TODO: Complete documentation for this part -->
+<!-- TODO: Delete seat types -->
+<!-- TODO: Delete student helper -->
+<!-- TODO: Rollback sequelize transaction on error -->
+<!-- TODO: Drag and select seats for helpers -->
+
 <%- include('../templates/head')-%>
 
 <body>
@@ -19,7 +25,7 @@
                                 <label for="eventNameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Name</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" value="<%= event.name %>" placeholder="e.g. Dance Competition" required> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" value="<%= event.name %>" placeholder="e.g. Dance Competition"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
                             </div>
                         </div>
                     </div>
@@ -30,7 +36,7 @@
                                 <label for="eventDateTimeInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Date / Time</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" value="<%= event.startDateTime %>" placeholder="e.g 13th March 2021, 9am" required> <!-- This is where the user actually inputs all their stuff  -->
+                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" value="<%= moment(event.startDateTime).format('YYYY-MM-DDTkk:mm') %>" placeholder="e.g 13th March 2021, 9am" required> <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
@@ -41,7 +47,7 @@
                                 <label for="maxSeatsPerReservationInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Maximum no. of seats per reservation</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="maxSeatsPerReservationInput" name="maxSeatsPerReservationInput" class="form-control card-input" type="number" min="1" max="10" value="<%= event.seatsPerReservation %>" placeholder="No Limit">
+                                <input id="maxSeatsPerReservationInput" name="maxSeatsPerReservationInput" class="form-control card-input" type="number" value="<%= event.seatsPerReservation %>" min="1" max="10" placeholder="No Limit">
                             </div>
                         </div>
                     </div>
@@ -51,7 +57,7 @@
                             <div class="card-body no-label-card-body">
                                 <div id="prioritiseBackCheck">
                                     <div class="form-check form-check-inline ml-2">
-                                        <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true" <% if (event.prioritiseBackRows) { %> checked <% } %>>
+                                        <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true" <%= event.prioritiseBackRows ? "checked" : "" %>>
                                         <label class="form-check-label px-3" for="prioritiseBackCheck">
                                             Prioritise seats at the back
                                         </label>
@@ -76,13 +82,12 @@
                                 <label for="venueSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Venue</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <select id="venueSelectInput" name="venueSelectInput" class="form-control card-input"> <!-- This is where the user actually inputs all their stuff  -->
+                                <select id="venueSelectInput" name="venueSelectInput" class="form-control card-input" tabindex="0"> <!-- This is where the user actually inputs all their stuff  -->
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div id="seatChartCard" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                     <div class="card-body">
                         <div id="tableWrapper" class="seatCharts-wrapper"> <!-- Seat maps should be ensclosed in a seat chart wrapper -->
@@ -92,13 +97,13 @@
                         </div>
                     </div>
                 </div>
-                <div id="editMapLegend" class="seatCharts-legend row">
+                <div class="seatCharts-legend row">
                     <!-- Add Seat Type Card -->
                     <!-- This card will always be fixed in front of all the other legend cards -->
-                    <div id="addSeatTypeCol" class="seatCharts-cardColumn col-auto">
-                        <div id="addSeatTypeCard" class="seatCharts-legendCard card card-hover text-primary font-weight-medium py-2 px-4 mt-3">
+                    <div id="addSeatTypeCol" class="seatCharts-cardColumn col-md-3">
+                        <div id="addSeatTypeCard" class="seatCharts-legendCard card card-hover text-primary font-weight-medium py-2 px-4 mt-3 clickable-div">
                             <div class="seatCharts-cardBody card-body">
-                                <div id="addSeatContent" class="seatCharts-legendItem">
+                                <div id="addSeatContent" class="seatCharts-legendItem text-center text-truncate">
                                     <span class="seatCharts-legendDescription">
                                         <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Seat Type
                                     </span>
@@ -107,9 +112,13 @@
                             <a href="#addSeatTypeModal" class="stretched-link" data-toggle="modal" data-target="#addSeatTypeModal"></a> <!-- On pressing this card, the add seat type button will show up -->
                         </div>
                     </div>
+                    <div class="col-md-9">
+                        <div id="editMapLegend" class="row px-0">
+                        </div>
+                        <div class="mt-3"></div>
+                        <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
+                    </div>
                 </div>
-                <div class="mt-2"></div>
-                <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <!-- Helpers input section  -->
                 <!-- Heading  -->
@@ -123,7 +132,7 @@
                                 <label for="helperSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Student Helpers</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <select id="helperSelectInput" name="helperSelectInput" class="form-control card-input"> <!-- This is where the user actually inputs all their stuff  -->
+                                <select id="helperSelectInput" name="helperSelectInput" class="form-control card-input" tabindex="0"> <!-- This is where the user actually inputs all their stuff  -->
                                     <option selected="true" disabled="disabled">Choose Helper</option> 
                                 </select>
                             </div>
@@ -135,7 +144,7 @@
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <div class="row">
                     <div class="col-sm-6">
-                        <button id="deleteEventButton" class="btn btn-danger btn-lg w-100" type="button">Delete Event</button>
+                        <button id="deleteEventButton" class="btn btn-danger btn-lg w-100" href="/api/delete-venue/<%= event.id %>" type="button">Delete Event</button>
                     </div>
                     <div class="col-sm-6">
                         <button id="updateEventButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
@@ -188,6 +197,9 @@
 </body>
 
 <script>
+    const eventId = <%= event.id %>;
+
+    // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
     const editEventForm = '#editEventForm';
     const eventNameInput = '#eventNameInput';
     const eventDateTimeInput = '#eventDateTimeInput';
@@ -200,22 +212,22 @@
     const addSeatTypeCard = '#addSeatTypeCard';
     const helperSelectInput = '#helperSelectInput';
     const helpersCardCol = '#helpersCardCol';
-    const updateEventButton = '#updateEventButton';
     const deleteEventButton = '#deleteEventButton';
+    const updateEventButton = '#updateEventButton';
     const addSeatTypeModal = '#addSeatTypeModal';
     const seatTypeNameInput = '#seatTypeNameInput';
     const blockSeatTypeCheck = '#blockSeatTypeCheck';
     const addSeatTypeButton = '#addSeatTypeButton';
+
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
 
-    // TODO: remove seat characters that are already used by the event
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
 
-    let venues = [];
-    let helpers = [];
-
     let selectedSeatType; // This variable will contain the character of the seat type we've selected
-    let selectedVenue;
+
+    let event;
+    let venues;
+    let helpers;
 
     // Seat chart configuration
     let sc = {};
@@ -224,48 +236,65 @@
 
     sc.seats = {};
 
-    sc.legend = {
-        node : $(legend),
-        items : []				
-    };
-
     sc.naming = {
         rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-        getLabel : function (character, row, column) {
+        getLabel: function (character, row, column) {
             return row + ':' + column;
         },
-        getId : function (character, row, column) {
+        getId: function (character, row, column) {
             return row + ':' + column;
         }
     };
 
+    sc.legend = {
+        node: $(legend),
+        items: []				
+    };
+
     sc.click = function () {
-        replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
+        if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
+            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
+        }
     };
 
     $(document).ready(async function() {
         try {
+            event = await getEventDetails(eventId);
             venues = await getAllVenues();
             helpers = await getAllHelpers();
-            helpers.forEach(function (helper) {
-                helper.selected = false;
-            });
 
-            populateSelect(venues, venueSelectInput);
-            populateHelperSelect(helpers, helperSelectInput);
-            populateSelectedHelperColumn(helpers, helpersCardCol);
-
-            // Bind map
-            setEventMap(getSelectedObject(venues, venueSelectInput));
-            bindMap(sc, seatMap);
-            scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
-
-            for (const seatCharacter in sc.seats) {
-                renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend));
+            // at least a single venue is required to create an event, so throw error if it doesn't exists
+            if (venues.length < 1) {
+                throwException("There are no venues available! Please contact the admin to create a venue.");
             }
         } catch (error) {
-            handleError(error);
+            return handleError(error);
         }
+        
+        for (i = 0; i < helpers.length; i++) {
+            for (r = 0; r < event.helpers.length; r++) {
+                helpers[i].selected = (helpers[i].id === event.helpers[r].id || helpers[i].selected === true);
+            }
+        }
+
+        populateHelperSelect(helpers, helperSelectInput);
+        populateSelectedHelperColumn(helpers, helpersCardCol);
+        populateVenueSelect(venues, venueSelectInput);
+
+        for (i = 0; i < venues.length; i++) {
+            if (venues[i].id === event.venueId) {
+                $(venueSelectInput).val(i);
+                break;
+            }
+        }
+        
+        sc.map = event.seatMap;
+        sc.seats = getSeatsObject(event.seatTypes);
+        sc.legend.items = getLegendArray(sc.seats);
+        
+        // Bind map
+        bindMap(sc, seatMap);
+        scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -273,40 +302,43 @@
     });
 
     $(venueSelectInput).on('change', function() {
-        setEventMap(getSelectedObject(venues, venueSelectInput));
-        const orgHeight = $(seatMap)[0].getBoundingClientRect().height; // Get the original height of the seat map before reloading to the new map
-        reloadMap(sc, seatMap);
-        resizeParentHeight(orgHeight, tableWrapper, seatMap); // Resize parent's height in relation to the original height
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.map = JSON.parse(getSelectedVenue(venues, venueSelectInput).seatMap);
+        reloadMap(sc, tableWrapper, seatMap, legend);
     });
 
     $(helperSelectInput).on('change', function() {
-        getSelectedObject(helpers, helperSelectInput).selected = true;
+        getSelectedHelper(helpers, helperSelectInput).selected = true;
         populateHelperSelect(helpers, helperSelectInput);
         populateSelectedHelperColumn(helpers, helpersCardCol);
     });
 
     $(addSeatTypeButton).click(function () {
+        if (availableSeatCharacters.length < 1) {
+            return showDangerToast("You cannot add anymore seat types! Please delete some if you want to add more.");
+        }
+        
         const seatName = $(seatTypeNameInput).val();
         const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
         const seatCharacter = availableSeatCharacters[0];
-        const descriptiveCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
+        const legendCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
 
-        if (!seatName) {
-            showDangerToast("Please enter a seat name!");
-            return;
+        if (seatName === "") {
+            return showDangerToast("Please enter a seat name!");
+        }
+
+        if (seatCharacter.length != 1) {
+            throwException("The string for the seat's character is not a single length character!")
         }
 
         sc.seats[seatCharacter] = {
             category: seatName,
-            descriptiveCategory: descriptiveCategory,
             blocked: seatIsBlocked,
             classes: seatCharacter,
-            legendClasses: selectableLegendClasses
         };
 
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
-        renderSeatChartLegendCardTemplate(seatCharacter, sc.seats[seatCharacter]).appendTo($(legend)); // Passes in the seat's details and its characters to the render function and appends the result to the legend element
+        sc.legend.items.push([seatCharacter, "available", legendCategory, selectableLegendClasses]); // Pushes a new legend to the legend items that will be shown upon reload
+        reloadMap(sc, tableWrapper, seatMap, legend);
         
         $(addSeatTypeModal).modal('hide'); // Hides the modal
         $(seatTypeNameInput).val(''); // Reset input to default state
@@ -314,56 +346,61 @@
     });
 
     $(document).on("click", `.seatCharts-legendCard:not(${addSeatTypeCard})`, function() {
-        const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-        
-        if (highlighted) {
-            selectedSeatType = $(this).attr("data-seat-character");
+        const seatCharAttr = $(this).attr("data-seat-character");
+        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
+            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
+            selectedSeatType = (highlighted === true) ? seatCharAttr : null;
         } else {
-            selectedSeatType = null;
+            $(this).removeClass("highlighted");
+        }
+    });
+
+    $(deleteEventButton).click(function (event) {
+        const check = confirm("Are you sure you want to delete this event?");
+        if (check == true) {
+            window.location.replace(`/api/delete-event/${event.id}`);
         }
     });
 
     $(editEventForm).submit(async function (e) {
         e.preventDefault();
         $(updateEventButton).prop('disabled', true);
-        
+
         try {
-            const event = await createEvent(
+            const updatedEvent = await updateEvent(
+                event.id,
                 $(eventNameInput).val(),
                 sc.map,
                 $(eventDateTimeInput).val(),
                 $(maxSeatsPerReservationInput).val(),
                 $(prioritiseBackCheck).is(':checked'),
-                getSelectedObject(venues, venueSelectInput).id
+                getSelectedVenue(venues, venueSelectInput).id
             );
             
             const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
             const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
 
-            await createEventSeatTypes(seatTypeArray);
-            await createEventHelpers(eventHelperArray);
-            
+            await updateEventSeatTypes(seatTypeArray, event.id);
+            await updateEventHelpers(eventHelperArray, event.id);
+            await flashSuccess("Successfully updated this event!");
+
             $(window).unbind('beforeunload');
             
             window.location.replace("/planner/events");
         } catch (error) {
             handleError(error);
         } finally {
-            $(updateEventButton).prop('disabled', false);
+            $(createEventButton).prop('disabled', false);
         }
     });
-
-    $(deleteEventButton).click(function() {
-        
-    });
-
-    setEventMap = (venue) => {
-        sc.map = JSON.parse(venue.seatMap);
-    };
 
     $(window).on('beforeunload', function() {
         return confirm();
     });
+
+    getLegendArray = (seats) => {
+        return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+    }
 </script>
 
 <%- include('../templates/footer')-%>
