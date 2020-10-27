@@ -175,6 +175,7 @@ router.post('/update-event', async (req, res) => {
     const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
     const venueId = req.body.venueId == '' ? null : req.body.venueId;
 
+    console.log(eventId)
     if (!eventId) {
         return ajax.error(res, "Please provide an event id!");
     }
@@ -229,7 +230,7 @@ router.post('/update-event', async (req, res) => {
         return ajax.success(res, "Successfully created event!", event);
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while creating this event. Please try again later!", 500);
+        return ajax.error(res, "Something went wrong while updating this event. Please try again later!", 500);
     }
 });
 
@@ -305,16 +306,18 @@ router.post('/create-event-seat-types', async (req, res) => {
 });
 
 router.post('/update-event-seat-types', async (req, res) => {
+    const eventId = req.body.eventId;
     const seatTypes = req.body.seatTypes;
 
     // TODO: Do validation for each seat type in array
 
     try {
-        await EventSeatType.updateEventSeatTypes(seatTypes);
-        return ajax.success(res, "Successfully created event seat types!");
+        await EventSeatType.deleteEventSeatTypes(eventId);
+        await EventSeatType.createEventSeatTypes(seatTypes);
+        return ajax.success(res, "Successfully updated event seat types!");
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while creating the event's seat types. Please try again later!", 500);
+        return ajax.error(res, "Something went wrong while updating the event's seat types. Please try again later!", 500);
     }
 });
 
@@ -330,6 +333,22 @@ router.post('/create-event-helpers', async (req, res) => {
     } catch (error) {
         console.error(error);
         return ajax.error(res, "Something went wrong while creating the event's helpers. Please try again later!", 500);
+    }
+});
+
+router.post('/update-event-helpers', async (req, res) => {
+    const eventId = req.body.eventId;
+    const eventHelpers = req.body.eventHelpers;
+
+    // TODO: Do validation for each event helper in array
+
+    try {
+        await EventHelper.deleteEventHelpers(eventId);
+        await EventHelper.createEventHelpers(eventHelpers);
+        return ajax.success(res, "Successfully updated event helpers!");
+    } catch (error) {
+        console.error(error);
+        return ajax.error(res, "Something went wrong while updating the event's helpers. Please try again later!", 500);
     }
 });
 

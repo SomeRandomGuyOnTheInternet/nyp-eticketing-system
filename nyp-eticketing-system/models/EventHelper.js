@@ -44,6 +44,19 @@ module.exports.createEventHelpers = async (eventHelpers) => {
     });
 };
 
+module.exports.createEventHelpers = async (eventHelpers) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await EventHelper.bulkCreate(eventHelpers, {
+                validate: true
+            });
+            resolve(eventHelpers);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports.getHelpersByEventId = async (eventId) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -83,6 +96,21 @@ module.exports.getEventsByHelperId = async (helperId) => {
                 raw: true
             });
             resolve(events);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+module.exports.deleteEventHelpers = async (eventId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await EventHelper.destroy({
+                where: {
+                    eventId: eventId
+                }
+            })
+            resolve(true);
         } catch (error) {
             reject(error);
         }

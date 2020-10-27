@@ -68,3 +68,19 @@ module.exports.getEventSeatTypes = async (eventId) => {
         }
     });
 };
+
+module.exports.deleteEventSeatTypes = async (eventId) => {
+    console.log(eventId)
+    return new Promise(async (resolve, reject) => {
+        try {
+            await EventSeatType.destroy({
+                where: {
+                    eventId: eventId
+                }
+            })
+            resolve(true);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
