@@ -1,7 +1,7 @@
 NYP eTicketing System
 ======
 
-A really cool seat ticketing system that'll blow your socks off woah
+An online system for students and teachers to access and aid in the management and on-site reservation of events to reduce the use of physical tickets.
 
 
 Demo
@@ -10,21 +10,23 @@ Demo
 Open https://nyp-eticketing-system.herokuapp.com/ in a browser.
 
 
-
-Run Locally
+Installation
 ---
 
-_Note: The local version requires a .env file with database and SMS credentials. Please contact us for more details._
-
+_The local version requires a .env file with database and SMS credentials. Please contact us for more details._
+    
 Windows
 
-    > npm install
-    > npm run wst
+	> git clone https://github.com/SomeRandomGuyOnTheInternet/nyp-eticketing-system
+	> npm install
+	> npm run wst
 
 macOS
 
-    $ npm install
-    $ npm run mst
-
-
+	$ git clone https://github.com/SomeRandomGuyOnTheInternet/nyp-eticketing-system
+	$ npm install
+	$ npm run mst
+	
+	
 Open http://127.0.0.1:5000 in a browser.
+    
