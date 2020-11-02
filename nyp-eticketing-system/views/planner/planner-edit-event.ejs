@@ -382,6 +382,7 @@
 
             await updateEventSeatTypes(event.id, seatTypeArray);
             await updateEventHelpers(event.id, eventHelperArray);
+            
             showSuccessToast("Event has been updated successfully!");
         } catch (error) {
             handleError(error);
@@ -395,6 +396,11 @@
     });
 
     getLegendArray = (seats) => {
+        return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+    }
+
+    removeTakenSeatChars = (seats) => {
+        for ()
         return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
     }
 </script>

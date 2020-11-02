@@ -17,33 +17,6 @@ module.exports = EventHelper;
 
 // Every model should have their own version of this
 
-module.exports.createEventHelper = async (eventId, userId) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const eventHelper = await EventHelper.create({
-                eventId: eventId,
-                userId: userId
-            });
-            resolve(eventHelper);
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
-
-module.exports.createEventHelpers = async (eventHelpers) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            await EventHelper.bulkCreate(eventHelpers, {
-                validate: true
-            });
-            resolve(eventHelpers);
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
-
 module.exports.createEventHelpers = async (eventHelpers) => {
     return new Promise(async (resolve, reject) => {
         try {

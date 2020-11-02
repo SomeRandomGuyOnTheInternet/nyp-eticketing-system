@@ -82,7 +82,7 @@
     const nameInput = '#nameInput';
     const columnInput = '#columnInput';
     const rowInput = '#rowInput';
-    const tableWrapper = '#tableWrapper';
+    const mapWrapper = '#tableWrapper';
     const seatMap = '#seatMap';
     const legend = '#legend';
     const saveVenueTypeButton = '#saveVenueTypeButton';
@@ -97,65 +97,55 @@
 
     let selectedSeatType; // This variable will contain the character of the seat type the user's selected
 
-    // Seat chart configuration
-    let sc = {}; // The configuration attribures are stored in the sc object which will then be passed into the bind map function. Upon changing any of the configuration attributes like the map, pass the updated sc object into the reloadMap function
-
-    sc.map = [ // The seat map that the configuration object is instantiated with. For the add venue page we just instantiate with a default map with 4 rows and 6 columns
-        'GGGGGG',
-        'GGGGGG',
-        'GGGGGG',
-        'GGGGGG',
-    ];
-
-    sc.seats = { // The seat types required for this map, with attributes that specify different properties of the seat. In the add venue page, we will only have two seat types at all times (available and empty), so we'll be instantiating the map those two seat types alone
-        // Each seat type is a key-value pair, where the key is the seat character and the value is an object containing various details about the seat type 
-        [defaultSeat]: {
-            category: 'General', // Human readable name for the seat character
-            blocked: false, // Whether it's a blocked seat type
-            classes: 'general', // The css class of the seat
+    let sc = new SeatChart({
+        map: [ // The seat map that the configuration object is instantiated with. For the add venue page we just instantiate with a default map with 4 rows and 6 columns
+            'GGGGGG',
+            'GGGGGG',
+            'GGGGGG',
+            'GGGGGG',
+        ],
+        seatTypes: [
+            new SeatType({ char: defaultSeat, category: 'General', blocked: false, classes: 'general' }),
+            new SeatType({ char: tempEmptySpace, category: 'Empty Space', blocked: false, classes: 'temp-space' })
+        ],
+        naming: {
+            rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
+            getLabel: function (character, row, column) {
+                return row + ':' + column;
+            },
+            getId: function (character, row, column) {
+                return row + ':' + column;
+            }
         },
-        [tempEmptySpace]: {
-            category: 'Empty Space',
-            blocked: false,
-            classes: 'temp-space',
-        }
-    };
-    
-    sc.naming = {
-        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-        getLabel: function (character, row, column) {
-            return row + ':' + column;
+        legend: {
+            node: $(legend),
+            items: [
+                [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
+                [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses],
+            ]					
         },
-        getId: function (character, row, column) {
-            return row + ':' + column;
-        }
-    };
+        mapNode: seatMap,
+        wrapperNode: mapWrapper,
+        legendNode: legend
+    });
 
-    sc.legend = {
-        node: $(legend),
-        items: [
-            [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
-            [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses],
-        ]					
-    },
-
-    sc.click = function () {
-        if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
-            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
-        }
+    sc.onClick = function () {
+        sc.replaceMapSeat(this, selectedSeatType);
     };
 
     // Rest of the functions
     $(document).ready(function() {
-        bindMap(sc, seatMap);
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.bindMap();
+        sc.scaleContentWidth();
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.scaleContentWidth();
     });
 
     $(`${columnInput}, ${rowInput}`).change(function () {
+        addUnloadListener();
+
         const columnVal = $(columnInput).val();
         const rowVal = $(rowInput).val();
 
@@ -175,17 +165,19 @@
         }
 
         if (this.id == "rowInput") {
-            sc.map = resizeRows(columns, rows, sc.map); // Changes number of columns
+            sc.resizeRows(columns, rows); // Changes number of columns
         }
 
         if (this.id == "columnInput") {
-            sc.map = resizeColumns(columns, rows, sc.map); // Changes number of rows
+            sc.resizeColumns(columns, rows); // Changes number of rows
         }
 
-        reloadMap(sc, tableWrapper, seatMap, legend); // Reloads the map with the updated map
+        sc.reloadMap(); // Reloads the map with the updated map
     });
 
     $(document).on("click", ".seatCharts-legendCard", function() {
+        addUnloadListener();
+
         const seatCharAttr = $(this).attr("data-seat-character");
         if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
             const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
@@ -199,23 +191,26 @@
         event.preventDefault();
         $(saveVenueTypeButton).prop('disabled', true);
 
-        const name = toTitleCase($(nameInput).val());
-        const map = replaceMapSeatCharacters(sc.map, tempEmptySpace, emptySpace);
+        sc.replaceMapSeatCharacters(tempEmptySpace, emptySpace);
+
+        const venue = new Venue({ 
+            id: null, 
+            name: $(nameInput).val(), 
+            seatMap: sc.map 
+        });
         
         try {
-            await createVenue(name, map);
-            await flashSuccess("Successfully created a new venue!");
-            $(window).unbind('beforeunload');
+            await postTo(routes.admin.venues, venue);
+            await postTo(routes.index.successFlash, "Successfully created a new venue!");
+
+            removeUnloadListener();
+            
             window.location.replace("/admin/venues");
         } catch (error) {
             handleError(error);
         } finally {
             $(saveVenueTypeButton).prop('disabled', false);
         }
-    });
-
-    $(window).on('beforeunload', function() {
-        return confirm();
     });
 </script>
 

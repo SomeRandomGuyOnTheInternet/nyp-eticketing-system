@@ -3,7 +3,7 @@
 
 // UPDATE THE APPROPRIATE TEMPLATE HERE AND CHANGES WILL BE REFLECTED ON TEMPLATES USED AFTER PAGE LOAD
 
-function renderToastTemplate(notification) {
+function renderToastNode(notification) {
     var $toast = $('<div></div>')
         .attr('id', notification.id)
         .addClass('toast')
@@ -55,7 +55,7 @@ function renderToastTemplate(notification) {
     return $toast;
 };
 
-function renderSelectedSeatConfirmationTemplate(category, seats) {
+function renderSelectedSeatConfirmationNode(category, seats) {
     let $parentDiv = $('<div></div>')
         .addClass('mt-1 mb-2');
 
@@ -90,7 +90,7 @@ function renderSelectedSeatConfirmationTemplate(category, seats) {
     return $parentDiv;
 };
 
-function renderStudentHelperCardTemplate(helper) {
+function renderStudentHelperCardNode(helper) {
     var $card = $('<div></div>')
         .addClass('card mb-2')
         .attr("helper-id", helper.id);
@@ -121,7 +121,7 @@ function renderStudentHelperCardTemplate(helper) {
     return $card;
 };
 
-function renderNoStudentHelpersSelectedTemplate() {
+function renderNoStudentHelpersSelectedNode() {
     var $span = $('<span></span>')
         .addClass('text-secondary h6')
         .text("You have not selected any student helpers!");

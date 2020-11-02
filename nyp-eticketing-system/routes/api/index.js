@@ -6,17 +6,16 @@ const moment = require('moment');
 const XML = require('pixl-xml');
 const router = express.Router();
 
-const flash = require('../utils/flash');
-const ajax = require('../utils/ajax');
+const flash = require('../../utils/flash');
+const ajax = require('../../utils/status');
 
-const User = require('../models/User');
-const Venue = require('../models/Venue');
-const Event = require('../models/Event');
-const EventSeatType = require('../models/EventSeatType');
-const EventAttendee = require('../models/EventAttendee');
-const EventHelper = require('../models/EventHelper');
-const EventReservedSeat = require('../models/EventReservedSeat');
-
+const User = require('../../models/User');
+const Venue = require('../../models/Venue');
+const Event = require('../../models/Event');
+const EventSeatType = require('../../models/EventSeatType');
+const EventAttendee = require('../../models/EventAttendee');
+const EventHelper = require('../../models/EventHelper');
+const EventReservedSeat = require('../../models/EventReservedSeat');
 
 router.get('/test', async (req, res) => {
     try {
@@ -29,7 +28,6 @@ router.get('/test', async (req, res) => {
     }
 });
 
-
 router.post('/success-flash', async (req, res) => {
     flash.success(req, req.body.message);
     return ajax.success(res);
@@ -39,7 +37,6 @@ router.post('/error-flash', async (req, res) => {
     flash.error(req, req.body.message);
     return ajax.success(res);
 });
-
 
 router.post('/create-venue', async (req, res) => {
     const name = req.body.name;
@@ -109,7 +106,6 @@ router.get('/delete-venue/:id', async (req, res) => {
         return ajax.error(res, "Something went wrong while deleting this venue!", 500);
     }
 });
-
 
 router.post('/create-event', async (req, res) => {
     const name = req.body.name;
@@ -236,10 +232,6 @@ router.post('/update-event', async (req, res) => {
 
 router.get('/events/:eventId/', async (req, res) => {
     const eventId = req.params.eventId;
-
-    if (!eventId) {
-        return ajax.error(res, "Please enter a valid id for the venue!");
-    }
 
     try {
         let event = await Event.getEventById(eventId);
@@ -483,4 +475,4 @@ router.post('/sms-reservation-confirm', async (req, res) => {
     }
 });
 
-module.exports = router;    
+module.exports = router;

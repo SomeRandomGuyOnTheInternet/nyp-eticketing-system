@@ -345,7 +345,7 @@
         $(reservationConfirmName).text(reservationNameInputVal);
         $(reservationConfirmPhNo).text(reservationPhoneNumberInputVal);
         for (const category in sortedSeats) {
-            $(selectedSeatConfirmationWrapper).append(renderSelectedSeatConfirmationTemplate(category, sortedSeats[category]));
+            $(selectedSeatConfirmationWrapper).append(renderSelectedSeatConfirmationNode(category, sortedSeats[category]));
         }
 
         $(reservationDetailsModal).modal();
@@ -400,7 +400,39 @@
         }, []);
         legends.push(["G", "blocked", "Blocked"]);
         return legends;
-    }
+    };
+
+    getQuadrantDimensions = (quadrant) => {
+		if (sc.map.length == 0) {
+			return throwException("The given map has no rows!");
+		}
+
+		if (sc.map[0].length == 0) {
+			return throwException("The given map has no columns!");
+		}
+
+		const rowStart = 0;
+		const colStart = 0;
+		const rowMid = Math.floor(sc.map.length / 2);
+		const colMid = Math.floor(sc.map[0].length / 2);
+		const rowEnd = sc.map.length;
+		const colEnd = sc.map[0].length;
+
+		switch (quadrant) {
+			case "whole":
+				return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
+			case "topLeft":
+				return [[rowStart, Math.max(1, rowMid)], [colStart, Math.max(1, colMid)]];
+			case "topRight":
+				return [[rowStart, Math.max(1, rowMid)], [colMid, Math.max(1, colEnd)]];
+			case "bottomLeft":
+				return [[rowMid, Math.max(1, rowEnd)], [colStart, Math.max(1, colMid)]];
+			case "bottomRight":
+				return [[rowMid, Math.max(1, rowEnd)], [colMid, Math.max(1, colEnd)]];
+			default:
+				return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
+		}
+	};
 
     $(window).on('beforeunload', function() {
         return confirm();

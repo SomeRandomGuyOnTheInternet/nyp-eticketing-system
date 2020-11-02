@@ -37,17 +37,6 @@ module.exports = Event;
 
 // Every model should have their own version of this
 
-module.exports.createEvent = async (event) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const newEvent = await Event.create(event);
-            resolve(newEvent);
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
-
 module.exports.getEventById = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {

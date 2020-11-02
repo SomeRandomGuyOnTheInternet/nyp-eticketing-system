@@ -29,30 +29,6 @@ module.exports = EventSeatType;
 
 // Every model should have their own version of this
 
-module.exports.createEventSeatType = async (eventSeatType) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const createdEventSeatType = await EventSeatType.create(eventSeatType);
-            resolve(createdEventSeatType);
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
-
-module.exports.createEventSeatTypes = async (eventSeatTypes) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            await EventSeatType.bulkCreate(eventSeatTypes, {
-                validate: true
-            });
-            resolve(eventSeatTypes);
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
-
 module.exports.getEventSeatTypes = async (eventId) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -70,7 +46,6 @@ module.exports.getEventSeatTypes = async (eventId) => {
 };
 
 module.exports.deleteEventSeatTypes = async (eventId) => {
-    console.log(eventId)
     return new Promise(async (resolve, reject) => {
         try {
             await EventSeatType.destroy({

@@ -2,6 +2,8 @@
 // TODO: Use camelcase for html ids
 // TODO: Update console.log to morgan
 // TODO: Create 404 page
+// TODO: minify the hosted version
+// TODO: use json web tokens to make api more secure
 
 const express = require('express');
 const session = require('express-session');
@@ -23,7 +25,11 @@ const mainRoute = require('./routes/main');
 const helperRoute = require('./routes/helper');
 const plannerRoute = require('./routes/planner');
 const adminRoute = require('./routes/admin');
-const apiRoute = require('./routes/api');
+
+const apiRoute = require('./routes/api/index');
+const helperApiRoute = require('./routes/api/helper');
+const plannerApiRoute = require('./routes/api/planner');
+const adminApiRoute = require('./routes/api/admin');
 
 // Our app is a blank canvas at this point (wow so artistic)
 const app = express();
@@ -85,6 +91,8 @@ app.use('/helper', helperRoute);
 app.use('/planner', plannerRoute);
 app.use('/admin', adminRoute);
 app.use('/api', apiRoute);
+app.use('/api/admin', adminApiRoute);
+app.use('/api/planner', plannerApiRoute);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });

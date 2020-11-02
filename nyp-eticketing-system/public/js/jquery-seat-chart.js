@@ -6,6 +6,8 @@
  * Released under the MIT license
  */
 
+//  TODO: Convert to javascript/react
+
 (function($) {
 		
 	//'use strict';	
@@ -17,7 +19,7 @@
 			return this.data('seatCharts');
 		}
 		
-		var fn = this,
+		var fn       = this,
 			seats    = {},
 			seatIds  = [],
 			settings = {
@@ -635,171 +637,3 @@
 	
 	
 })(jQuery);
-
-// Helper functions
-// General dependency functions
-resizeArray = (arr, size, defval) => {
-    var delta = arr.length - size;
-
-    if (delta > 0) {
-        arr.length = size;
-    } else {
-        while (delta++ < 0) { 
-            arr.push(defval); 
-        }
-    }
-
-    return arr;
-};
-
-// Responsive functions
-scaleContentWidth = (parent, content) => { // This function scales the content's width proportional to the parent container's width
-    const orgHeight = $(content)[0].getBoundingClientRect().height; // This gets the initial height of the content before the transformation
-
-	const scale = $(parent).width() / ($(content).width()); // This equation get us the scale of the parent's width in relation to the container's width
-	$(content).css('transform', 'scale(' + Math.min(1.75, scale) + ')'); // We then apply the scale obtained above to the content's scale css property to scale appropriately
-	$(content).css('transform-origin', 'top left'); // This just makes sure we scale it from the correct point
-    
-    resizeParentHeight(orgHeight, parent, content);
-};
-
-resizeParentHeight = (orgHeight, parent, content) => { // This function resizes the parent's height using the delta between the original hight and the current height of the content
-    const newHeight = $(content)[0].getBoundingClientRect().height; // Here we get the new height of the content
-    const deltaHeight = newHeight - orgHeight; // Then we get the delta between the original height of the content and the new height of the content
-    $(parent).css("height", `${$(parent).height() + deltaHeight}px`); // The delta is then added with the parent's height to ensure the parent's height is updated according to how much the difference between the original and the new content height is.
-};
-
-// Seat map editing functions
-replaceMapSeat = (map, seat, selectedSeatType, selectedSeatTypeDetails) => {
-    if (selectedSeatTypeDetails) {
-        seat.settings.character = selectedSeatType;
-        seat.settings.data = selectedSeatTypeDetails;
-
-        replaceMapSeatClasses(seat.settings.$node, selectedSeatTypeDetails.classes);
-        replaceMapSeatCharacter(map, seat.settings, selectedSeatType);
-    };
-
-    return 'available';
-};
-
-replaceMapSeatCharacter = (map, seatSettings, newCharacter) => {
-    map[seatSettings.row] = map[seatSettings.row].replaceAt(seatSettings.column, newCharacter);
-};
-
-replaceMapSeatClasses = (node, classes) => {
-    node.removeClass();
-    node
-        .addClass("seatCharts-seat seatCharts-cell")
-        .addClass(classes)
-        .addClass("available");
-};
-
-replaceMapSeatCharacters = (map, characterToReplace, newCharacter) => {
-    for (i = 0; i < map.length; i++) {
-        map[i] = map[i].replaceAll(characterToReplace, newCharacter);
-    }
-
-    return map;
-};
-
-resizeRows = (columns, rows, map) => {
-    const defaultRow = defaultSeat.repeat(columns); // The default row is just the one that gets assigned to any new row that's created. We take the number of columns the user input and multiply it by the default seat type (general, G) to get it
-	return resizeArray(map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
-};
-
-resizeColumns = (columns, rows, map) => {
-    for (i = 0; i < rows; i++) { // To change the number of columns we have to loop through each row indvidually and resize them
-        const splitRow = [...map[i]]; // Since rows are stored as strings in the map, we have to split them into an array
-        map[i] = resizeArray(splitRow, columns, defaultSeat).join(""); // Then we just have to join the array into a string and then put them back into the map
-	}
-
-	return map
-};
-
-// Quadrant zoom functions
-getQuadrantDimensions = (map, quadrant) => {
-	if (map.length == 0) {
-		return throwException("The given map has no rows!");
-	}
-
-	if (map[0].length == 0) {
-		return throwException("The given map has no columns!");
-	}
-
-	const rowStart = 0;
-	const colStart = 0;
-	const rowMid = Math.floor(map.length / 2);
-	const colMid = Math.floor(map[0].length / 2);
-	const rowEnd = map.length;
-	const colEnd = map[0].length;
-
-	switch (quadrant) {
-		case "whole":
-			return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
-		case "topLeft":
-			return [[rowStart, Math.max(1, rowMid)], [colStart, Math.max(1, colMid)]];
-		case "topRight":
-			return [[rowStart, Math.max(1, rowMid)], [colMid, Math.max(1, colEnd)]];
-		case "bottomLeft":
-			return [[rowMid, Math.max(1, rowEnd)], [colStart, Math.max(1, colMid)]];
-		case "bottomRight":
-			return [[rowMid, Math.max(1, rowEnd)], [colMid, Math.max(1, colEnd)]];
-		default:
-			return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
-	}
-};
-
-spliceMapRow = (map, startRow, endRow) => {
-	return map.splice(startRow, Math.max(1, endRow));
-};
-
-spliceMapCol = (map, startCol, endCol) => {
-	for (i = 0; i < map.length; i++) {
-        const splitRow = [...map[i]].splice(startCol, Math.max(1, endCol)); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
-        map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
-	}
-	
-	return map;
-};
-
-// Others
-disableBlockedSeats = (activeMap, seats) => {
-	for (const char in seats) {
-		if (seats[char].blocked) {
-			activeMap.find(char).status('blocked');
-		}	
-	}
-};
-
-disableReservedSeats = (activeMap, reservedSeats) => {
-	for (i = 0; i < reservedSeats.length; i++) {
-		const reservedSeat = activeMap.get(reservedSeats[i].seatNumber);
-		if (typeof reservedSeat !== 'undefined' && reservedSeat !== null) {
-			reservedSeat.status('reserved');
-		}
-	}
-};
-
-// Binding and reloading map stuff
-reloadMap = (sc, tableWrapperNode, seatMapNode, legendNode = '#legend') => {
-	const orgHeight = $(seatMapNode)[0].getBoundingClientRect().height; // Get the original height of the seat map before changing the number of rows
-
-	unbindMap(seatMapNode, legendNode);
-	const activeMap = bindMap(sc, seatMapNode);
-
-	resizeParentHeight(orgHeight, tableWrapperNode, seatMapNode);
-	scaleContentWidth(tableWrapperNode, seatMapNode); // Scale the map so the columns are all visible
-
-	return activeMap;
-};
-
-unbindMap = (seatMapNode, legendNode) => {
-	$('.seatCharts-row').remove();
-	$(legendNode).empty();
-    $(`${seatMapNode}, ${seatMapNode} *`).unbind().removeData();
-    $(seatMapNode).attr('aria-activedescendant', null);
-};
-
-bindMap = (sc, seatMapNode) => {
-	return $(seatMapNode).seatCharts(sc);
-};

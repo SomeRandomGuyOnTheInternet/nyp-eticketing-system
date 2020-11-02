@@ -51,6 +51,17 @@ handleError = (error) => { // Use inside the catch block of a try catch
     return false;
 };
 
+addUnloadListener = () => {
+    window.addEventListener('beforeunload', (event) => {
+        event.preventDefault();
+        event.returnValue = '';
+    });
+};
+
+removeUnloadListener = () => {
+    window.removeEventListener('beforeunload', () => {}, true);
+};
+
 toggleHighlight = (node, nodeCssClass) => {
     if ($(node).hasClass("highlighted")) {
         $(nodeCssClass).removeClass("highlighted");
@@ -73,7 +84,7 @@ showDangerToast = (message) => {
 };
 
 showToast = (notification) => {
-    let toastNode = renderToastTemplate(notification); // Upon clicking each toast's buttons, we call pass the template string we defined in template.js and the variables required in the templates to ejs so it gives us a complete html element with all the data filled in
+    let toastNode = renderToastNode(notification); // Upon clicking each toast's buttons, we call pass the template string we defined in template.js and the variables required in the templates to ejs so it gives us a complete html element with all the data filled in
     $("#toastContainer").append(toastNode); // Then we append the resulting toast html to the toast container defined in footer.ejs
     $('.toast').not('.hide').toast('show'); // Show the unhidden toasts in the toast container, which includes the one we just appended
 };
@@ -147,32 +158,18 @@ populateSelectedHelperColumn = (helpers, selectedHelpersColNode) => {
     
     for (i = 0; i < helpers.length; i++) {
         if (helpers[i].selected) {
-            $(selectedHelpersColNode).append(renderStudentHelperCardTemplate(helpers[i]));
+            $(selectedHelpersColNode).append(renderStudentHelperCardNode(helpers[i]));
         }
     }
 
     if ($(selectedHelpersColNode).is(':empty')) {
-        $(selectedHelpersColNode).append(renderNoStudentHelpersSelectedTemplate());
+        $(selectedHelpersColNode).append(renderNoStudentHelpersSelectedNode());
     }
 };
 
 getSelectedHelper = (helpers, selectNode) => {
     return getSelectedObjectFromSelectNode(helpers, selectNode);
 }
-
-
-populateVenueSelect = (venues, venueSelectNode) => {
-    $(`${venueSelectNode} option`).remove();
-    
-    for (i = 0; i < venues.length; i++) {
-        $(venueSelectNode).append($('<option>', {
-            value: i,
-            text: venues[i].name
-        }));
-    }
-
-    $(venueSelectNode).val($(`${venueSelectNode} option:first`).val());
-};
 
 getSelectedVenue = (venues, selectNode) => {
     return getSelectedObjectFromSelectNode(venues, selectNode);

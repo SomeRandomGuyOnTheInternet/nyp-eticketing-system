@@ -52,11 +52,4 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 	});
 });
 
-router.get('/eventtopright', auth.isHelper, (req, res) => {
-	res.render('helper/helper-view-event-quadrant', { 
-		title: "Event", 
-		user: req.user
-	});;
-});
-
 module.exports = router;
