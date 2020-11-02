@@ -5,15 +5,15 @@ An online system for students and teachers to access and aid in the management a
 
 
 Demo
----
+----
 
 Open https://nyp-eticketing-system.herokuapp.com/ in a browser.
 
 
 Installation
----
+----
 
-_The local version requires a .env file with database and SMS credentials. Please contact us for more details._
+The local version requires a .env file with database and SMS credentials. Please contact us for more details.
     
 Windows
 
