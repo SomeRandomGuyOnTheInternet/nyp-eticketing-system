@@ -56,11 +56,6 @@ select {
     display: block;
 }
 
-.highlighted {
-    background-color: #faf6d1 !important;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.15) inset !important;
-}
-
 .vh-100-nav {
     height: calc(100vh - 175px) !important;
 }

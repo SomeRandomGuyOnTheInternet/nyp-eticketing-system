@@ -24,11 +24,11 @@
                             <label for="searchReservationInput" class="card-input-label">
                                 <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                 <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
-                                    Reservation</small>
+                                    Reservations</small>
                                 <!-- The small element is where we actually write down what the input does  -->
                             </label>
-                            <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="text"
-                                placeholder="E.g. 91864675 ">
+                            <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="search"
+                                placeholder="E.g. 91864675">
                             <!-- This is where the user actually inputs all their stuff  -->
                         </div>
                     </div>
@@ -160,11 +160,12 @@
                             <div class="d-flex">
                                 <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                                 <div id="seatDetailsSeatCell" class="seatCharts-seat seatCharts-cell available" style="height: 50px; width: 50px;"></div>    
-                                <div class="ml-3">
+                                <div class="ml-3 w-100">
                                     <span id="seatDetailsId" class="align-self-center h4"></span>
                                     <br>
                                     <span id="seatDetailsDescription" class="align-self-center"></span>
-                                </div>                       
+                                </div>
+                                <i id="seatDetailsDelete" class="d-flex justify-content-end align-items-center fa fa-trash text-danger" style="font-size: 25px;"></i>
                             </div>
                         </div>
                     </div>
@@ -265,12 +266,16 @@
                 return 'selected';
             case 'selected':
                 return 'available';
-            case 'reserved':
-                populateSeatDetailsModal(this.settings.id, "Lam En Qing", this.settings.data.classes);
-                return 'reserved';
             case 'blocked':
                 populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);
                 return 'blocked';
+            case 'highlighted':
+            case 'reserved':
+                const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
+                const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
+                if (attendee.length !== 1) return this.style();;
+                populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name}`, this.settings.data.classes);
+                return this.status();
             default:
                 return this.style();
         }
@@ -288,6 +293,7 @@
         sc.seats = getSeatsObject(event.seatTypes);
         sc.legend.items = getLegendArray(sc.seats);
 
+        console.log(event)
         activeMap = bindMap(sc, seatMap);
         scaleContentWidth(tableWrapper, seatMap);
         disableBlockedSeats(activeMap, sc.seats);
@@ -298,9 +304,31 @@
         scaleContentWidth(tableWrapper, seatMap);
     });
 
-    $(searchReservationInput).change(function() {
-        activeMap.find('reserved').status('highlighted');
+    $(searchReservationInput).keydown(function(e) {
+        if (e.keyCode == 13) {
+            const attendee = event.attendees.filter(attendee => attendee.phoneNumber == e.target.value);
+
+            if (attendee.length !== 1) {
+                return showDangerToast("This phone number is not tied to any reservation!");
+            }
+            
+            const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendee[0].id);
+
+            if (seatDetails.length === 0) {
+                return showDangerToast("This attendee does not have any reserved seats for this event!");
+            }
+
+            activeMap.get(seatDetails.map(seat => seat.seatNumber)).status('highlighted');
+            document.getElementById(seatChartCard.substring(1)).scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+        }
     });
+
+    document.getElementById(searchReservationInput.substring(1)).addEventListener("search", function(e) {
+        if (e.target.value.length === 0){
+            activeMap.find('highlighted').status('reserved');
+        }
+    });
+
 
     $(zoomQuadrantSelect).change(function() {
         sc.map = Array.from(event.seatMap);
