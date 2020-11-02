@@ -1,17 +1,32 @@
-NYP Seat Reservation System
+NYP eTicketing System
 ======
 
-A really cool seat booking system that'll blow your socks off woah
+An online system for students and teachers to access and aid in the management and on-site reservation of events to reduce the use of physical tickets.
 
-Run
+
+Demo
 ---
 
-    $ cd ./nyp-seat-reservation
-    $ nodemon
+Open https://nyp-eticketing-system.herokuapp.com/ in a browser.
 
-Or on Windows cmd::
 
-    > cd ./nyp-seat-reservation
-    > nodemon
+Installation
+---
 
+_The local version requires a .env file with database and SMS credentials. Please contact us for more details._
+    
+Windows
+
+	> git clone https://github.com/SomeRandomGuyOnTheInternet/nyp-eticketing-system
+	> npm install
+	> npm run wst
+
+macOS
+
+	$ git clone https://github.com/SomeRandomGuyOnTheInternet/nyp-eticketing-system
+	$ npm install
+	$ npm run mst
+	
+	
 Open http://127.0.0.1:5000 in a browser.
+    
