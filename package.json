@@ -1,7 +1,7 @@
 {
   "name": "nyp-eticketing-system",
   "version": "3.0.0",
-  "description": "A really cool seat ticketing system that'll blow your socks off man woah",
+  "description": "An online system for students and teachers to access and aid in the management and on-site reservation of events to reduce the use of physical tickets.",
   "main": "app.js",
   "scripts": {
     "mst": "cd ./nyp-eticketing-system && open-cli http://localhost:5000 -- 'google chrome' && nodemon app",
