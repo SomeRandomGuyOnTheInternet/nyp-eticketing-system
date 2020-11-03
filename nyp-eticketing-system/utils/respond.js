@@ -3,11 +3,11 @@ module.exports.error = (res, message = "Something went wrong while processing yo
         case 400:
             return res.status(400).json({ status: 400, message: message });
         case 404:
-            return res.status(404).send(message);
+            return res.status(404).json({ status: 404, message: message });
         case 500:
-            return res.status(500).send(message);
+            return res.status(500).json({ status: 500, message: message });
         default:
-            return res.status(500).send(message);
+            return res.status(500).json({ status: 400, message: message });
     }
 }
 

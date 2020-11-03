@@ -3,21 +3,20 @@
 const express = require('express');
 const router = express.Router();
 
-const status = require('../../utils/status');
+const respond = require('../../utils/respond');
 const auth = require('../../utils/api-auth');
 
 const Venue = require('../../models/Venue');
 const User = require('../../models/User');
 
-
 router.get('/helpers', async (req, res) => {
     try {
         const helpers = await User.getHelpers();
         
-        return status.success(res, "Successfully gotten all helpers!", helpers);
+        return respond.success(res, "All helpers have been retrieved successfully!", helpers);
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while getting all the helpers. Please try again later!", 500);
+        return respond.error(res, "Something went wrong while getting all the helpers. Please try again later!", 500);
     }
 });
 
@@ -27,10 +26,10 @@ router.get('/venues', async (req, res) => {
             order: [['name', 'ASC']]
         });
 
-        return status.success(res, "Successfully gotten all venues!", venues);
+        return respond.success(res, "All venues have been retrieved successfully!", venues);
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while getting all venues!", 500);
+        return respond.error(res, "Something went wrong while getting all venues!", 500);
     }
 });
 
@@ -40,12 +39,12 @@ router.get('/venues/:id', async (req, res) => {
     try {
         const venue = await Venue.findByPk(id);
 
-        if (!venue) return ajax.error(res, "That venue does not exist!", 404);
+        if (!venue) return respond.error(res, "That venue does not exist!", 404);
 
-        return status.success(res, "Successfully gotten all venues!", venue);
+        return respond.success(res, "Venue details have been retrieved successfully!", venue);
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while getting all venues!", 500);
+        return respond.error(res, "Something went wrong while getting all venues!", 500);
     }
 });
 
@@ -53,8 +52,8 @@ router.post('/venues', auth.isAdmin, async (req, res) => {
     const name = req.body.name;
     const seatMap = req.body.seatMap;
 
-    if (!name) return ajax.error(res, "Please provide a venue name!", 400);
-    if (!seatMap) return ajax.error(res, "Please provide a seat map for the venue!", 400);
+    if (!name) return respond.error(res, "Please provide a venue name!", 400);
+    if (!seatMap) return respond.error(res, "Please provide a seat map for the venue!", 400);
 
     try {
         await Venue.create({
@@ -62,10 +61,10 @@ router.post('/venues', auth.isAdmin, async (req, res) => {
             seatMap: JSON.stringify(seatMap)
         });
 
-        return status.success(res, "Successfully added venue!");
+        return respond.success(res, "A new venue has been created successfully!");
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while creating this venue!", 500);
+        return respond.error(res, "Something went wrong while creating this venue!", 500);
     }
 });
 
@@ -74,8 +73,8 @@ router.put('/venues/:id', auth.isAdmin, async (req, res) => {
     const name = req.body.name;
     const seatMap = req.body.seatMap;
 
-    if (!name) return ajax.error(res, "Please provide a venue name!");
-    if (!seatMap) return ajax.error(res, "Please provide a seat map for the venue!");
+    if (!name) return respond.error(res, "Please provide a venue name!");
+    if (!seatMap) return respond.error(res, "Please provide a seat map for the venue!");
 
     try {
         await Venue.update({
@@ -86,10 +85,10 @@ router.put('/venues/:id', auth.isAdmin, async (req, res) => {
             where: { id: id } 
         });
 
-        return status.success(res, "Successfully updated venue!");
+        return respond.success(res, "The venue has been updated successfully!");
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while updating this venue!", 500);
+        return respond.error(res, "Something went wrong while updating this venue!", 500);
     }
 });
 
@@ -99,12 +98,11 @@ router.delete('/venues/:id', auth.isAdmin, async (req, res) => {
     try {
         await Venue.destroy({ where: { id: id } });
 
-        return status.success(res, "Successfully deleted venue!");
+        return respond.success(res, "The venue has been deleted successfully!");
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while deleting this venue!", 500);
+        return respond.error(res, "Something went wrong while deleting this venue!", 500);
     }
 });
-
 
 module.exports = router;

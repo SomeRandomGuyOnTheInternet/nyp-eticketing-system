@@ -3,7 +3,9 @@
 const express = require('express');
 const router = express.Router();
 
-const ajax = require('../../utils/status');
+const sequelize = require('../../config/DBConfig');
+
+const respond = require('../../utils/respond');
 const auth = require('../../utils/api-auth');
 
 const Event = require('../../models/Event');
@@ -13,17 +15,29 @@ const Venue = require('../../models/Venue');
 const EventReservedSeat = require('../../models/EventReservedSeat');
 const User = require('../../models/User');
 
+router.get('/helpers', auth.isPlanner, async (req, res) => {
+    try {
+        const helpers = await User.getHelpers();
+
+        return respond.success(res, "All helpers have been retrieved successfully!", helpers);
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting all helpers!", 500);
+    }
+});
 
 router.get('/venues', auth.isPlanner, async (req, res) => {
     try {
-        const venues = await Venue.findAll({
+        let venues = await Venue.findAll({
             order: [['name', 'ASC']]
         });
 
-        return ajax.success(res, "Successfully gotten all venues!", venues);
+        venues.forEach(v => v.seatMap = JSON.parse(v.seatMap));
+
+        return respond.success(res, "All venues have been retrieved successfully!", venues);
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while getting all venues!", 500);
+        return respond.error(res, "Something went wrong while getting all venues!", 500);
     }
 });
 
@@ -31,16 +45,18 @@ router.get('/events/:id', auth.isPlanner, async (req, res) => {
     const eventId = req.params.id;
 
     try {
-        let event = await Event.getEventById(eventId);
+        let event = await Event.findByPk(eventId, { raw: true });
+        event.venue = await Venue.findByPk(event.venueId, { raw: true });
         event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
         event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
-        event.venue = await Venue.getVenueById(event.venueId);
         event.helpers = await EventHelper.getHelpersByEventId(eventId);
 
-        return ajax.success(res, "Successfully gotten event details!", event);
+        event.seatMap = JSON.parse(event.seatMap);
+
+        return respond.success(res, "Event details have been retrieved successfully!", event);
     } catch (error) {
         console.error(error);
-        return ajax.error(res, "Something went wrong while getting the event details. Please try again later!", 500);
+        return respond.error(res, "Something went wrong while getting the event details. Please try again later!", 500);
     }
 });
 
@@ -48,20 +64,20 @@ router.post('/events', auth.isPlanner, async (req, res) => {
     const name = req.body.name;
     const seatMap = JSON.stringify(req.body.seatMap);
     const startDateTime = req.body.startDateTime;
-    const seatsPerReservation = req.body.seatsPerReservation;
+    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;
-    const eventHelpers = req.body.helpers;
+    const eventHelpers = req.body.eventHelpers;
 
-    if (!venueId) return ajax.error(res, "Please enter a valid id for the venue!");
-    if (!name) return ajax.error(res, "Please enter a event name!");
-    if (!seatMap) return ajax.error(res, "Please enter a seat map for the event!");
-    if (!startDateTime) return ajax.error(res, "Please enter a valid start date/time for the event!");
+    if (!venueId) return respond.error(res, "Please provide a valid id for the venue!");
+    if (!name) return respond.error(res, "Please provide a event name!");
+    if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
+    if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
     if (seatsPerReservation) {
-        if (isNaN(seatsPerReservation)) return ajax.error(res, "Please enter a valid max number of seats per reservation!");
-        else if (seatsPerReservation < 1) return ajax.error(res, "Please enter a higher number of seats per reservation!");
-        else if (seatsPerReservation > 10) return ajax.error(res, "Please enter a lower number of seats per reservation!");
+        if (isNaN(seatsPerReservation)) return respond.error(res, "Please provide a valid max number of seats per reservation!");
+        else if (seatsPerReservation < 1) return respond.error(res, "Please provide a higher number of seats per reservation!");
+        else if (seatsPerReservation > 10) return respond.error(res, "Please provide a lower number of seats per reservation!");
     }
 
     let t = await sequelize.transaction();
@@ -76,48 +92,62 @@ router.post('/events', auth.isPlanner, async (req, res) => {
             venueId: venueId
         },{
             transaction: t
-        });  
-        const newSeatTypes = await EventSeatType.bulkCreate(seatTypes, {
+        });
+
+        seatTypes.forEach(s => s.eventId = newEvent.id);
+        eventHelpers.forEach(h => h.eventId = newEvent.id);
+
+        await EventSeatType.bulkCreate(seatTypes, {
             validate: true,
             transaction: t
         });
-        const newEventHelpers = await EventHelper.bulkCreate(eventHelpers, {
+        await EventHelper.bulkCreate(eventHelpers, {
             validate: true,
             transaction: t
         });
         
         await t.commit();
 
-        return ajax.success(res, "Successfully created event!", event);
+        return respond.success(res, "A new event has been created successfully!");
     } catch (error) {
         await t.rollback();
 
         console.error(error);
-        return ajax.error(res, "Something went wrong while creating this event. Please try again later!", 500);
+        return respond.error(res, "Something went wrong while creating this event. Please try again later!", 500);
     }
 });
 
 router.put('/events/:id', auth.isPlanner, async (req, res) => {
-    const eventId = req.body.eventId;
+    const eventId = req.params.id;
+
     const name = req.body.name;
     const seatMap = JSON.stringify(req.body.seatMap);
     const startDateTime = req.body.startDateTime;
-    const prioritiseBackRows = req.body.prioritiseBackRows;
     const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
-    const venueId = req.body.venueId == '' ? null : req.body.venueId;
-    
-    if (!venueId) return ajax.error(res, "Please enter a valid id for the venue!");
-    if (!name) return ajax.error(res, "Please enter a event name!");
-    if (!seatMap) return ajax.error(res, "Please enter a seat map for the event!");
-    if (!startDateTime) return ajax.error(res, "Please enter a valid start date/time for the event!");
+    const prioritiseBackRows = req.body.prioritiseBackRows;
+    const venueId = req.body.venueId;
+    const seatTypes = req.body.seatTypes;
+    const eventHelpers = req.body.eventHelpers;
+
+    console.log(prioritiseBackRows)
+
+    if (!venueId) return respond.error(res, "Please provide a valid id for the venue!");
+    if (!name) return respond.error(res, "Please provide a event name!");
+    if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
+    if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
     if (seatsPerReservation) {
-        if (isNaN(seatsPerReservation)) return ajax.error(res, "Please enter a valid max number of seats per reservation!");
-        else if (seatsPerReservation < 1) return ajax.error(res, "Please enter a higher number of seats per reservation!");
-        else if (seatsPerReservation > 10) return ajax.error(res, "Please enter a lower number of seats per reservation!");
+        if (isNaN(seatsPerReservation)) return respond.error(res, "Please provide a valid max number of seats per reservation!");
+        else if (seatsPerReservation < 1) return respond.error(res, "Please provide a higher number of seats per reservation!");
+        else if (seatsPerReservation > 10) return respond.error(res, "Please provide a lower number of seats per reservation!");
     }
 
+    seatTypes.forEach(s => s.eventId = eventId);
+    eventHelpers.forEach(h => h.eventId = eventId);
+
+    let t = await sequelize.transaction();
+
     try {
-        const event = await Event.update(
+        await Event.update(
 			{
                 name: name,
                 seatMap: seatMap,
@@ -129,25 +159,53 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
             { 
                 where: { 
                     id: eventId 
-                } 
+                },
+                transaction: t
             },
-		);
+        );
+
+        await EventSeatType.destroy({ where: { eventId: eventId }, transaction: t });
+        await EventSeatType.bulkCreate(seatTypes, {
+            validate: true,
+            transaction: t
+        });
+
+        await EventHelper.destroy({ where: { eventId: eventId }, transaction: t });
+        await EventHelper.bulkCreate(eventHelpers, {
+            validate: true,
+            transaction: t
+        });
         
-        return ajax.success(res, "Successfully created event!", event);
+        await t.commit();
+
+        return respond.success(res, "The event has been updated successfully!");
     } catch (error) {
+        await t.rollback();
+
         console.error(error);
-        return ajax.error(res, "Something went wrong while updating this event. Please try again later!", 500);
+        return respond.error(res, "Something went wrong while updating this event. Please try again later!", 500);
     }
 });
 
-router.get('/helpers', auth.isPlanner, async (req, res) => {
-    try {
-        const helpers = await User.getHelpers();
+router.delete('/events/:id', auth.isPlanner, async (req, res) => {
+    const id = req.params.id;
 
-        return ajax.success(res, "Successfully gotten all helpers!", helpers);
-    } catch (error) {
+    let t = await sequelize.transaction();
+    
+    try {
+        await Event.destroy({ where: { id: id }, transaction: t });
+        await EventSeatType.destroy({ where: { eventId: id }, transaction: t });
+        await EventReservedSeat.destroy({ where: { eventId: id }, transaction: t });
+        await EventHelper.destroy({ where: { eventId: id }, transaction: t });
+
+        await t.commit();
+
+        return respond.success(res, "The event has been deleted successfully!");
+    } catch (error) {        
+        await t.rollback();
+
         console.error(error);
-        return ajax.error(res, "Something went wrong while getting all helpers!", 500);
+        return respond.error(res, "Something went wrong while deleting this event!", 500);
     }
 });
 

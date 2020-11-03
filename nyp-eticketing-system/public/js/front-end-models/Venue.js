@@ -6,13 +6,7 @@ class Venue {
         this.createdAt = obj.createdAt;
     };
 
-    objectifyForDb() {
-        return {
-            
-        }
-    }
-
-    static parseDbResult(result) {
+    static parseApiResult(result) {
         return new Venue({
             id: result.id,
             name: result.name,

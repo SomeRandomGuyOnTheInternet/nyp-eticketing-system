@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 
 const flash = require('../../utils/flash');
-const auth = require('../../utils/check-auth');
+const auth = require('../../utils/page-load-auth');
 
 const User = require('../../models/User');
 const Venue = require('../../models/Venue');
@@ -75,7 +75,7 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
 		isDeleted: false
 	});
 
-	flash.success(req, "Planner account has been successfully created!");
+	flash.success(req, "Planner account has been created successfully!");
 	return res.redirect('/admin/planners');
 });
 
@@ -132,7 +132,7 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 		isDeleted: false
 	});
 
-	flash.success(req, "Planner account has been successfully created!");
+	flash.success(req, "Helper account has been created successfully!");
 	return res.redirect('/admin/helpers');
 });
 
@@ -142,7 +142,7 @@ router.get('/deleteplanner/:id', async (req, res) => {
 
 	await User.destroy({ where: { id: id } });
 
-	flash.success(req, 'Successfully deleted planner account!');
+	flash.success(req, 'Planner account has been deleted successfully!');
 	res.redirect('/admin/planners');
 });
 
@@ -152,7 +152,7 @@ router.get('/deletehelper/:id', async (req, res) => {
 
 	await User.destroy({ where: { id: id } });
 
-	flash.success(req, 'Successfully deleted helper account!');
+	flash.success(req, 'Helper account has been deleted successfully!');
 	res.redirect('/admin/helpers');
 });
 
@@ -169,12 +169,14 @@ router.get('/venues', auth.isAdmin, async (req, res) => {
 router.get('/venues/:id', auth.isAdmin, async (req, res) => {
 	const id = req.params.id;
 	
-	const venue = await Venue.findByPk(id);
+	let venue = await Venue.findByPk(id);
 
 	if (!venue) {
 		flash.error(req, "That ID does not belong to any venue!");
 		return res.redirect('/admin/venues');
 	}
+
+	venue.seatMap = JSON.parse(venue.seatMap);
 	
 	res.render('admin/admin-edit-venue', { 
 		title: venue.name, 

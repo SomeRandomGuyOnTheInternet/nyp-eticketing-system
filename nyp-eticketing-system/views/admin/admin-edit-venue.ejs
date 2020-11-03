@@ -108,32 +108,17 @@
     let selectedSeatType; // This variable will contain the character of the seat type the user's selected
 
     let sc = new SeatChart({
-        map: [ // The seat map that the configuration object is instantiated with. For the add venue page we just instantiate with a default map with 4 rows and 6 columns
-            'GGGGGG',
-            'GGGGGG',
-            'GGGGGG',
-            'GGGGGG',
-        ],
+        map: [],
         seatTypes: [
             new SeatType({ char: defaultSeat, category: 'General', blocked: false, classes: 'general' }),
             new SeatType({ char: tempEmptySpace, category: 'Empty Space', blocked: false, classes: 'temp-space' })
         ],
-        naming: {
-            rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-            getLabel: function (character, row, column) {
-                return row + ':' + column;
-            },
-            getId: function (character, row, column) {
-                return row + ':' + column;
-            }
-        },
-        legend: {
-            node: $(legend),
-            items: [
-                [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
-                [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses],
-            ]					
-        },
+        legends: [                
+            [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
+            [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses]
+        ],
+        rowLabels: SeatChart.alphabeticalLabels(),
+        columnLabels: SeatChart.undefinedLabels(),
         mapNode: seatMap,
         wrapperNode: mapWrapper,
         legendNode: legend,
@@ -148,15 +133,15 @@
     // Rest of the functions
     $(document).ready(async function() {
         try {
-            const fetchedVenue = await fetchFrom(`${routes.admin.venues}/${venueId}`);
+            const fetchedVenue = await ajax.get(`${routes.admin.venues}/${venueId}`);
             venue.id = fetchedVenue.id;
             venue.name = fetchedVenue.name;
             venue.seatMap = fetchedVenue.seatMap;
         } catch (error) {
-            return handleError(error);
+            return utils.handleError(error);
         }
 
-        sc.map = JSON.parse(venue.seatMap);
+        sc.map = venue.seatMap;
         sc.replaceMapSeatCharacters(emptySpace, tempEmptySpace); // Convert empty space characters to a temporary character that can be interacted with
         sc.bindMap();
         sc.scaleContentWidth();
@@ -167,62 +152,63 @@
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.scaleContentWidth();
     });
 
     $(`${columnInput}, ${rowInput}`).change(function () {
-        addUnloadListener();
+        utils.addUnloadListener();
 
         const columnVal = $(columnInput).val();
         const rowVal = $(rowInput).val();
 
-        if (!$.isNumeric(columnVal) || !$.isNumeric(rowVal)) {
-            return showDangerToast("Please enter a valid value!");
-        }
+        if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
 
         const columns = columnVal.toNum();
         const rows = rowVal.toNum();
 
-        if (columns < 1 || rows < 1) {
-            return showDangerToast("Please enter a larger value!");
-        }
+        if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
+        if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
 
-        if (columns > 40 || rows > 40) {
-            return showDangerToast("Please enter a smaller value!");
-        }
-
-        if (this.id == "rowInput") {
-            sc.resizeRows(columns, rows); // Changes number of columns
-        }
-
-        if (this.id == "columnInput") {
-            sc.resizeColumns(columns, rows); // Changes number of rows
-        }
+        if (this.id == "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
+        if (this.id == "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
 
         sc.reloadMap(); // Reloads the map with the updated map
     });
 
-    $(document).on("click", ".seatCharts-legendCard", function() {
-        addUnloadListener();
-        const seatCharAttr = $(this).attr("data-seat-character");
-        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
-            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-            selectedSeatType = (highlighted) ? seatCharAttr : null;
-        } else {
-            $(this).removeClass("highlighted");
-        }
-    });
+    document.addEventListener('click', function (e) {
+        if (!e.target.classList.contains('seatCharts-legendCard')) return;
 
-    $(deleteVenueButton).click(async function (event) {
+        const node = e.target;
+        const seatCharAttr = node.getAttribute("data-seat-character");
+        const highlighted = node.classList.contains("highlighted");
+
+        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+
+        if (seatCharAttr) {
+            node.classList.add((highlighted) ? null : "highlighted");
+            selectedSeatType = (highlighted) ? null : seatCharAttr;
+        }
+    }, false);
+
+    $(deleteVenueButton).click(async function (e) {
         const check = confirm("Are you sure you want to delete this venue?");
-        if (check == true) {
-            await deleteFrom(`${routes.admin.venues}/${venueId}`);
-            window.location.replace('/admin/venues');
+        
+        if (check === true) {
+            try {
+                await ajax.delete(`${routes.admin.venues}/${venueId}`);
+                await ajax.post(routes.index.dangerFlash, "Venue has been deleted successfully!");
+
+                utils.removeUnloadListener();
+
+                window.location.replace('/admin/venues');
+            } catch (error) {
+                utils.handleError(error);
+            }
         }
     });
 
-    $(updateVenueForm).submit(async function (event) {
-        event.preventDefault();
+    $(updateVenueForm).submit(async function (e) {
+        e.preventDefault();
         $(saveEditedVenueButton).prop('disabled', true);
 
         sc.replaceMapSeatCharacters(tempEmptySpace, emptySpace);
@@ -231,12 +217,12 @@
         venue.seatMap = sc.map;
         
         try {
-            await updateTo(`${routes.admin.venues}/${venueId}`, venue);
-            showSuccessToast("Venue has been updated successfully!");
+            await ajax.update(`${routes.admin.venues}/${venueId}`, venue);
 
-            removeUnloadListener();
+            toast.success("Venue has been updated successfully!");
+            utils.removeUnloadListener();
         } catch (error) {
-            handleError(error);
+            utils.handleError(error);
         } finally {
             $(saveEditedVenueButton).prop('disabled', false);
         }

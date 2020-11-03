@@ -122,6 +122,10 @@ span.seatCharts-legendDescription {
 	line-height: 30px;
 }
 
+div.seatCharts-cardBody {
+    pointer-events: none;
+}
+
 #selected-seats {
 	max-height: 90px;
 	overflow: hidden;

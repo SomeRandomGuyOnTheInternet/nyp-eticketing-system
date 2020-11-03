@@ -7,11 +7,11 @@
 const express = require('express');
 const router = express.Router();
 
-const flash = require('../utils/flash');
-const auth = require('../utils/check-auth');
+const flash = require('../../utils/flash');
+const auth = require('../../utils/page-load-auth');
 
-const Venue = require('../models/Venue');
-const Event = require('../models/Event');
+const Venue = require('../../models/Venue');
+const Event = require('../../models/Event');
 
 // Sample user object to test navigation
 // For the planner pages, this user is a planner

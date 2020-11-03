@@ -21,10 +21,10 @@ require('dotenv').config();
 // We split the webpages by routes for clarity and security purposes
 // So each route is in charge of a chunk of webpages that are connected logically (eg: all planner functions are handled under the planner route, which is located in planner.js)
 // This'll make it easier to maintain the webpages
-const mainRoute = require('./routes/main');
-const helperRoute = require('./routes/helper');
-const plannerRoute = require('./routes/planner');
-const adminRoute = require('./routes/admin');
+const mainRoute = require('./routes/page-load/main');
+const helperRoute = require('./routes/page-load/helper');
+const plannerRoute = require('./routes/page-load/planner');
+const adminRoute = require('./routes/page-load/admin');
 
 const apiRoute = require('./routes/api/index');
 const helperApiRoute = require('./routes/api/helper');

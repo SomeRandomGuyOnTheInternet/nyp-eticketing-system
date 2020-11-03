@@ -12,4 +12,18 @@ class Event {
         this.helpers = obj.helpers;
         this.attendees = obj.attendees;
     }
+
+    convertToApiFormat() {
+        return {
+            id: this.id,
+            name: this.name,
+            seatMap: this.seatMap,
+            startDateTime: this.startDateTime,
+            seatsPerReservation: this.seatsPerReservation,
+            prioritiseBackRows: this.prioritiseBackRows,
+            venueId: this.name,
+            seatTypes: this.name,
+            eventHelpers: this.helpers.map(helper => helper.convertToApiFormat(this.id)),
+        }
+    }
 }

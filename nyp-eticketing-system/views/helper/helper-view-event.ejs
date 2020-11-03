@@ -434,9 +434,41 @@
 		}
 	};
 
-    $(window).on('beforeunload', function() {
-        return confirm();
-    });
+    function renderSelectedSeatConfirmationNode(category, seats) {
+        let $parentDiv = $('<div></div>')
+            .addClass('mt-1 mb-2');
+
+        $parentDiv.append($('<span></span>')
+            .addClass('h6 text-muted')
+            .text(`${category} Seats`)
+        );
+
+        let $seatRow = $('<div></div>')
+            .addClass('row-small-margin row mt-2')
+            .appendTo($parentDiv);
+
+        for (let i = 0; i < seats.length; i++) {
+            var $seatCol = $('<div></div>')
+                .addClass('col-small-margin col-auto mb-2')
+                .appendTo($seatRow);
+
+            var $card = $('<div></div>')
+                .addClass('card')
+                .appendTo($seatCol);
+
+            var $cardBody = $('<div></div>')
+                .addClass('card-body py-2 px-3')
+                .appendTo($card);
+
+            $cardBody.append($('<span></span>')
+                .addClass('h6')
+                .text(seats[i].settings.id)
+            );
+        }
+
+        return $parentDiv;
+    };
+
 </script>
 
 <%- include('../templates/footer')-%>

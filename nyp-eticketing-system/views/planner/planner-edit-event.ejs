@@ -55,13 +55,11 @@
                     <div class="col-sm-6">
                         <div class="card input-card mt-3">
                             <div class="card-body no-label-card-body">
-                                <div id="prioritiseBackCheck">
-                                    <div class="form-check form-check-inline ml-2">
-                                        <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true" <%= event.prioritiseBackRows ? "checked" : "" %>>
-                                        <label class="form-check-label px-3" for="prioritiseBackCheck">
-                                            Prioritise seats at the back
-                                        </label>
-                                    </div>
+                                <div class="form-check form-check-inline ml-2">
+                                    <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true" <%= event.prioritiseBackRows ? "checked" : "" %>>
+                                    <label class="form-check-label px-3" for="prioritiseBackCheck">
+                                        Prioritise seats at the back
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -206,7 +204,7 @@
     const maxSeatsPerReservationInput = '#maxSeatsPerReservationInput';
     const prioritiseBackCheck = '#prioritiseBackCheck';
     const venueSelectInput = '#venueSelectInput';
-    const tableWrapper = '#tableWrapper';
+    const mapWrapper = '#tableWrapper';
     const seatMap = '#seatMap';
     const legend = '#editMapLegend';
     const addSeatTypeCard = '#addSeatTypeCard';
@@ -223,142 +221,176 @@
 
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
 
-    let selectedSeatType; // This variable will contain the character of the seat type we've selected
+    const defaultSeatType = "G";
+    let selectedSeatType = defaultSeatType; // This variable will contain the character of the seat type we've selected
 
     let event;
     let venues;
     let helpers;
 
     // Seat chart configuration
-    let sc = {};
+    let sc = new SeatChart({
+        map: [],
+        seatTypes: [],
+        legends: [],
+        rowLabels: SeatChart.alphabeticalLabels(),
+        columnLabels: SeatChart.undefinedLabels(),
+        mapNode: seatMap,
+        wrapperNode: mapWrapper,
+        legendNode: legend,
+    });
 
-    sc.map = [];
-
-    sc.seats = {};
-
-    sc.naming = {
-        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-        getLabel: function (character, row, column) {
-            return row + ':' + column;
-        },
-        getId: function (character, row, column) {
-            return row + ':' + column;
-        }
-    };
-
-    sc.legend = {
-        node: $(legend),
-        items: []				
-    };
-
-    sc.click = function () {
-        if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
-            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
-        }
+    sc.onClick = function () {
+        sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType : selectedSeatType);
     };
 
     $(document).ready(async function() {
         try {
-            event = await getEventDetails(eventId);
-            venues = await getAllVenues();
-            helpers = await getAllHelpers();
+            event = Event.parseApiResult(await ajax.get(`${routes.planner.events}/${eventId}`));
+            venues = (await ajax.get(routes.planner.venues)).map(venue => Venue.parseApiResult(venue));
+            helpers = (await ajax.get(routes.planner.helpers)).map((helper) => {
+                let parsedHelper = EventHelper.parseApiResult(helper);
+                for (i = 0; i < event.helpers.length; i++) {
+                    parsedHelper.selected = (parsedHelper.id === event.helpers[i].id || parsedHelper.selected === true);
+                }
+                return parsedHelper;
+            });
 
             // at least a single venue is required to create an event, so throw error if it doesn't exists
             if (venues.length < 1) {
-                throwException("There are no venues available! Please contact the admin to create a venue.");
+                utils.throwException("There are no venues available! Please contact the admin to create a venue.");
             }
         } catch (error) {
-            return handleError(error);
-        }
-        
-        for (i = 0; i < helpers.length; i++) {
-            for (r = 0; r < event.helpers.length; r++) {
-                helpers[i].selected = (helpers[i].id === event.helpers[r].id || helpers[i].selected === true);
-            }
+            return utils.handleError(error);
         }
 
-        populateHelperSelect(helpers, helperSelectInput);
-        populateSelectedHelperColumn(helpers, helpersCardCol);
-        populateVenueSelect(venues, venueSelectInput);
-
+        Venue.populateSelect(venues, venueSelectInput);
         for (i = 0; i < venues.length; i++) {
-            if (venues[i].id === event.venueId) {
+            if (venues[i].id === event.venue.id) {
                 $(venueSelectInput).val(i);
                 break;
             }
         }
         
+        EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
+        EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
+        
         sc.map = event.seatMap;
-        sc.seats = getSeatsObject(event.seatTypes);
-        sc.legend.items = getLegendArray(sc.seats);
+        sc.seatTypes = event.seatTypes;
+        sc.legends = sc.seatTypes.reduce(function(legends, seatType){
+            if (seatType.char !== defaultSeatType) {
+                legends.push([seatType.char, "available", seatType.category.concat((seatType.blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+            }
+            return legends;
+        }, []);
         
         // Bind map
-        bindMap(sc, seatMap);
-        scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
+        sc.bindMap();
+        sc.scaleContentWidth();
+
+        sc.seatTypes.forEach(seatType => {
+            availableSeatCharacters = availableSeatCharacters.filter(sc => sc !== seatType.char);
+        });
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.scaleContentWidth();
     });
 
     $(venueSelectInput).on('change', function() {
-        sc.map = JSON.parse(getSelectedVenue(venues, venueSelectInput).seatMap);
-        reloadMap(sc, tableWrapper, seatMap, legend);
+        utils.addUnloadListener();
+
+        sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
+        sc.reloadMap();
     });
 
     $(helperSelectInput).on('change', function() {
-        getSelectedHelper(helpers, helperSelectInput).selected = true;
-        populateHelperSelect(helpers, helperSelectInput);
-        populateSelectedHelperColumn(helpers, helpersCardCol);
+        utils.addUnloadListener();
+
+        EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
+        EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
+        EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
     });
 
     $(addSeatTypeButton).click(function () {
-        if (availableSeatCharacters.length < 1) {
-            return showDangerToast("You cannot add anymore seat types! Please delete some if you want to add more.");
-        }
+        utils.addUnloadListener();
+
+        if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         
         const seatName = $(seatTypeNameInput).val();
         const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
+
         const seatCharacter = availableSeatCharacters[0];
-        const legendCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
-
-        if (seatName === "") {
-            return showDangerToast("Please enter a seat name!");
-        }
-
-        if (seatCharacter.length != 1) {
-            throwException("The string for the seat's character is not a single length character!")
-        }
-
-        sc.seats[seatCharacter] = {
-            category: seatName,
-            blocked: seatIsBlocked,
-            classes: seatCharacter,
-        };
-
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
-        sc.legend.items.push([seatCharacter, "available", legendCategory, selectableLegendClasses]); // Pushes a new legend to the legend items that will be shown upon reload
-        reloadMap(sc, tableWrapper, seatMap, legend);
+
+        if (seatName === "") return toast.danger("Please enter a seat name!");
+        if (seatCharacter.length != 1) utils.throwException("The string for the seat's character is not a single length character!");
+
+        const seatType = new SeatType({ 
+            char: seatCharacter, 
+            category: seatName, 
+            blocked: seatIsBlocked, 
+            classes: seatCharacter 
+        });
+        
+        selectedSeatType = seatType.char;
+        sc.seatTypes.push(seatType);
+        sc.legends.push([seatType.char, "available", seatType.category + ((seatIsBlocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+        sc.reloadMap();
+
+        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => {
+            if (obj.getAttribute("data-seat-character") == seatType.char) {
+                obj.classList.add("highlighted");
+            }
+        });
         
         $(addSeatTypeModal).modal('hide'); // Hides the modal
         $(seatTypeNameInput).val(''); // Reset input to default state
         $(blockSeatTypeCheck).prop('checked', false);
     });
 
-    $(document).on("click", `.seatCharts-legendCard:not(${addSeatTypeCard})`, function() {
-        const seatCharAttr = $(this).attr("data-seat-character");
-        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
-            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-            selectedSeatType = (highlighted === true) ? seatCharAttr : null;
-        } else {
-            $(this).removeClass("highlighted");
-        }
-    });
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('seatCharts-legendCard')) {
+            utils.addUnloadListener();
 
-    $(deleteEventButton).click(function (event) {
+            const node = e.target;
+            const seatCharAttr = node.getAttribute("data-seat-character");
+            const highlighted = node.classList.contains("highlighted");
+
+            document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+
+            if (seatCharAttr) {
+                node.classList.add((highlighted) ? null : "highlighted");
+                selectedSeatType = (highlighted) ? defaultSeatType.char : seatCharAttr;
+            }
+        }
+
+        if (e.target.classList.contains('remove-helper')) {
+            const node = e.target;
+            helpers.forEach(helper => {
+                if (helper.id == node.id) helper.selected = false;
+            });
+
+            EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
+            EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
+        }
+    }, false);
+
+    $(deleteEventButton).click(async function (event) {
         const check = confirm("Are you sure you want to delete this event?");
-        if (check == true) {
-            window.location.replace(`/api/delete-event/${event.id}`);
+
+        if (check === true) {
+            try {
+                await ajax.delete(`${routes.planner.events}/${eventId}`);
+                await ajax.post(routes.index.successFlash, "The venue has been deleted successfully!");
+
+                utils.removeUnloadListener();
+
+                window.location.replace('/planner/events');
+            } catch (error) {
+                utils.handleError(error);
+            }
         }
     });
 
@@ -366,43 +398,32 @@
         e.preventDefault();
         $(updateEventButton).prop('disabled', true);
 
-        try {
-            const updatedEvent = await updateEvent(
-                event.id,
-                $(eventNameInput).val(),
-                sc.map,
-                $(eventDateTimeInput).val(),
-                $(maxSeatsPerReservationInput).val(),
-                $(prioritiseBackCheck).is(':checked'),
-                getSelectedVenue(venues, venueSelectInput).id
-            );
-            
-            const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
-            const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
+        const event = new Event({
+            name: $(eventNameInput).val(),
+            seatMap: sc.map,
+            startDateTime: $(eventDateTimeInput).val(),
+            seatsPerReservation: $(maxSeatsPerReservationInput).val(),
+            prioritiseBackRows: $(prioritiseBackCheck).is(':checked'),
+            venue: Venue.selectedOption(venues, venueSelectInput),
+            seatTypes: sc.seatTypes,
+            helpers: helpers.filter(helper => helper.selected == true)
+        });
 
-            await updateEventSeatTypes(event.id, seatTypeArray);
-            await updateEventHelpers(event.id, eventHelperArray);
-            
-            showSuccessToast("Event has been updated successfully!");
+        try {
+            await ajax.update(`${routes.planner.events}/${eventId}`, event.convertToApiFormat());
+
+            toast.success("The event has been successfully updated!");
+            utils.removeUnloadListener();
         } catch (error) {
-            handleError(error);
+            utils.handleError(error);
         } finally {
             $(updateEventButton).prop('disabled', false);
         }
     });
 
-    $(window).on('beforeunload', function() {
-        return confirm();
-    });
-
-    getLegendArray = (seats) => {
-        return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
-    }
-
-    removeTakenSeatChars = (seats) => {
-        for ()
-        return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
-    }
+    // removeTakenSeatChars = (seats) => {
+    //     return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+    // }
 </script>
 
 <%- include('../templates/footer')-%>

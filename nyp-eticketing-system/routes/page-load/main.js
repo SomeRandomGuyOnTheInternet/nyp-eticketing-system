@@ -4,8 +4,8 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-const flash = require('../utils/flash');
-const auth = require('../utils/check-auth');
+const flash = require('../../utils/flash');
+const auth = require('../../utils/page-load-auth');
 
 // // Sample user object to test navigation
 // // For the test pages, this user is neither a planner or helper or an admin

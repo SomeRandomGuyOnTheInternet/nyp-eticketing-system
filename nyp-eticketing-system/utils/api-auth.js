@@ -1,4 +1,4 @@
-const ajax = require('./status');
+const ajax = require('./respond');
 
 module.exports.isUser = (req, res, next) => {
     if (req.user) {

@@ -95,7 +95,7 @@
 
     const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-4'; // These are the css class belonging to legends that can be clicked on by the user
 
-    let selectedSeatType; // This variable will contain the character of the seat type the user's selected
+    let selectedSeatType = null; // This variable will contain the character of the seat type the user's selected
 
     let sc = new SeatChart({
         map: [ // The seat map that the configuration object is instantiated with. For the add venue page we just instantiate with a default map with 4 rows and 6 columns
@@ -108,25 +108,15 @@
             new SeatType({ char: defaultSeat, category: 'General', blocked: false, classes: 'general' }),
             new SeatType({ char: tempEmptySpace, category: 'Empty Space', blocked: false, classes: 'temp-space' })
         ],
-        naming: {
-            rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-            getLabel: function (character, row, column) {
-                return row + ':' + column;
-            },
-            getId: function (character, row, column) {
-                return row + ':' + column;
-            }
-        },
-        legend: {
-            node: $(legend),
-            items: [
-                [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
-                [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses],
-            ]					
-        },
+        legends: [                
+            [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
+            [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses]
+        ],
+        rowLabels: SeatChart.alphabeticalLabels(),
+        columnLabels: SeatChart.undefinedLabels(),
         mapNode: seatMap,
         wrapperNode: mapWrapper,
-        legendNode: legend
+        legendNode: legend,
     });
 
     sc.onClick = function () {
@@ -144,51 +134,42 @@
     });
 
     $(`${columnInput}, ${rowInput}`).change(function () {
-        addUnloadListener();
+        utils.addUnloadListener();
 
         const columnVal = $(columnInput).val();
         const rowVal = $(rowInput).val();
 
-        if (!$.isNumeric(columnVal) || !$.isNumeric(rowVal)) {
-            return showDangerToast("Please enter a valid value!");
-        }
+        if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
 
         const columns = columnVal.toNum();
         const rows = rowVal.toNum();
 
-        if (columns < 1 || rows < 1) {
-            return showDangerToast("Please enter a larger value!");
-        }
+        if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
+        if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
 
-        if (columns > 40 || rows > 40) {
-            return showDangerToast("Please enter a smaller value!");
-        }
-
-        if (this.id == "rowInput") {
-            sc.resizeRows(columns, rows); // Changes number of columns
-        }
-
-        if (this.id == "columnInput") {
-            sc.resizeColumns(columns, rows); // Changes number of rows
-        }
+        if (this.id == "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
+        if (this.id == "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
 
         sc.reloadMap(); // Reloads the map with the updated map
     });
 
-    $(document).on("click", ".seatCharts-legendCard", function() {
-        addUnloadListener();
+    document.addEventListener('click', function (e) {
+        if (!e.target.classList.contains('seatCharts-legendCard')) return;
 
-        const seatCharAttr = $(this).attr("data-seat-character");
-        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
-            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-            selectedSeatType = (highlighted) ? seatCharAttr : null;
-        } else {
-            $(this).removeClass("highlighted");
+        const node = e.target;
+        const seatCharAttr = node.getAttribute("data-seat-character");
+        const highlighted = node.classList.contains("highlighted");
+
+        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+
+        if (seatCharAttr) {
+            node.classList.add((highlighted) ? null : "highlighted");
+            selectedSeatType = (highlighted) ? null : seatCharAttr;
         }
-    });
+    }, false);
 
-    $(createVenueForm).submit(async function (event) {
-        event.preventDefault();
+    $(createVenueForm).submit(async function (e) {
+        e.preventDefault();
         $(saveVenueTypeButton).prop('disabled', true);
 
         sc.replaceMapSeatCharacters(tempEmptySpace, emptySpace);
@@ -200,14 +181,14 @@
         });
         
         try {
-            await postTo(routes.admin.venues, venue);
-            await postTo(routes.index.successFlash, "Successfully created a new venue!");
+            await ajax.post(routes.admin.venues, venue);
+            await ajax.post(routes.index.successFlash, "Venue has been created successfully!");
 
-            removeUnloadListener();
-            
+            utils.removeUnloadListener();
+
             window.location.replace("/admin/venues");
         } catch (error) {
-            handleError(error);
+            utils.handleError(error);
         } finally {
             $(saveVenueTypeButton).prop('disabled', false);
         }
