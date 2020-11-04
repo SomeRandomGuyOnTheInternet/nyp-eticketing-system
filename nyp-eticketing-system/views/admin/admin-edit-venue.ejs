@@ -21,7 +21,7 @@
                                 <label for="nameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Venue Name</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="nameInput" name="nameInput" class="form-control card-input" type="text" placeholder="e.g. Block A"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                                <input id="nameInput" name="nameInput" class="form-control card-input" type="text" value="<%- venue.name %>" placeholder="e.g. Block A"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
                             </div>
                         </div>
                     </div>
@@ -84,12 +84,14 @@
 </body>
 
 <script>
+    const venueId = <%- venue.id %>;
+
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
     const updateVenueForm = '#updateVenueForm';
     const nameInput = '#nameInput';
     const columnInput = '#columnInput';
     const rowInput = '#rowInput';
-    const tableWrapper = '#tableWrapper';
+    const mapWrapper = '#tableWrapper';
     const seatMap = '#seatMap';
     const legend = '#legend';
     const deleteVenueButton = '#deleteVenueButton';
@@ -105,57 +107,44 @@
 
     let selectedSeatType; // This variable will contain the character of the seat type the user's selected
 
-    let venue = <%- JSON.stringify(venue) %>;
-
-    // Seat chart configuration
-    let sc = {}; // The configuration attribures are stored in the sc object which will then be passed into the bind map function. Upon changing any of the configuration attributes like the map, pass the updated sc object into the reloadMap function
-
-    sc.map = venue.seatMap; // The seat map that the configuration object is instantiated with. For the edit venue we instantiate with the previously created venue seat map
-
-    sc.seats = { // The seat types required for this map, with attributes that specify different properties of the seat. In the add venue page, we will only have two seat types at all times (available and empty), so we'll be instantiating the map those two seat types alone
-        // Each seat type is a key-value pair, where the key is the seat character and the value is an object containing various details about the seat type 
-        [defaultSeat]: {
-            category: 'General', // Human readable name for the seat character
-            blocked: false, // Whether it's a blocked seat type
-            classes: 'general', // The css class of the seat
-        },
-        [tempEmptySpace]: {
-            category: 'Empty Space',
-            blocked: false,
-            classes: 'temp-space',
-        },
-    };
-    
-    sc.naming = {
-        // columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
-        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-        getLabel: function (character, row, column) {
-            return row + ':' + column;
-        },
-        getId: function (character, row, column) {
-            return row + ':' + column;
-        },
-    };
-
-    sc.legend = {
-        node: $(legend),
-        items: [
+    let sc = new SeatChart({
+        map: [],
+        seatTypes: [
+            new SeatType({ char: defaultSeat, category: 'General', blocked: false, classes: 'general' }),
+            new SeatType({ char: tempEmptySpace, category: 'Empty Space', blocked: false, classes: 'temp-space' })
+        ],
+        legends: [                
             [defaultSeat, 'seat-legend-icon add-seat-legend-icon', 'Add Seat', selectableLegendClasses],
-            [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses],
-        ]					
+            [tempEmptySpace, 'seat-legend-icon remove-seat-legend-icon', 'Remove Seat', selectableLegendClasses]
+        ],
+        rowLabels: SeatChart.alphabeticalLabels(),
+        columnLabels: SeatChart.undefinedLabels(),
+        mapNode: seatMap,
+        wrapperNode: mapWrapper,
+        legendNode: legend,
+    });
+
+    sc.onClick = function () {
+        sc.replaceMapSeat(this, selectedSeatType);
     };
 
-    sc.click = function () {
-        if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
-            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]) 
-        }    
-    };
+    let venue = new Venue({});
 
     // Rest of the functions
-    $(document).ready(function() {
-        replaceMapSeatCharacters(sc.map, emptySpace, tempEmptySpace); // Convert empty space characters to a temporary character that can be interacted with
-        bindMap(sc, seatMap);
-        scaleContentWidth(tableWrapper, seatMap);
+    $(document).ready(async function() {
+        try {
+            const fetchedVenue = await ajax.get(`${routes.admin.venues}/${venueId}`);
+            venue.id = fetchedVenue.id;
+            venue.name = fetchedVenue.name;
+            venue.seatMap = JSON.parse(fetchedVenue.seatMap);
+        } catch (error) {
+            return utils.handleError(error);
+        }
+
+        sc.map = venue.seatMap;
+        sc.replaceMapSeatCharacters(emptySpace, tempEmptySpace); // Convert empty space characters to a temporary character that can be interacted with
+        sc.bindMap();
+        sc.scaleContentWidth();
 
         // TODO: Do validation whether map exists before setting the input value
         $(columnInput).val(sc.map[0].length);
@@ -163,75 +152,80 @@
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.scaleContentWidth();
     });
 
     $(`${columnInput}, ${rowInput}`).change(function () {
+        utils.addUnloadListener();
+
         const columnVal = $(columnInput).val();
         const rowVal = $(rowInput).val();
 
-        if (!$.isNumeric(columnVal) || !$.isNumeric(rowVal)) {
-            return showDangerToast("Please enter a valid value!");
-        }
+        if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
 
         const columns = columnVal.toNum();
         const rows = rowVal.toNum();
 
-        if (columns < 1 || rows < 1) {
-            return showDangerToast("Please enter a larger value!");
-        }
+        if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
+        if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
 
-        if (columns > 40 || rows > 40) {
-            return showDangerToast("Please enter a smaller value!");
-        }
+        if (this.id == "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
+        if (this.id == "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
 
-        if (this.id == "rowInput") {
-            sc.map = resizeRows(columns, rows, sc.map); // Changes number of columns
-        }
-
-        if (this.id == "columnInput") {
-            sc.map = resizeColumns(columns, rows, sc.map); // Changes number of rows
-        }
-
-        reloadMap(sc, tableWrapper, seatMap, legend); // Reloads the map with the updated map
+        sc.reloadMap(); // Reloads the map with the updated map
     });
 
-    $(document).on("click", ".seatCharts-legendCard", function() {
-        const seatCharAttr = $(this).attr("data-seat-character");
-        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
-            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-            selectedSeatType = (highlighted) ? seatCharAttr : null;
-        } else {
-            $(this).removeClass("highlighted");
-        }
-    });
+    document.addEventListener('click', function (e) {
+        if (!e.target.classList.contains('seatCharts-legendCard')) return;
 
-    $(deleteVenueButton).click(function (event) {
+        const node = e.target;
+        const seatCharAttr = node.getAttribute("data-seat-character");
+        const highlighted = node.classList.contains("highlighted");
+
+        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+
+        if (seatCharAttr) {
+            node.classList.add((highlighted) ? null : "highlighted");
+            selectedSeatType = (highlighted) ? null : seatCharAttr;
+        }
+    }, false);
+
+    $(deleteVenueButton).click(async function (e) {
         const check = confirm("Are you sure you want to delete this venue?");
-        if (check == true) {
-            window.location.replace(`/api/delete-venue/${venue.id}`);
+        
+        if (check === true) {
+            try {
+                await ajax.delete(`${routes.admin.venues}/${venueId}`);
+                await ajax.post(routes.index.dangerFlash, "Venue has been deleted successfully!");
+
+                utils.removeUnloadListener();
+
+                window.location.replace('/admin/venues');
+            } catch (error) {
+                utils.handleError(error);
+            }
         }
     });
 
-    $(updateVenueForm).submit(async function (event) {
-        event.preventDefault();
+    $(updateVenueForm).submit(async function (e) {
+        e.preventDefault();
         $(saveEditedVenueButton).prop('disabled', true);
 
-        venue.name = toTitleCase($(nameInput).val());
-        venue.seatMap = replaceMapSeatCharacters(sc.map, tempEmptySpace, emptySpace);
+        sc.replaceMapSeatCharacters(tempEmptySpace, emptySpace);
+
+        venue.name = $(nameInput).val();
+        venue.seatMap = sc.map;
         
         try {
-            await updateVenue(venue);
-            showSuccessToast("Venue has been updated successfully!");
+            await ajax.update(`${routes.admin.venues}/${venueId}`, venue);
+
+            toast.success("Venue has been updated successfully!");
+            utils.removeUnloadListener();
         } catch (error) {
-            handleError(error);
+            utils.handleError(error);
         } finally {
             $(saveEditedVenueButton).prop('disabled', false);
         }
-    });
-
-    $(window).on('beforeunload', function() {
-        return confirm();
     });
 </script>
 

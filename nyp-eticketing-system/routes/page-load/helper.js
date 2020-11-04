@@ -5,11 +5,11 @@
 const express = require('express');
 const router = express.Router();
 
-const flash = require('../utils/flash');
-const auth = require('../utils/check-auth');
+const flash = require('../../utils/flash');
+const auth = require('../../utils/page-load-auth');
 
-const EventHelper = require('../models/EventHelper');
-const Event = require('../models/Event');
+const EventHelper = require('../../models/EventHelper');
+const Event = require('../../models/Event');
 
 // When creating new routes avoid using the route's name in the webpage's name
 // Eg: Use router.get('/venues', ...) instead of router.get('/helper-venues', ...) cause then the url will be '/helper/helper-venues' which is super redundant
@@ -50,13 +50,6 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 		user: req.user,
 		event: event,
 	});
-});
-
-router.get('/eventtopright', auth.isHelper, (req, res) => {
-	res.render('helper/helper-view-event-quadrant', { 
-		title: "Event", 
-		user: req.user
-	});;
 });
 
 module.exports = router;

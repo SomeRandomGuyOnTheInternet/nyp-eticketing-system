@@ -3,11 +3,11 @@
 const express = require('express');
 const router = express.Router();
 
-const flash = require('../utils/flash');
-const auth = require('../utils/check-auth');
+const flash = require('../../utils/flash');
+const auth = require('../../utils/page-load-auth');
 
-const User = require('../models/User');
-const Venue = require('../models/Venue');
+const User = require('../../models/User');
+const Venue = require('../../models/Venue');
 
 // When creating new routes avoid using the route's name in the webpage's name
 // Eg: Use router.get('/planners', ...) instead of router.get('/admin-planners', ...) cause then the url will be '/admin/admin-planners' which is super redundant
@@ -39,35 +39,30 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
 
 	if (!name) {
 		flash.error(req, "Please enter a name!");
-		res.redirect('/admin/planners');
-		return;
+		return res.redirect('/admin/planners');
 	}
 
 	if (!email) {
 		flash.error(req, "Please enter an email!");
-		res.redirect('/admin/planners');
-		return;
+		return res.redirect('/admin/planners');
 	}
 
 	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 	if (!email.match(mailformat)) {
 		flash.error(req, "Please enter a valid email!");
-		res.redirect('/admin/planners');
-		return;
+		return res.redirect('/admin/planners');
 	}
 
 	if (!password) {
 		flash.error(req, "Please enter a password!");
-		res.redirect('/admin/planners');
-		return;
+		return res.redirect('/admin/planners');
 	}
 
 	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
 
 	if (existingEmail) {
 		flash.error(req, "This email has already been registered!");
-		res.redirect('/admin/planners');
-		return;
+		return res.redirect('/admin/planners');
 	}
 
 	await User.createUser({
@@ -80,9 +75,8 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
 		isDeleted: false
 	});
 
-	flash.success(req, "Planner account has been successfully created!");
-	res.redirect('/admin/planners');
-	return;
+	flash.success(req, "Planner account has been created successfully!");
+	return res.redirect('/admin/planners');
 });
 
 router.get('/helpers', auth.isAdmin, async(req, res) => {
@@ -102,35 +96,30 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 
 	if (!name) {
 		flash.error(req, "Please enter a name!");
-		res.redirect('/admin/helpers');
-		return;
+		return res.redirect('/admin/helpers');
 	}
 
 	if (!email) {
 		flash.error(req, "Please enter an email!");
-		res.redirect('/admin/helpers');
-		return;
+		return res.redirect('/admin/helpers');
 	}
 	
 	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 	if (!email.match(mailformat)) {
 		flash.error(req, "Please enter a valid email address!");
-		res.redirect('/admin/planners');
-		return;
+		return res.redirect('/admin/planners');
 	}
 
 	if (!password) {
 		flash.error(req, "Please enter a password!");
-		res.redirect('/admin/helpers');
-		return;
+		return res.redirect('/admin/helpers');
 	}
 
 	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
 
 	if (existingEmail) {
 		flash.error(req, "This email has already been registered!");
-		res.redirect('/admin/helpers');
-		return;
+		return res.redirect('/admin/helpers');
 	}
 
 	await User.createUser({
@@ -143,24 +132,27 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 		isDeleted: false
 	});
 
-	flash.success(req, "Planner account has been successfully created!");
-	res.redirect('/admin/helpers');
-	return;
+	flash.success(req, "Helper account has been created successfully!");
+	return res.redirect('/admin/helpers');
 });
 
-//Delete function for planner accounts
+// Delete function for planner accounts
 router.get('/deleteplanner/:id', async (req, res) => {
 	const id = req.params.id;
-	await User.deleteuSers(id);
-	flash.success(req, 'Successfully deleted planner account');
+
+	await User.destroy({ where: { id: id } });
+
+	flash.success(req, 'Planner account has been deleted successfully!');
 	res.redirect('/admin/planners');
 });
 
-//Delete function for helper accounts
+// Delete function for helper accounts
 router.get('/deletehelper/:id', async (req, res) => {
 	const id = req.params.id;
-	await User.deleteuSers(id);
-	flash.success(req, 'Successfully deleted helper account');
+
+	await User.destroy({ where: { id: id } });
+
+	flash.success(req, 'Helper account has been deleted successfully!');
 	res.redirect('/admin/helpers');
 });
 
@@ -176,13 +168,15 @@ router.get('/venues', auth.isAdmin, async (req, res) => {
 
 router.get('/venues/:id', auth.isAdmin, async (req, res) => {
 	const id = req.params.id;
-	const venue = await Venue.getVenueById(id);
+	
+	let venue = await Venue.findByPk(id);
 
 	if (!venue) {
 		flash.error(req, "That ID does not belong to any venue!");
-		res.redirect('/admin/venues');
-		return;
+		return res.redirect('/admin/venues');
 	}
+
+	venue.seatMap = JSON.parse(venue.seatMap);
 	
 	res.render('admin/admin-edit-venue', { 
 		title: venue.name, 

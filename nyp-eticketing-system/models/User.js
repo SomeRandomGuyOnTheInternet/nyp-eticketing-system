@@ -61,9 +61,10 @@ module.exports.getUserById = async (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await User.findOne({ 
-                where: { 
-                    id: userId
-                } 
+                where: { id: userId },
+                attributes: {
+                    exclude: ['password']
+                },
             });
 
             resolve(user)
@@ -77,9 +78,10 @@ module.exports.getUserByEmail = async (email) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await User.findOne({ 
-                where: { 
-                    email: email
-                } 
+                where: { email: email },
+                attributes: {
+                    exclude: ['password']
+                },
             });
 
             resolve(user)
@@ -93,10 +95,11 @@ module.exports.getHelpers = async () => {
     return new Promise(async (resolve, reject) => {
         try {
             let helpers = await User.findAll({ 
-                where: { 
-                    isHelper: true
+                where: { isHelper: true },
+                order: [['name', 'ASC']],
+                attributes: {
+                    exclude: ['password']
                 },
-                order: [['name', 'ASC']]
             });
 
             resolve(helpers)
@@ -110,25 +113,13 @@ module.exports.getPlanners = async () => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await User.findAll({ 
-                where: { 
-                    isPlanner: true
+                where: { isPlanner: true },
+                order: [['name', 'ASC']],
+                attributes: {
+                    exclude: ['password']
                 },
-                order: [['name', 'ASC']]
             });
 
-            resolve(user)
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-//Delete user
-module.exports.deleteuSers = async (id) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let user = await User.getUserById(id)
-            user.destroy();
             resolve(user)
         } catch (error) {
             reject(error);

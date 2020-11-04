@@ -14,7 +14,9 @@ function localStrategy(passport) {
         passReqToCallback: true 
     }, async (req, email, password, done) => {
         try {
-            let user = await User.getUserByEmail(email.toLocaleLowerCase());
+            let user = await User.findOne({ 
+                where: { email: email.toLocaleLowerCase() },
+            });
     
             if (!user) {
                 return done(null, false, { message: flash.error(req, "Please enter a valid email address!") });

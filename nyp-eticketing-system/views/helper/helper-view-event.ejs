@@ -21,15 +21,21 @@
                     <div class="card input-card">
                         <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                         <div class="card-body input-card-body">
-                            <label for="searchReservationInput" class="card-input-label">
-                                <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
-                                    Reservations</small>
-                                <!-- The small element is where we actually write down what the input does  -->
-                            </label>
-                            <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="search"
-                                placeholder="E.g. 91864675">
-                            <!-- This is where the user actually inputs all their stuff  -->
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <label for="searchReservationInput" class="card-input-label">
+                                        <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                            Reservations</small>
+                                        <!-- The small element is where we actually write down what the input does  -->
+                                    </label>
+                                    <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="search"
+                                        placeholder="E.g. 91864675">
+                                </div>
+                                <button id="clearSearchReservationButton" class="btn text-muted" type="button" style="display: none;"><i class="fas fa-times"></i></button>
+                                <button id="searchReservationButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
+                                <!-- This is where the user actually inputs all their stuff  -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -201,17 +207,18 @@
 </body>
 
 <script>
-    const helperId = <%= user.id %>;
     const eventId = <%= event.id %>;
 
     const nameHeading = '#nameHeading';
     const startDateTimeHeading = '#startDateTimeHeading';
     const searchReservationInput = '#searchReservationInput';
+    const searchReservationBtn = '#searchReservationButton';
+    const clearSearchReservationBtn = '#clearSearchReservationButton';
     const venueNameHeading = '#venueNameHeading';
     const zoomQuadrantSelect = '#zoomQuadrantSelect';
     const venueSelectInput = '#venueSelectInput';
     const seatChartCard = '#seatChartCard';
-    const tableWrapper = '#tableWrapper';
+    const mapWrapper = '#tableWrapper';
     const seatMap = '#seatMap';
     const legend = '#legend';
     const reserveSeatForm = '#reserveSeatForm';
@@ -234,33 +241,18 @@
     let event;
 
     // Seat chart configuration
-    let activeMap;
+    let sc = new SeatChart({
+        map: [],
+        seatTypes: [],
+        legends: [],
+        rowLabels: SeatChart.alphabeticalLabels(),
+        columnLabels: SeatChart.undefinedLabels(),
+        mapNode: seatMap,
+        wrapperNode: mapWrapper,
+        legendNode: legend,
+    });
 
-    const colLabels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
-    const rowLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'];
-
-    let sc = {};
-
-    sc.map = [];
-
-    sc.seats = {};
-
-    sc.naming = {
-        rows: rowLabels,
-        getLabel: function (character, row, column) {
-            return row + ':' + column;
-        },
-        getId: function (character, row, column) {
-            return row + ':' + column;
-        }
-    };
-
-    sc.legend = {
-        node: $(legend),
-        items: []				
-    };
-
-    sc.click = function () {
+    sc.onClick = function () {
         switch (this.status()) {
             case 'available':
                 return 'selected';
@@ -271,10 +263,16 @@
                 return 'blocked';
             case 'highlighted':
             case 'reserved':
+                utils.addUnloadListener();
+
                 const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
                 const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
-                if (attendee.length !== 1) return this.style();;
+
+                console.log(event.attendees)
+                if (attendee.length !== 1) return this.style();
+
                 populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name}`, this.settings.data.classes);
+                
                 return this.status();
             default:
                 return this.style();
@@ -284,85 +282,76 @@
     // Rest of the functions
     $(document).ready(async function() {
         try {
-            event = await getEventDetailsForHelper(eventId, helperId);
+            event = Event.parseApiResult(await ajax.get(`${routes.helper.events}/${eventId}`));
         } catch (error) {
-            return handleError(error);
+            return utils.handleError(error);
         }
 
         sc.map = event.seatMap;
-        sc.seats = getSeatsObject(event.seatTypes);
-        sc.legend.items = getLegendArray(sc.seats);
+        sc.seatTypes = event.seatTypes;
+        sc.legends = sc.seatTypes.reduce(function(legends, seatType){
+            if (!seatType.blocked) {
+                legends.push([seatType.char, "available", seatType.category]);
+            }
+            return legends;
+        }, []);
+        sc.legends.push(["G", "blocked", "Blocked"]);
 
-        console.log(event)
-        activeMap = bindMap(sc, seatMap);
-        scaleContentWidth(tableWrapper, seatMap);
-        disableBlockedSeats(activeMap, sc.seats);
-        disableReservedSeats(activeMap, event.reservedSeats);
+        sc.bindMap();
+        sc.scaleContentWidth();
+
+        sc.disableBlockedSeats();
+        sc.disableReservedSeats(event.reservedSeats);
     });
 
     $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.scaleContentWidth();
     });
 
-    $(searchReservationInput).keydown(function(e) {
-        if (e.keyCode == 13) {
-            const attendee = event.attendees.filter(attendee => attendee.phoneNumber == e.target.value);
-
-            if (attendee.length !== 1) {
-                return showDangerToast("This phone number is not tied to any reservation!");
-            }
-            
-            const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendee[0].id);
-
-            if (seatDetails.length === 0) {
-                return showDangerToast("This attendee does not have any reserved seats for this event!");
-            }
-
-            activeMap.get(seatDetails.map(seat => seat.seatNumber)).status('highlighted');
-            document.getElementById(seatChartCard.substring(1)).scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-        }
+    $(searchReservationInput).keyup(function(e) {
+        if (e.keyCode == 13) searchReservations(e.target.value);
+        if (e.target.value.length === 0) $(clearSearchReservationBtn).hide();
+        else $(clearSearchReservationBtn).show();
     });
 
-    document.getElementById(searchReservationInput.substring(1)).addEventListener("search", function(e) {
-        if (e.target.value.length === 0){
-            activeMap.find('highlighted').status('reserved');
-        }
+    $(clearSearchReservationBtn).click(function() {
+        sc.activeNode.find('highlighted').status('reserved');
+        $(searchReservationInput).val('');
+        $(clearSearchReservationBtn).hide();
+    });
+
+    $(searchReservationBtn).click(function() {
+        searchReservations($(this).val());
     });
 
 
     $(zoomQuadrantSelect).change(function() {
         sc.map = Array.from(event.seatMap);
 
-        const dimensions = getQuadrantDimensions(sc.map, $(zoomQuadrantSelect).val());
+        const dimensions = sc.getQuadrantDimensions($(zoomQuadrantSelect).val());
 
-        sc.map = spliceMapRow(sc.map, dimensions[0][0], dimensions[0][1]);
-        sc.map = spliceMapCol(sc.map, dimensions[1][0], dimensions[1][1]);
+        sc.spliceMapRow(dimensions[0][0], dimensions[0][1]);
+        sc.spliceMapCol(dimensions[1][0], dimensions[1][1]);
 
-        sc.naming.rows = rowLabels.slice(dimensions[0][0], dimensions[0][1]);
-        sc.naming.columns = colLabels.slice(dimensions[1][0], dimensions[1][1]);
+        sc.rowLabels = SeatChart.alphabeticalLabels().slice(dimensions[0][0], dimensions[0][1]);
+        sc.columnLabels = SeatChart.numericalLabels().slice(dimensions[1][0], dimensions[1][1]);
 
-        activeMap = reloadMap(sc, tableWrapper, seatMap, legend);
-        disableBlockedSeats(activeMap, sc.seats);
-        disableReservedSeats(activeMap, event.reservedSeats);
+        sc.reloadMap();
+        sc.disableBlockedSeats();
+        sc.disableReservedSeats(event.reservedSeats);
     });
 
-    $(reserveSeatForm).submit(async function (event) {
-        event.preventDefault();
+    $(reserveSeatForm).submit(async function (e) {
+        e.preventDefault();
+
         const reservationNameInputVal = $(reservationNameInput).val();
         const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
-        const selectedSeats = activeMap.find('selected');
+        const selectedSeats = sc.activeNode.find('selected');
 
-        if (selectedSeats.length == 0) {
-            return showDangerToast("Please select some seats to reserve for the attendee!");
-        }
-
-        if (reservationNameInputVal === "") {
-            return showDangerToast("Please enter a name for the attendee!");
-        }
-
-        if (reservationPhoneNumberInputVal == "") {
-            return showDangerToast("Please enter a phone number for the attendee!");
-        }
+        if (selectedSeats.length == 0) return toast.danger("Please select some seats to reserve for the attendee!");
+        if (reservationNameInputVal === "") return toast.danger("Please enter a name for the attendee!");
+        if (reservationPhoneNumberInputVal == "") return toast.danger("Please enter a phone number for the attendee!");
+        if (!(/^[0-9]{8}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
 
         const sortedSeats = selectedSeats.seats.reduce((sortedSeats, seat) => ({
             ...sortedSeats,
@@ -373,7 +362,7 @@
         $(reservationConfirmName).text(reservationNameInputVal);
         $(reservationConfirmPhNo).text(reservationPhoneNumberInputVal);
         for (const category in sortedSeats) {
-            $(selectedSeatConfirmationWrapper).append(renderSelectedSeatConfirmationTemplate(category, sortedSeats[category]));
+            $(selectedSeatConfirmationWrapper).append(renderSelectedSeatsOfCategory(category, sortedSeats[category]));
         }
 
         $(reservationDetailsModal).modal();
@@ -381,32 +370,46 @@
 
     $(confirmReservationButton).click(async function() {
         $(confirmReservationButton).prop('disabled', true);
-        const reservationNameInputVal = $(reservationNameInput).val();
-        const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
-        const selectedSeats = activeMap.find('selected');
-
-        let attendee;
         
+        let attendee = new EventAttendee({
+            name: $(reservationNameInput).val(),
+            phoneNumber: $(reservationPhoneNumberInput).val(),
+            reservedSeats: sc.activeNode.find('selected').seatIds,
+            eventId: eventId
+        });
+
+        utils.removeUnloadListener();
+
         try {
-            attendee = await createEventAttendee(reservationNameInputVal, reservationPhoneNumberInputVal, eventId);
-            for (let i = 0; i < selectedSeats.seatIds.length; i++) {
-                await createEventSeatReservation(selectedSeats.seatIds[i], eventId, attendee.id);
-            }
+            attendee = await ajax.post(routes.helper.reservations, attendee);
         } catch (error) {
             $(confirmReservationButton).prop('disabled', false);
-            return handleError(error);
+            return utils.handleError(error);
         }
 
         try {
-            await sendReservationConfirmSMS(attendee.id);
-            await flashSuccess("Successfully created a new reservation!");
+            await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
+            await ajax.post(routes.index.successFlash, "The reservation has been created successfully!");
         } catch (error) {
-            await flashError("Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
+            utils.throwException(error.message);
+            await ajax.post(routes.index.errorFlash, "Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
         } finally {
-            $(window).unbind('beforeunload');
             window.location.reload();
         }
     });
+
+    searchReservations = (val) => {
+        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == val);
+        if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
+
+        const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendee[0].id);
+        if (seatDetails.length === 0) return toast.danger("This attendee does not have any seats reserved for this event!");
+
+        sc.activeNode.find('highlighted').status('reserved');
+        sc.activeNode.get(seatDetails.map(seat => seat.seatNumber)).status('highlighted');
+
+        document.getElementById(seatChartCard.substring(1)).scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    };
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {
         $(seatDetailsSeatId).text(seatId);
@@ -419,20 +422,40 @@
         $(seatDetailsModal).modal();
     };
 
-    getLegendArray = (seats) => {
-        let legends = Object.keys(seats).reduce(function(legends, char) {
-            if (!seats[char].blocked){
-                legends.push([char, "available", seats[char].category]);
-            }
-            return legends;
-        }, []);
-        legends.push(["G", "blocked", "Blocked"]);
-        return legends;
-    }
-
-    $(window).on('beforeunload', function() {
-        return confirm();
-    });
+    renderSelectedSeatsOfCategory = (category, seats) => {
+        let $parentDiv = $('<div></div>')
+            .addClass('mt-1 mb-2');
+    
+        $parentDiv.append($('<span></span>')
+            .addClass('h6 text-muted')
+            .text(`${category} Seats`)
+        );
+    
+        let $seatRow = $('<div></div>')
+            .addClass('row-small-margin row mt-2')
+            .appendTo($parentDiv);
+    
+        for (let i = 0; i < seats.length; i++) {
+            var $seatCol = $('<div></div>')
+                .addClass('col-small-margin col-auto mb-2')
+                .appendTo($seatRow);
+    
+            var $card = $('<div></div>')
+                .addClass('card')
+                .appendTo($seatCol);
+    
+            var $cardBody = $('<div></div>')
+                .addClass('card-body py-2 px-3')
+                .appendTo($card);
+    
+            $cardBody.append($('<span></span>')
+                .addClass('h6')
+                .text(seats[i].settings.id)
+            );
+        }
+    
+        return $parentDiv;
+    };
 </script>
 
 <%- include('../templates/footer')-%>

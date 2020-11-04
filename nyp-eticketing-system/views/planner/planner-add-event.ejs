@@ -1,8 +1,8 @@
 <!-- TODO: Complete documentation for this part -->
 <!-- TODO: Delete seat types -->
 <!-- TODO: Delete student helper -->
-<!-- TODO: Rollback sequelize transaction on error -->
 <!-- TODO: Drag and select seats for helpers -->
+<!-- TODO: Pagination -->
 
 <%- include('../templates/head')-%>
 
@@ -25,7 +25,7 @@
                                 <label for="eventNameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Name</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" placeholder="e.g. Dance Competition"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" placeholder="e.g. Dance Competition" > <!-- Note that the name attribute is   to get textbox values from the backend. It should have the same value as the id.  --> 
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                                 <label for="eventDateTimeInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">Event Date / Time</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" placeholder="e.g 13th March 2021, 9am" required> <!-- This is where the user actually inputs all their stuff  -->
+                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" placeholder="e.g 13th March 2021, 9am" > <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
@@ -55,13 +55,11 @@
                     <div class="col-sm-6">
                         <div class="card input-card mt-3">
                             <div class="card-body no-label-card-body">
-                                <div id="prioritiseBackCheck">
-                                    <div class="form-check form-check-inline ml-2">
-                                        <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true">
-                                        <label class="form-check-label px-3" for="prioritiseBackCheck">
-                                            Prioritise seats at the back
-                                        </label>
-                                    </div>
+                                <div class="form-check form-check-inline ml-2">
+                                    <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true">
+                                    <label class="form-check-label px-3" for="prioritiseBackCheck">
+                                        Prioritise seats at the back
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -117,7 +115,7 @@
                         <div id="editMapLegend" class="row px-0">
                         </div>
                         <div class="mt-3"></div>
-                        <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
+                        <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types above and select a seat in the map to replace it with your selection.</span>
                     </div>
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
@@ -131,7 +129,7 @@
                         <div class="card input-card mb-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
                                 <label for="helperSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Student Helpers</small> <!-- The small element is where we actually write down what the input does  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Helpers</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
                                 <select id="helperSelectInput" name="helperSelectInput" class="form-control card-input" tabindex="0"> <!-- This is where the user actually inputs all their stuff  -->
                                     <option selected="true" disabled="disabled">Choose Helper</option> 
@@ -198,7 +196,7 @@
     const maxSeatsPerReservationInput = '#maxSeatsPerReservationInput';
     const prioritiseBackCheck = '#prioritiseBackCheck';
     const venueSelectInput = '#venueSelectInput';
-    const tableWrapper = '#tableWrapper';
+    const mapWrapper = '#tableWrapper';
     const seatMap = '#seatMap';
     const legend = '#editMapLegend';
     const addSeatTypeCard = '#addSeatTypeCard';
@@ -214,171 +212,176 @@
 
     let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
 
-    let selectedSeatType; // This variable will contain the character of the seat type we've selected
-    let selectedVenue;
+    const defaultSeatType = new SeatType({ char: 'G', category: 'General', blocked: false, classes: 'general' });
+    const handicappedSeatType = new SeatType({ char: 'H', category: 'Handicapped', blocked: false, classes: 'handicapped' });
+    let selectedSeatType = defaultSeatType.char; // This variable will contain the character of the seat type we've selected
 
     let venues = [];
     let helpers = [];
 
-    // Seat chart configuration
-    let sc = {};
+    let sc = new SeatChart({
+        map: [],
+        seatTypes: [
+            defaultSeatType,
+            handicappedSeatType
+        ],
+        legends: [],
+        rowLabels: SeatChart.alphabeticalLabels(),
+        columnLabels: SeatChart.undefinedLabels(),
+        mapNode: seatMap,
+        wrapperNode: mapWrapper,
+        legendNode: legend,
+    });
 
-    sc.map = [];
-
-    sc.seats = {
-        'G': {
-            category: 'General',
-            blocked: false,
-            classes : 'general',
-        },
-        'H': {
-            category: 'Handicapped',
-            blocked: false,
-            classes : 'handicapped',
-        }
-    };
-
-    sc.naming = {
-        rows: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE', 'FF','GG','HH','JJ','KK','LL','MM','NN','OO'],
-        getLabel: function (character, row, column) {
-            return row + ':' + column;
-        },
-        getId: function (character, row, column) {
-            return row + ':' + column;
-        }
-    };
-
-    sc.legend = {
-        node: $(legend),
-        items: []				
-    };
-
-    sc.click = function () {
-        if (sc.hasOwnProperty('map') && sc.hasOwnProperty('seats')) {
-            replaceMapSeat(sc.map, this, selectedSeatType, sc.seats[selectedSeatType]);
-        }
+    sc.onClick = function () {
+        sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType.char : selectedSeatType);
     };
 
     $(document).ready(async function() {
         try {
-            venues = await getAllVenues();
-            helpers = await getAllHelpers();
-
+            venues = (await ajax.get(routes.planner.venues)).map(venue => Venue.parseApiResult(venue));
+            helpers = (await ajax.get(routes.planner.helpers)).map((helper) => {
+                helper = EventHelper.parseApiResult(helper);
+                helper.selected = false;
+                return helper;
+            });
+            
             // at least a single venue is required to create an event, so throw error if it doesn't exists
             if (venues.length < 1) {
-                throwException("There are no venues available! Please contact the admin to create a venue.");
+                utils.throwException("There are no venues available! Please contact the admin to create a venue.");
             }
         } catch (error) {
-            return handleError(error);
+            return utils.handleError(error);
         }
-        
-        helpers.forEach(function (helper) {
-            helper.selected = false;
-        });
 
-        populateVenueSelect(venues, venueSelectInput);
-        populateHelperSelect(helpers, helperSelectInput);
-        populateSelectedHelperColumn(helpers, helpersCardCol);
+        Venue.populateSelect(venues, venueSelectInput);
+        EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
+        EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
 
-        sc.map = JSON.parse(getSelectedVenue(venues, venueSelectInput).seatMap);
-        sc.legend.items = Object.entries(sc.seats).map(([char, details]) => ([char, "available", details.category, selectableLegendClasses]));
+        sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
+        sc.legends = sc.seatTypes.reduce(function(legends, seatType){
+            if (seatType.char !== defaultSeatType.char){
+                legends.push([seatType.char, "available", seatType.category, selectableLegendClasses]);
+            }
+            return legends;
+        }, []);
 
         // Bind map
-        bindMap(sc, seatMap);
-        scaleContentWidth(tableWrapper, seatMap); // This function is used to scale the entire seat chart to fit within the card's dimensions when the seat chart is first created
+        sc.bindMap();
+        sc.scaleContentWidth();
     });
 
     $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
-        scaleContentWidth(tableWrapper, seatMap);
+        sc.scaleContentWidth();
     });
 
     $(venueSelectInput).on('change', function() {
-        sc.map = JSON.parse(getSelectedVenue(venues, venueSelectInput).seatMap);
-        reloadMap(sc, tableWrapper, seatMap, legend);
+        utils.addUnloadListener();
+
+        sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
+        sc.reloadMap();
     });
 
     $(helperSelectInput).on('change', function() {
-        getSelectedHelper(helpers, helperSelectInput).selected = true;
-        populateHelperSelect(helpers, helperSelectInput);
-        populateSelectedHelperColumn(helpers, helpersCardCol);
+        utils.addUnloadListener();
+
+        EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
+        EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
+        EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
     });
 
     $(addSeatTypeButton).click(function () {
-        if (availableSeatCharacters.length < 1) {
-            return showDangerToast("You cannot add anymore seat types! Please delete some if you want to add more.");
-        }
+        utils.addUnloadListener();
         
         const seatName = $(seatTypeNameInput).val();
         const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
+
+        if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         const seatCharacter = availableSeatCharacters[0];
-        const legendCategory = seatName + ((seatIsBlocked) ? " (Blocked)" : "");
-
-        if (seatName === "") {
-            return showDangerToast("Please enter a seat name!");
-        }
-
-        if (seatCharacter.length != 1) {
-            throwException("The string for the seat's character is not a single length character!")
-        }
-
-        sc.seats[seatCharacter] = {
-            category: seatName,
-            blocked: seatIsBlocked,
-            classes: seatCharacter,
-        };
-
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
-        sc.legend.items.push([seatCharacter, "available", legendCategory, selectableLegendClasses]); // Pushes a new legend to the legend items that will be shown upon reload
-        reloadMap(sc, tableWrapper, seatMap, legend);
+
+        if (seatName === "") return toast.danger("Please enter a seat name!");
+        if (seatCharacter.length != 1) utils.throwException("The string for the seat's character is not a single length character!");
+
+        const seatType = new SeatType({ 
+            char: seatCharacter, 
+            category: seatName, 
+            blocked: seatIsBlocked, 
+            classes: seatCharacter 
+        });
+        
+        selectedSeatType = seatType.char;
+        sc.seatTypes.push(seatType);
+        sc.legends.push([seatType.char, "available", seatType.category + ((seatIsBlocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+        sc.reloadMap();
+
+        const legendCards = document.querySelectorAll(".seatCharts-legendCard");
+        legendCards.forEach(obj => obj.classList.remove("highlighted"));
+        legendCards.forEach(obj => {
+            if (obj.getAttribute("data-seat-character") == seatType.char) {
+                obj.classList.add("highlighted");
+            }
+        });
         
         $(addSeatTypeModal).modal('hide'); // Hides the modal
         $(seatTypeNameInput).val(''); // Reset input to default state
         $(blockSeatTypeCheck).prop('checked', false);
     });
 
-    $(document).on("click", `.seatCharts-legendCard:not(${addSeatTypeCard})`, function() {
-        const seatCharAttr = $(this).attr("data-seat-character");
-        if (typeof seatCharAttr !== typeof undefined && seatCharAttr !== false) {
-            const highlighted = toggleHighlight(this, ".seatCharts-legendCard");
-            selectedSeatType = (highlighted === true) ? seatCharAttr : null;
-        } else {
-            $(this).removeClass("highlighted");
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('seatCharts-legendCard')) {
+            utils.addUnloadListener();
+
+            const node = e.target;
+            const seatCharAttr = node.getAttribute("data-seat-character");
+            const highlighted = node.classList.contains("highlighted");
+
+            document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+
+            if (seatCharAttr) {
+                node.classList.add((highlighted) ? null : "highlighted");
+                selectedSeatType = (highlighted) ? defaultSeatType.char : seatCharAttr;
+            }
         }
-    });
+
+        if (e.target.classList.contains('remove-helper')) {
+            const node = e.target;
+            helpers.forEach(helper => {
+                if (helper.id == node.id) helper.selected = false;
+            });
+
+            EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
+            EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
+        }
+    }, false);
 
     $(addEventForm).submit(async function (e) {
         e.preventDefault();
         $(createEventButton).prop('disabled', true);
 
+        const event = new Event({
+            name: $(eventNameInput).val(),
+            seatMap: sc.map,
+            startDateTime: $(eventDateTimeInput).val(),
+            seatsPerReservation: $(maxSeatsPerReservationInput).val(),
+            prioritiseBackRows: $(prioritiseBackCheck).is(':checked'),
+            venue: Venue.selectedOption(venues, venueSelectInput),
+            seatTypes: sc.seatTypes,
+            helpers: helpers.filter(helper => helper.selected == true)
+        });
+
         try {
-            const event = await createEvent(
-                $(eventNameInput).val(),
-                sc.map,
-                $(eventDateTimeInput).val(),
-                $(maxSeatsPerReservationInput).val(),
-                $(prioritiseBackCheck).is(':checked'),
-                getSelectedVenue(venues, venueSelectInput).id
-            );
-            
-            const seatTypeArray = getSeatTypeArray(sc.seats, event.id);
-            const eventHelperArray = getSelectedEventHelperArray(helpers, event.id);
+            await ajax.post(routes.planner.events, event.convertToApiFormat());
+            await ajax.post(routes.index.successFlash, "A new event has been created successfully!");
 
-            await createEventSeatTypes(seatTypeArray);
-            await createEventHelpers(eventHelperArray);
-            await flashSuccess("Successfully created a new reservation!");
-
-            $(window).unbind('beforeunload');
+            utils.removeUnloadListener();
             
             window.location.replace("/planner/events");
         } catch (error) {
-            handleError(error);
+            utils.handleError(error);
         } finally {
             $(createEventButton).prop('disabled', false);
         }
-    });
-
-    $(window).on('beforeunload', function() {
-        return confirm();
     });
 </script>
 
