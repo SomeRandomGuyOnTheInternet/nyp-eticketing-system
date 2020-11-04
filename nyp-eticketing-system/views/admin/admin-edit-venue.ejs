@@ -136,7 +136,7 @@
             const fetchedVenue = await ajax.get(`${routes.admin.venues}/${venueId}`);
             venue.id = fetchedVenue.id;
             venue.name = fetchedVenue.name;
-            venue.seatMap = fetchedVenue.seatMap;
+            venue.seatMap = JSON.parse(fetchedVenue.seatMap);
         } catch (error) {
             return utils.handleError(error);
         }
