@@ -93,6 +93,7 @@ app.use('/admin', adminRoute);
 app.use('/api', apiRoute);
 app.use('/api/admin', adminApiRoute);
 app.use('/api/planner', plannerApiRoute);
+app.use('/api/helper', helperApiRoute);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });

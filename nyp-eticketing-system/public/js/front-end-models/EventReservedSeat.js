@@ -7,7 +7,7 @@ class EventReservedSeat {
     }
 
     static parseApiResult(result) {
-        return new Event({
+        return new EventReservedSeat({
             id: result.id,
             seatNumber: result.seatNumber,
             attendeeId: result.attendeeId,

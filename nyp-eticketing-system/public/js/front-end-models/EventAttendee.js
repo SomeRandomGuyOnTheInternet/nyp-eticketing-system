@@ -5,6 +5,8 @@ class EventAttendee {
         this.name = obj.name;
         this.phoneNumber = obj.phoneNumber;
         this.createdAt = obj.createdAt;
+        this.reservedSeats = obj.reservedSeats;
+        this.eventId = obj.eventId;
     }
 
     static parseApiResult(result) {
@@ -14,14 +16,5 @@ class EventAttendee {
             phoneNumber: result.phoneNumber,
             createdAt: result.createdAt
         });
-    }
-
-    convertToApiFormat() {
-        return {
-            id: this.id,
-            name: this.name,
-            phoneNumber: this.phoneNumber,
-            createdAt: this.createdAt
-        }
     }
 }

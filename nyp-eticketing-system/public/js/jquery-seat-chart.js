@@ -784,8 +784,8 @@ class SeatChart {
         }
 	};
 
-	spliceRow = (startRow, endRow) => {
-		this.map.splice(startRow, Math.max(1, endRow));
+	spliceMapRow = (startRow, endRow) => {
+		this.map = this.map.splice(startRow, Math.max(1, endRow));
 	};
 
 	spliceMapCol = (startCol, endCol) => {
@@ -810,6 +810,38 @@ class SeatChart {
 			if (typeof reservedSeat !== 'undefined' && reservedSeat !== null) {
 				reservedSeat.status('reserved');
 			}
+		}
+	};
+
+	getQuadrantDimensions = (quadrant) => {
+		if (this.map.length == 0) {
+			return throwException("The given map has no rows!");
+		}
+	
+		if (this.map[0].length == 0) {
+			return throwException("The given map has no columns!");
+		}
+	
+		const rowStart = 0;
+		const colStart = 0;
+		const rowMid = Math.floor(this.map.length / 2);
+		const colMid = Math.floor(this.map[0].length / 2);
+		const rowEnd = this.map.length;
+		const colEnd = this.map[0].length;
+	
+		switch (quadrant) {
+			case "whole":
+				return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
+			case "topLeft":
+				return [[rowStart, Math.max(1, rowMid)], [colStart, Math.max(1, colMid)]];
+			case "topRight":
+				return [[rowStart, Math.max(1, rowMid)], [colMid, Math.max(1, colEnd)]];
+			case "bottomLeft":
+				return [[rowMid, Math.max(1, rowEnd)], [colStart, Math.max(1, colMid)]];
+			case "bottomRight":
+				return [[rowMid, Math.max(1, rowEnd)], [colMid, Math.max(1, colEnd)]];
+			default:
+				return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
 		}
 	};
 

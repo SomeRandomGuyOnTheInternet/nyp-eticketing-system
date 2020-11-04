@@ -32,13 +32,8 @@ class Venue {
     static selectedOption(venues, selectId) {
         const selectVal = document.getElementById(selectId.substring(1)).value;
 
-        if (!selectVal) {
-            throwException('The selected option is not valid. Please try again later!');
-        }
-    
-        if (isNaN(selectVal)) {
-            throwException('The selected option is not valid. Please try again later!');
-        }
+        if (!selectVal) throwException('The selected option is not valid. Please try again later!');
+        if (isNaN(selectVal)) throwException('The selected option is not valid. Please try again later!');
     
         return venues[parseInt(selectVal)];
     };

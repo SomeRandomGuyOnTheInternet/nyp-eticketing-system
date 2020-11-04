@@ -1,6 +1,9 @@
 // All APIs are contained here
 
 const express = require('express');
+const axios = require('axios');
+const moment = require('moment');
+const XML = require('pixl-xml');
 const router = express.Router();
 
 const sequelize = require('../../config/DBConfig');
@@ -13,7 +16,7 @@ const EventSeatType = require('../../models/EventSeatType');
 const EventHelper = require('../../models/EventHelper');
 const Venue = require('../../models/Venue');
 const EventReservedSeat = require('../../models/EventReservedSeat');
-const User = require('../../models/User');
+const EventAttendee = require('../../models/EventAttendee');
 
 router.get('/events/:id', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
@@ -23,7 +26,7 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 
         if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
 
-        let event = await Event.findByPk(eventId);
+        let event = await Event.findByPk(eventId, { raw: true });
 
         if (!event) return respond.error(res, "Please provide a valid event ID!");
 
@@ -31,6 +34,7 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
         event.venue = await Venue.findByPk(event.venueId);
         event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
         event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
+        event.attendees = await EventAttendee.getEventAttendees(eventId);
 
         return respond.success(res, "Event details have been retrieved successfully!", event);
     } catch (error) {
@@ -39,150 +43,91 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
     }
 });
 
-router.post('/events', auth.isPlanner, async (req, res) => {
+router.post('/reservations', auth.isHelper, async (req, res) => {
     const name = req.body.name;
-    const seatMap = JSON.stringify(req.body.seatMap);
-    const startDateTime = req.body.startDateTime;
-    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
-    const prioritiseBackRows = req.body.prioritiseBackRows;
-    const venueId = req.body.venueId;
-    const seatTypes = req.body.seatTypes;
-    const eventHelpers = req.body.eventHelpers;
+    const phoneNumber = parseInt(req.body.phoneNumber, 10);
+    const reservedSeats = req.body.reservedSeats;
+    const eventId = req.body.eventId;
 
-    if (!venueId) return respond.error(res, "Please provide a valid id for the venue!");
-    if (!name) return respond.error(res, "Please provide a event name!");
-    if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
-    if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
-    if (seatsPerReservation) {
-        if (isNaN(seatsPerReservation)) return respond.error(res, "Please provide a valid max number of seats per reservation!");
-        else if (seatsPerReservation < 1) return respond.error(res, "Please provide a higher number of seats per reservation!");
-        else if (seatsPerReservation > 10) return respond.error(res, "Please provide a lower number of seats per reservation!");
-    }
+    if (!name)  return respond.error(res, "Please provide an attendee name!");
+    if (!eventId) return respond.error(res, "Please provide an event id!");
+    if (!phoneNumber) return respond.error(res, "Please provide an attendee phone number!");
+    if (!(/^[0-9]{8}$/.test(phoneNumber))) return respond.error(res, "Please provide a valid eight digit attendee phone number!");
 
     let t = await sequelize.transaction();
 
     try {
-        const newEvent = await Event.create({
-            name: name,
-            seatMap: seatMap,
-            startDateTime: startDateTime,
-            seatsPerReservation: seatsPerReservation,
-            prioritiseBackRows: prioritiseBackRows,
-            venueId: venueId
-        },{
-            transaction: t
-        });
+        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+        if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
 
-        seatTypes.forEach(s => s.eventId = newEvent.id);
-        eventHelpers.forEach(h => h.eventId = newEvent.id);
-
-        await EventSeatType.bulkCreate(seatTypes, {
-            validate: true,
-            transaction: t
-        });
-        await EventHelper.bulkCreate(eventHelpers, {
-            validate: true,
-            transaction: t
-        });
-        
-        await t.commit();
-
-        return respond.success(res, "A new event has been created successfully!");
-    } catch (error) {
-        await t.rollback();
-
-        console.error(error);
-        return respond.error(res, "Something went wrong while creating this event. Please try again later!", 500);
-    }
-});
-
-router.put('/events/:id', auth.isPlanner, async (req, res) => {
-    const eventId = req.params.id;
-
-    const name = req.body.name;
-    const seatMap = JSON.stringify(req.body.seatMap);
-    const startDateTime = req.body.startDateTime;
-    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
-    const prioritiseBackRows = req.body.prioritiseBackRows;
-    const venueId = req.body.venueId;
-    const seatTypes = req.body.seatTypes;
-    const eventHelpers = req.body.eventHelpers;
-
-    if (!venueId) return respond.error(res, "Please provide a valid id for the venue!");
-    if (!name) return respond.error(res, "Please provide a event name!");
-    if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
-    if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
-    if (seatsPerReservation) {
-        if (isNaN(seatsPerReservation)) return respond.error(res, "Please provide a valid max number of seats per reservation!");
-        else if (seatsPerReservation < 1) return respond.error(res, "Please provide a higher number of seats per reservation!");
-        else if (seatsPerReservation > 10) return respond.error(res, "Please provide a lower number of seats per reservation!");
-    }
-
-    seatTypes.forEach(s => s.eventId = eventId);
-    eventHelpers.forEach(h => h.eventId = eventId);
-
-    let t = await sequelize.transaction();
-
-    try {
-        await Event.update(
-			{
+        let attendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
+        if (!attendee) {
+            attendee = await EventAttendee.create({
                 name: name,
-                seatMap: seatMap,
-                startDateTime: startDateTime,
-                seatsPerReservation: seatsPerReservation,
-                prioritiseBackRows: prioritiseBackRows,
-                venueId: venueId
-            },
-            { 
-                where: { 
-                    id: eventId 
-                },
+                phoneNumber: phoneNumber,
+                eventId: eventId
+            },{
                 transaction: t
-            },
-        );
+            });
+        }
 
-        await EventSeatType.destroy({ where: { eventId: eventId }, transaction: t });
-        await EventSeatType.bulkCreate(seatTypes, {
+        await EventReservedSeat.bulkCreate(reservedSeats.map(seatNumber => {
+            return {
+                seatNumber: seatNumber, 
+                eventId: eventId, 
+                attendeeId: attendee.id
+            }
+        }),{
             validate: true,
             transaction: t
         });
 
-        await EventHelper.destroy({ where: { eventId: eventId }, transaction: t });
-        await EventHelper.bulkCreate(eventHelpers, {
-            validate: true,
-            transaction: t
-        });
-        
         await t.commit();
 
-        return respond.success(res, "The event has been updated successfully!");
+        return respond.success(res, "Reservation has been created successfully!", attendee);
     } catch (error) {
         await t.rollback();
 
         console.error(error);
-        return respond.error(res, "Something went wrong while updating this event. Please try again later!", 500);
+        return respond.error(res, "Something went wrong while creating the reservation. Please try again later!", 500);
     }
 });
 
-router.delete('/events/:id', auth.isPlanner, async (req, res) => {
-    const id = req.params.id;
+router.post('/sms-reservation-confirm', auth.isHelper, async (req, res) => {
+    const attendeeId = req.body.attendeeId;
 
-    let t = await sequelize.transaction();
-    
+    if (!attendeeId) {
+        return respond.error(res, "Please provide an attendee id to send the confirmation to!");
+    }
+
     try {
-        await Event.destroy({ where: { id: id }, transaction: t });
-        await EventSeatType.destroy({ where: { eventId: id }, transaction: t });
-        await EventReservedSeat.destroy({ where: { eventId: id }, transaction: t });
-        await EventHelper.destroy({ where: { eventId: id }, transaction: t });
+        const attendee = await EventAttendee.getEventAttendeeById(attendeeId);
+        const reservedSeats = await EventReservedSeat.getAttendeeReservedSeat(attendee.id);
+        const event = await Event.getEventById(attendee.eventId);
+        
+        const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
 
-        await t.commit();
-
-        return respond.success(res, "The event has been deleted successfully!");
-    } catch (error) {        
-        await t.rollback();
-
+        const sms = await axios.post(
+            'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
+            `SMSAccount=${process.env.SMS_USERNAME}&Pwd=${process.env.SMS_PASSWORD}&Mobile=${attendee.phoneNumber}&Message=${message}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        );
+    
+        const dataRes = XML.parse(sms.data);
+    
+        if (dataRes._Data == "Success") {
+            return respond.success(res, "Successfully sent confirmation!");
+        } else {
+            console.error(dataRes._Data)
+            return respond.error(res, "Please provide a valid eight digit mobile number!");
+        }
+    } catch (error) {
         console.error(error);
-        return respond.error(res, "Something went wrong while deleting this event!", 500);
+        return respond.error(res, "Something went wrong while getting the attendee details for sending the SMS. Please try again later!", 500);
     }
 });
 

@@ -15,6 +15,8 @@ const routes = {
         venues: "/api/planner/venues",
     },
     helper: {
-        events: "/api/planner/events",
+        events: "/api/helper/events",
+        reservations: "/api/helper/reservations",
+        sendConfirmationSMS: "/api/helper/sms-reservation-confirm",
     }
 };

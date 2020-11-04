@@ -22,10 +22,10 @@ class Event {
             seatsPerReservation: result.seatsPerReservation,
             prioritiseBackRows: result.prioritiseBackRows,
             venue: Venue.parseApiResult(result.venue),
-            seatTypes: result.seatTypes?.map(seatType => SeatType.parseApiResult(seatType)),
-            helpers: result.helpers?.map(helper => EventHelper.parseApiResult(helper)),
-            reservedSeats: result.reservedSeats?.map(reservedSeat => EventReservedSeat.parseApiResult(reservedSeat)),
-            attendees: result.attendees?.map(attendee => EventAttendee.parseApiResult(attendee)),
+            seatTypes: result.seatTypes ? result.seatTypes?.map(seatType => SeatType.parseApiResult(seatType)) : [],
+            helpers: result.helpers ? result.helpers.map(helper => EventHelper.parseApiResult(helper)) : [],
+            reservedSeats: result.reservedSeats ? result.reservedSeats.map(reservedSeat => EventReservedSeat.parseApiResult(reservedSeat)) : [],
+            attendees: result.attendees ? result.attendees.map(attendee => EventAttendee.parseApiResult(attendee)) : [],
         });
     }
 

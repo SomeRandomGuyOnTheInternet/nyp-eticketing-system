@@ -226,5 +226,12 @@ div.seatCharts-seat.selected {
 
 div.seatCharts-seat.highlighted {
     opacity: 1;
-    background-color: #2cd42c;
+    animation: blinker 1s linear infinite;
+    background-color: #62ff62 !important;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
 }
