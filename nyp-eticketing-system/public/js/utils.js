@@ -22,6 +22,10 @@ class AppException extends Error {
     }
 };
 
+handleBeforeUnload = (event) => {
+    event.returnValue = '';
+  }
+
 const utils = {
     throwException: function(description) {// DO NOT USE THIS EVERYWHERE. Use this function whenever there's a rare error or you get unsatisfactory results from an asynchronous call. For normal stuff like validation, just showDangerToast
         throw new AppException(description); // description should be user-readable
@@ -48,12 +52,9 @@ const utils = {
         });
     },
     addUnloadListener: function () {
-        window.addEventListener('beforeunload', (event) => {
-            event.preventDefault();
-            event.returnValue = '';
-        });
+        window.addEventListener('beforeunload', handleBeforeUnload);
     }, 
     removeUnloadListener: function () {
-        window.removeEventListener('beforeunload', () => {}, true);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
     },
 };

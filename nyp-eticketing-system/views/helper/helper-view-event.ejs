@@ -255,6 +255,7 @@
     sc.onClick = function () {
         switch (this.status()) {
             case 'available':
+                utils.addUnloadListener();
                 return 'selected';
             case 'selected':
                 return 'available';
@@ -263,8 +264,6 @@
                 return 'blocked';
             case 'highlighted':
             case 'reserved':
-                utils.addUnloadListener();
-
                 const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
                 const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
 
@@ -324,7 +323,6 @@
         searchReservations($(this).val());
     });
 
-
     $(zoomQuadrantSelect).change(function() {
         sc.map = Array.from(event.seatMap);
 
@@ -378,8 +376,6 @@
             eventId: eventId
         });
 
-        utils.removeUnloadListener();
-
         try {
             attendee = await ajax.post(routes.helper.reservations, attendee);
         } catch (error) {
@@ -387,11 +383,12 @@
             return utils.handleError(error);
         }
 
+        utils.removeUnloadListener();
+
         try {
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
             await ajax.post(routes.index.successFlash, "The reservation has been created successfully!");
         } catch (error) {
-            utils.throwException(error.message);
             await ajax.post(routes.index.errorFlash, "Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
         } finally {
             window.location.reload();

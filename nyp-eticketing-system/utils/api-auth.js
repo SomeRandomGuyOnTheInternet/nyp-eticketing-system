@@ -4,7 +4,7 @@ module.exports.isUser = (req, res, next) => {
     if (req.user) {
         next();
     } else {
-        return ajax.error(res, "This api can only be accessed by signed in users!");
+        return ajax.error(res, "This api route can only be accessed by signed in users!");
     }
 }
 
@@ -19,36 +19,36 @@ module.exports.isSignedOut = (req, res, next) => {
 
 module.exports.isAdmin = (req, res, next) => {
     if (!req.user) {
-        return ajax.error(res, "This api can only be accessed by signed in admins!");
+        return ajax.error(res, "This api route can only be accessed by signed in admins!");
     }
     
     if (req.user.isAdmin) {
         next();
     } else {
-        return ajax.error(res, "This api can only be accessed by admins!");
+        return ajax.error(res, "This api route can only be accessed by admins!");
     }
 }
 
 module.exports.isPlanner = (req, res, next) => {
     if (!req.user) {
-        return ajax.error(res, "This api can only be accessed by signed in planners!");
+        return ajax.error(res, "This api route can only be accessed by signed in planners!");
     }
     
     if (req.user.isPlanner || req.user.isAdmin) {
         next();
     } else {
-        return ajax.error(res, "This api can only be accessed by planners!");
+        return ajax.error(res, "This api route can only be accessed by planners!");
     }
 }
 
 module.exports.isHelper = (req, res, next) => {
     if (!req.user) {
-        return ajax.error(res, "This api can only be accessed by signed in helpers!");
+        return ajax.error(res, "This api route can only be accessed by signed in helpers!");
     }
     
     if (req.user.isHelper || req.user.isPlanner || req.user.isAdmin) {
         next();
     } else {
-        return ajax.error(res, "This api can only be accessed by helpers!");
+        return ajax.error(res, "This api route can only be accessed by helpers!");
     }
 }

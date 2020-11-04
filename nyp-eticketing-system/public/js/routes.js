@@ -5,7 +5,7 @@ const routes = {
         errorFlash: "/api/error-flash"
     },
     admin: {
-        planner: "/api/admin/planner",
+        planners: "/api/admin/planners",
         helpers: "/api/admin/helpers",
         venues: "/api/admin/venues",
     },

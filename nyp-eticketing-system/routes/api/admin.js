@@ -9,7 +9,7 @@ const auth = require('../../utils/api-auth');
 const Venue = require('../../models/Venue');
 const User = require('../../models/User');
 
-router.get('/helpers', async (req, res) => {
+router.get('/helpers', auth.isAdmin, async (req, res) => {
     try {
         const helpers = await User.getHelpers();
         
@@ -20,7 +20,7 @@ router.get('/helpers', async (req, res) => {
     }
 });
 
-router.get('/venues', async (req, res) => {
+router.get('/venues', auth.isAdmin, async (req, res) => {
     try {
         const venues = await Venue.findAll({
             order: [['name', 'ASC']]
@@ -33,7 +33,7 @@ router.get('/venues', async (req, res) => {
     }
 });
 
-router.get('/venues/:id', async (req, res) => {
+router.get('/venues/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
 
     try {
