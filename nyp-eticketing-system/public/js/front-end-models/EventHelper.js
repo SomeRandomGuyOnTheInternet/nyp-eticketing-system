@@ -22,7 +22,7 @@ class EventHelper extends User {
         });
     };
 
-    static populateSelect = (helpers, selectId) => {
+    static populateSelect(helpers, selectId) {
         let select = document.getElementById(selectId.substring(1));
         [...select.options].forEach(option => option.remove());
 
@@ -61,7 +61,7 @@ class EventHelper extends User {
         return helper[0];
     };
     
-    static populateColumn = (helpers, columnId) => {
+    static populateColumn(helpers, columnId) {
         const column = $(columnId).empty();
 
         if (helpers.length > 0) {

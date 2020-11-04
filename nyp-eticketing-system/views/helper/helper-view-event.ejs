@@ -1,3 +1,11 @@
+<!-- TODO: Check for gaps -->
+<!-- TODO: Delete seat reservation -->
+<!-- TODO: Validate the number of seats -->
+<!-- TODO: Hide reservation until seat selected -->
+<!-- TODO: Make button have a loading icon -->
+<!-- TODO: Check whether back rows have empty seats -->
+<!-- TODO: Fix seats not showing up and select in safari -->
+
 <%- include('../templates/head')-%>
 
 <body>
@@ -267,7 +275,6 @@
                 const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
                 const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
 
-                console.log(event.attendees)
                 if (attendee.length !== 1) return this.style();
 
                 populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name}`, this.settings.data.classes);
@@ -349,7 +356,7 @@
         if (selectedSeats.length == 0) return toast.danger("Please select some seats to reserve for the attendee!");
         if (reservationNameInputVal === "") return toast.danger("Please enter a name for the attendee!");
         if (reservationPhoneNumberInputVal == "") return toast.danger("Please enter a phone number for the attendee!");
-        if (!(/^[0-9]{8}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
+        if (!(/^[89]{8}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
 
         const sortedSeats = selectedSeats.seats.reduce((sortedSeats, seat) => ({
             ...sortedSeats,

@@ -82,6 +82,14 @@ router.post('/events', auth.isPlanner, async (req, res) => {
         else if (seatsPerReservation > 10) return respond.error(res, "Please provide a lower number of seats per reservation!");
     }
 
+    const parsedDateTime = Date.parse(startDateTime);
+    const maxDate = new Date().setFullYear(new Date().getFullYear() + 5);
+    const minDate = new Date().setFullYear(new Date().getFullYear() - 5);
+
+    if (isNaN(parsedDateTime)) return respond.error(res, "Please provide a valid start date/time for the event!");
+    if (parsedDateTime > maxDate) return respond.error(res, "Please provide a lower start date/time for the event!");
+    if (parsedDateTime < minDate) return respond.error(res, "Please provide a higher start date/time for the event!");
+
     let t = await sequelize.transaction();
 
     try {
