@@ -13,5 +13,8 @@ const routes = {
         helpers: "/api/planner/helpers",
         events: "/api/planner/events",
         venues: "/api/planner/venues",
+    },
+    helper: {
+        events: "/api/planner/events",
     }
 };

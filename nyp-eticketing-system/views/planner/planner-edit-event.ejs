@@ -249,7 +249,7 @@
             event = Event.parseApiResult(await ajax.get(`${routes.planner.events}/${eventId}`));
             venues = (await ajax.get(routes.planner.venues)).map(venue => Venue.parseApiResult(venue));
             helpers = (await ajax.get(routes.planner.helpers)).map((helper) => {
-                let parsedHelper = EventHelper.parseApiResult(helper);
+                const parsedHelper = EventHelper.parseApiResult(helper);
                 for (i = 0; i < event.helpers.length; i++) {
                     parsedHelper.selected = (parsedHelper.id === event.helpers[i].id || parsedHelper.selected === true);
                 }
@@ -272,8 +272,8 @@
             }
         }
         
-        EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
-        EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
+        EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
+        EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         
         sc.map = event.seatMap;
         sc.seatTypes = event.seatTypes;
@@ -338,8 +338,9 @@
         sc.legends.push([seatType.char, "available", seatType.category + ((seatIsBlocked) ? " (Blocked)" : ""), selectableLegendClasses]);
         sc.reloadMap();
 
-        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
-        document.querySelectorAll(".seatCharts-legendCard").forEach(obj => {
+        const legendCards = document.querySelectorAll(".seatCharts-legendCard");
+        legendCards.forEach(obj => obj.classList.remove("highlighted"));
+        legendCards.forEach(obj => {
             if (obj.getAttribute("data-seat-character") == seatType.char) {
                 obj.classList.add("highlighted");
             }
@@ -411,8 +412,8 @@
 
         try {
             await ajax.update(`${routes.planner.events}/${eventId}`, event.convertToApiFormat());
-
             toast.success("The event has been successfully updated!");
+
             utils.removeUnloadListener();
         } catch (error) {
             utils.handleError(error);
@@ -420,10 +421,6 @@
             $(updateEventButton).prop('disabled', false);
         }
     });
-
-    // removeTakenSeatChars = (seats) => {
-    //     return Object.keys(seats).map((char) => [char, "available", seats[char].category.concat((seats[char].blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
-    // }
 </script>
 
 <%- include('../templates/footer')-%>

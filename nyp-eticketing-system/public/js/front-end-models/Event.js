@@ -1,4 +1,3 @@
-
 class Event {
     constructor(obj) {
         this.id = obj.id;
@@ -9,8 +8,8 @@ class Event {
         this.prioritiseBackRows = obj.prioritiseBackRows;
         this.venue = obj.venue;
         this.seatTypes = obj.seatTypes;
-        this.reservedSeats = obj.reservedSeats;
         this.helpers = obj.helpers;
+        this.reservedSeats = obj.reservedSeats;
         this.attendees = obj.attendees;
     }
 
@@ -23,8 +22,10 @@ class Event {
             seatsPerReservation: result.seatsPerReservation,
             prioritiseBackRows: result.prioritiseBackRows,
             venue: Venue.parseApiResult(result.venue),
-            seatTypes: result.seatTypes.map(seatType => SeatType.parseApiResult(seatType)),
-            helpers: result.helpers.map(helper => EventHelper.parseApiResult(helper)),
+            seatTypes: result.seatTypes?.map(seatType => SeatType.parseApiResult(seatType)),
+            helpers: result.helpers?.map(helper => EventHelper.parseApiResult(helper)),
+            reservedSeats: result.reservedSeats?.map(reservedSeat => EventReservedSeat.parseApiResult(reservedSeat)),
+            attendees: result.attendees?.map(attendee => EventAttendee.parseApiResult(attendee)),
         });
     }
 
@@ -38,7 +39,7 @@ class Event {
             prioritiseBackRows: this.prioritiseBackRows,
             venueId: this.venue?.id,
             seatTypes: this.seatTypes?.map(seatType => seatType.convertToApiFormat(this.id)),
-            eventHelpers: this.helpers?.map(helper => helper.convertToApiFormat(this.id)),
+            eventHelpers: this.helpers?.map(helper => helper.convertToApiFormat(this.id))
         }
     }
 }

@@ -45,13 +45,15 @@ router.get('/events/:id', auth.isPlanner, async (req, res) => {
     const eventId = req.params.id;
 
     try {
-        let event = await Event.findByPk(eventId, { raw: true });
-        event.venue = await Venue.findByPk(event.venueId, { raw: true });
+        let event = await Event.findByPk(eventId);
+
+        if (!event) return respond.error(res, "Please provide a valid event ID!");
+
+        event.seatMap = JSON.parse(event.seatMap);
+        event.venue = await Venue.findByPk(event.venueId);
         event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
         event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
         event.helpers = await EventHelper.getHelpersByEventId(eventId);
-
-        event.seatMap = JSON.parse(event.seatMap);
 
         return respond.success(res, "Event details have been retrieved successfully!", event);
     } catch (error) {

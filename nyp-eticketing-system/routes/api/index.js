@@ -246,7 +246,6 @@ router.get('/events/:eventId/', async (req, res) => {
     }
 });
 
-
 router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
     const eventId = req.params.eventId;
     const helperId = req.params.helperId;
@@ -262,6 +261,7 @@ router.get('/helpers/:helperId/events/:eventId/', async (req, res) => {
         event.seatTypes = await EventSeatType.getEventSeatTypes(eventId);
         event.reservedSeats = await EventReservedSeat.getEventReservedSeat(eventId);
         event.venue = await Venue.getVenueById(event.venueId);
+        event.attendees = await EventAttendee.getEventAttendees(eventId);
 
         return respond.success(res, "Successfully gotten event details for the helper!", event);
     } catch (error) {
