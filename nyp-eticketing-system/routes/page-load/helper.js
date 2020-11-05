@@ -3,6 +3,7 @@
 // All helper's webpages are contained here
 
 const express = require('express');
+const { Op } = require('sequelize');
 const router = express.Router();
 
 const flash = require('../../utils/flash');
@@ -10,6 +11,7 @@ const auth = require('../../utils/page-load-auth');
 
 const EventHelper = require('../../models/EventHelper');
 const Event = require('../../models/Event');
+const EventAttendee = require('../../models/EventAttendee');
 
 // When creating new routes avoid using the route's name in the webpage's name
 // Eg: Use router.get('/venues', ...) instead of router.get('/helper-venues', ...) cause then the url will be '/helper/helper-venues' which is super redundant
@@ -38,6 +40,15 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 	}
 
 	const event = await Event.getEventById(eventId);
+	const attendeesOnWaitingList = await EventAttendee.findAll({
+		where: { 
+			eventId: eventId,
+			noOfExtraAttendees: {
+				[Op.gt]: 0,
+			}
+		},
+		raw: true
+	});
 
 	if (!event) {
 		flash.error(req, "That ID does not belong to any event!");
@@ -49,6 +60,7 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 		title: event.name, 
 		user: req.user,
 		event: event,
+		attendeesOnWaitingList: attendeesOnWaitingList
 	});
 });
 

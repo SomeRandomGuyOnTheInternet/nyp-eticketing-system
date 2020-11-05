@@ -92,12 +92,12 @@
             </div>
             <% } %>
 
-            <form id="reserveSeatForm" action="/" method="post">
+            <form id="reserveSeatForm" action="/" method="post" class="d-none">
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <h3>Reservation</h3>
                 <div class="row">
                     <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
-                    <div class="col-sm-6">
+                    <div class="col-md-4">
                         <div class="card input-card mt-3">
                             <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
@@ -107,13 +107,12 @@
                                     <!-- The small element is where we actually write down what the input does  -->
                                 </label>
                                 <input id="reservationNameInput" name="reservationNameInput" class="form-control card-input" type="text"
-                                    placeholder="e.g. Lam En Qing">
-                                <!-- This is where the user actually inputs all their stuff  -->
+                                    placeholder="e.g. Lam En Qing"> <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
                     <!-- Select (combo box) Input Card  -->
-                    <div class="col-sm-6">
+                    <div class="col-md-4">
                         <div class="card input-card mt-3">
                             <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
@@ -127,11 +126,23 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="noOfExtraAttendeesInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">No. of Extra Attendees</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="noOfExtraAttendeesInput" name="noOfExtraAttendeesInput" class="form-control card-input" type="number" min="1" max="5" placeholder="e.g. 3">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4"></div>
                 <button id="reserveSeatButton" type="submit" class="btn btn-lg btn-primary responsive-float w-100">Reserve Seats</button>
             </form>
-            <div id="waitingListContainer" class="d-none">
+
+            <% if (attendeesOnWaitingList.length > 0) { %> 
+            <div id="waitingListContainer">
                 <div class="mt-6"></div>
                 <h3>Waiting List</h3>
                 <div class="mt-4"></div> <!-- Used for spacing between section heading and content  -->
@@ -145,25 +156,24 @@
                                     <tr>
                                         <th scope="col">Name</th>
                                         <th scope="col">Phone No.</th>
-                                        <th scope="col">No. of additional guests</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Time</th>
+                                        <th scope="col">No. of Extra Attendees</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="font-weight-medium">Lam En Qing</td>
-                                        <td class="font-weight-medium"><a href="#">90616192</a></td>
-                                        <td class="font-weight-medium">2</td>
-                                        <td class="font-weight-medium">18th April 2021</td>
-                                        <td class="font-weight-medium">9am</td>
+                                    <% for (i = 0; i < attendeesOnWaitingList.length; i++) { %>
+                                    <tr id="<%= attendeesOnWaitingList[i].id %>" class="waitingListRow">
+                                        <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].name %></a></td>
+                                        <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].phoneNumber %></a></td>
+                                        <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].noOfExtraAttendees %></a></td>
                                     </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
+            <% } %>
 
             <div class="modal fade" id="seatDetailsModal" tabindex="-1" role="dialog" aria-labelledby="seatDetailsModal" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -195,8 +205,11 @@
                             </button>
                             <div class="row">
                                 <div class="col-5 mb-3 pl-0">
-                                    <span id="reservationConfirmName" class="h2 text-primary text-break-hyphen"></span><br>
+                                    <span id="reservationConfirmName" class="h4 text-primary text-break-hyphen"></span><br>
                                     <span id="reservationConfirmPhNo" class="h5 text-break-hyphen"></span>
+                                    <div id="reservationConfirmExtraAttendees" class="text-secondary mt-3 text-break font-italic">
+                                        <span id="reservationConfirmNoOfExtraAttendees">0</span> extra attendees
+                                    </div>
                                 </div>
                                 <div class="col-7 pr-0">
                                     <div id="selectedSeatConfirmationWrapper" class="mb-3">
@@ -232,15 +245,20 @@
     const reserveSeatForm = '#reserveSeatForm';
     const reservationNameInput = '#reservationNameInput';
     const reservationPhoneNumberInput = '#reservationPhoneNumberInput';
+    const noOfExtraAttendeesInput = '#noOfExtraAttendeesInput';
     const reserveSeatButton = '#reserveSeatButton';
     const seatDetailsModal = '#seatDetailsModal';
     const seatDetailsSeatCell = '#seatDetailsSeatCell';
     const seatDetailsSeatId = '#seatDetailsId';
     const seatDetailsDescription = '#seatDetailsDescription';
     const waitingListContainer = '#waitingListContainer';
+    const waitingListRow = '.waitingListRow';
+    const waitingListRowDelete = '.waitingListRowDelete';
     const reservationDetailsModal = '#reservationDetailsModal';
     const reservationConfirmName = '#reservationConfirmName';
     const reservationConfirmPhNo = '#reservationConfirmPhNo';
+    const reservationConfirmExtraAttendees = '#reservationConfirmExtraAttendees';
+    const reservationConfirmNoOfExtraAttendees = '#reservationConfirmNoOfExtraAttendees';
     const selectedSeatConfirmationWrapper = '#selectedSeatConfirmationWrapper';
     const confirmReservationButton = '#confirmReservationButton';
 
@@ -260,30 +278,7 @@
         legendNode: legend,
     });
 
-    sc.onClick = function () {
-        switch (this.status()) {
-            case 'available':
-                utils.addUnloadListener();
-                return 'selected';
-            case 'selected':
-                return 'available';
-            case 'blocked':
-                populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);
-                return 'blocked';
-            case 'highlighted':
-            case 'reserved':
-                const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
-                const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
-
-                if (attendee.length !== 1) return this.style();
-
-                populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name}`, this.settings.data.classes);
-                
-                return this.status();
-            default:
-                return this.style();
-        }
-    };
+    sc.onClick = seatOnClick();
 
     // Rest of the functions
     $(document).ready(async function() {
@@ -302,6 +297,7 @@
             return legends;
         }, []);
         sc.legends.push(["G", "blocked", "Blocked"]);
+        sc.onClick = 
 
         sc.bindMap();
         sc.scaleContentWidth();
@@ -315,7 +311,12 @@
     });
 
     $(searchReservationInput).keyup(function(e) {
-        if (e.keyCode == 13) searchReservations(e.target.value);
+        // if (e.keyCode == 13) {
+        //     const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(this).val());
+        //     if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
+
+        //     highlightAttendeeSeats(attendee[0].id);
+        // }
         if (e.target.value.length === 0) $(clearSearchReservationBtn).hide();
         else $(clearSearchReservationBtn).show();
     });
@@ -327,7 +328,12 @@
     });
 
     $(searchReservationBtn).click(function() {
-        searchReservations($(this).val());
+        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(this).val());
+        if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
+
+        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
+
+        highlightAttendeeSeats(attendee[0].id);
     });
 
     $(zoomQuadrantSelect).change(function() {
@@ -346,11 +352,30 @@
         sc.disableReservedSeats(event.reservedSeats);
     });
 
+    $(waitingListRow).click(function() {
+        const attendee = event.attendees.filter(attendee => attendee.id == this.id);
+        const wasActive = this.classList.contains("table-active");
+
+        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
+        sc.activeNode.find('highlighted').status('reserved');
+
+        if (attendee.length == 1) {
+            $(reservationNameInput).val((wasActive) ? '' : attendee[0].name);
+            $(reservationPhoneNumberInput).val((wasActive) ? '' : attendee[0].phoneNumber);
+
+            this.classList.add((wasActive) ? null : "table-active");
+            (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
+        } else {
+            return toast.danger("Something went wrong while retrieving the seats for that attendee!");
+        }
+    });
+
     $(reserveSeatForm).submit(async function (e) {
         e.preventDefault();
 
         const reservationNameInputVal = $(reservationNameInput).val();
         const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
+        const noOfExtraAttendeesInputVal = $(noOfExtraAttendeesInput).val();
         const selectedSeats = sc.activeNode.find('selected');
 
         if (selectedSeats.length == 0) return toast.danger("Please select some seats to reserve for the attendee!");
@@ -366,6 +391,8 @@
         $(selectedSeatConfirmationWrapper).empty();
         $(reservationConfirmName).text(reservationNameInputVal);
         $(reservationConfirmPhNo).text(reservationPhoneNumberInputVal);
+        $(reservationConfirmExtraAttendees).toggle(noOfExtraAttendeesInputVal !== '');
+        $(reservationConfirmNoOfExtraAttendees).text(noOfExtraAttendeesInputVal);
         for (const category in sortedSeats) {
             $(selectedSeatConfirmationWrapper).append(renderSelectedSeatsOfCategory(category, sortedSeats[category]));
         }
@@ -380,6 +407,7 @@
             name: $(reservationNameInput).val(),
             phoneNumber: $(reservationPhoneNumberInput).val(),
             reservedSeats: sc.activeNode.find('selected').seatIds,
+            noOfExtraAttendees: $(noOfExtraAttendeesInput).val(),
             eventId: eventId
         });
 
@@ -388,7 +416,7 @@
         } catch (error) {
             $(confirmReservationButton).prop('disabled', false);
             return utils.handleError(error);
-        }
+        } 
 
         utils.removeUnloadListener();
 
@@ -402,17 +430,14 @@
         }
     });
 
-    searchReservations = (val) => {
-        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == val);
-        if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
-
-        const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendee[0].id);
+    highlightAttendeeSeats = (attendeeId) => {
+        const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendeeId);
         if (seatDetails.length === 0) return toast.danger("This attendee does not have any seats reserved for this event!");
 
         sc.activeNode.find('highlighted').status('reserved');
         sc.activeNode.get(seatDetails.map(seat => seat.seatNumber)).status('highlighted');
 
-        document.getElementById(seatChartCard.substring(1)).scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+        document.getElementById(seatChartCard.substring(1)).scrollIntoView({behavior: "smooth", block: "nearest", inline: "nearest"});
     };
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {
@@ -424,6 +449,47 @@
             .addClass(cssClasses);
             
         $(seatDetailsModal).modal();
+    };
+
+    function seatOnClick() {
+        return function () {
+            switch (this.status()) {
+                case 'available':
+                    utils.addUnloadListener();
+
+                    $(reserveSeatForm).removeClass("d-none");
+                    const selectedSeatIds = sc.activeNode.find('selected').seatIds;
+
+                    if (event.seatsPerReservation) {
+                        if (selectedSeatIds.length >= event.seatsPerReservation) {
+                            toast.danger("You have reached the maximum number of seats allowed per reservation!")
+                            return 'available';
+                        }
+                    }  
+
+                    return 'selected';
+                case 'selected':
+                    if (sc.activeNode.find('selected').seatIds.length <= 1) {
+                        $(reserveSeatForm).addClass("d-none");
+                    } else {
+                        $(reserveSeatForm).removeClass("d-none");
+                    }
+                    return 'available';
+                case 'blocked':
+                    populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);
+                    return 'blocked';
+                case 'highlighted':
+                case 'reserved':
+                    const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
+                    const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
+                    if (attendee.length !== 1) return this.style();
+
+                    populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name}`, this.settings.data.classes);
+                    return this.status();
+                default:
+                    return this.style();
+            }
+        };
     };
 
     renderSelectedSeatsOfCategory = (category, seats) => {

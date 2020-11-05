@@ -112,17 +112,17 @@
                             </thead>
                             <tbody>
                                 <% for (i = 0; i < helpers.length; i++) { %>
-                                    <tr>
-                                        <td scope="row"><%= i + 1 %></td>
-                                        <td class="font-weight-medium"><a href="#"><%= helpers[i].name %></a></td>
-                                        <td><%= helpers[i].email %></td>
-                                        <td><%= moment(helpers[i].createdAt).format('Do MMMM YYYY') %></td>
-                                        <td>
-                                            <a href="/admin/deletehelper/<%= helpers[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
-                                                <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td scope="row"><%= i + 1 %></td>
+                                    <td class="font-weight-medium"><a href="#"><%= helpers[i].name %></a></td>
+                                    <td><%= helpers[i].email %></td>
+                                    <td><%= moment(helpers[i].createdAt).format('Do MMMM YYYY') %></td>
+                                    <td>
+                                        <a href="/admin/deletehelper/<%= helpers[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
+                                            <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
                                 <% } %>
                             </tbody>
                         </table>

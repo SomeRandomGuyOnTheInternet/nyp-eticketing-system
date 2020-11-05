@@ -1,10 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
 
-const Venue = require('./Venue');
-const Event = require('./Event');
-const EventReservedSeat = require('./EventReservedSeat');
-
 // DO NOT SPECIFY PRIMARY OR FOREIGN KEYS HERE
 // Go to DBConnection.js for more details
 
@@ -15,6 +11,10 @@ const EventAttendee = db.define('EventAttendee', {
     phoneNumber: {
         type: Sequelize.INTEGER
     },
+    noOfExtraAttendees: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    }
 });
 
 module.exports = EventAttendee;
