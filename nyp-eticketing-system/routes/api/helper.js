@@ -52,7 +52,7 @@ router.post('/reservations', auth.isHelper, async (req, res) => {
     if (!name)  return respond.error(res, "Please provide an attendee name!");
     if (!eventId) return respond.error(res, "Please provide an event id!");
     if (!phoneNumber) return respond.error(res, "Please provide an attendee phone number!");
-    if (!(/^[0-9]{8}$/.test(phoneNumber))) return respond.error(res, "Please provide a valid eight digit attendee phone number!");
+    if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please provide a valid eight digit attendee phone number!");
 
     let t = await sequelize.transaction();
 

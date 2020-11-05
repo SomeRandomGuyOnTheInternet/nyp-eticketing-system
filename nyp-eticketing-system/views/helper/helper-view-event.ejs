@@ -356,7 +356,7 @@
         if (selectedSeats.length == 0) return toast.danger("Please select some seats to reserve for the attendee!");
         if (reservationNameInputVal === "") return toast.danger("Please enter a name for the attendee!");
         if (reservationPhoneNumberInputVal == "") return toast.danger("Please enter a phone number for the attendee!");
-        if (!(/^[89]{8}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
+        if (!(/^(8|9)[0-9]{7}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
 
         const sortedSeats = selectedSeats.seats.reduce((sortedSeats, seat) => ({
             ...sortedSeats,
