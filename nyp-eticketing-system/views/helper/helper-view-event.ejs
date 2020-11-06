@@ -132,7 +132,7 @@
                                 <label for="noOfExtraAttendeesInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">No. of Extra Attendees</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="noOfExtraAttendeesInput" name="noOfExtraAttendeesInput" class="form-control card-input" type="number" min="1" max="5" placeholder="e.g. 3">
+                                <input id="noOfExtraAttendeesInput" name="noOfExtraAttendeesInput" class="form-control card-input" type="number" min="1" max="5" placeholder="Leave empty if no extra attendees">
                             </div>
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                                     <br>
                                     <span id="seatDetailsDescription" class="align-self-center"></span>
                                 </div>
-                                <i id="seatDetailsDelete" class="d-flex justify-content-end align-items-center fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                <!-- <i id="seatDetailsDelete" class="d-flex justify-content-end align-items-center fa fa-trash text-danger" style="font-size: 25px;"></i> -->
                             </div>
                         </div>
                     </div>
@@ -278,7 +278,7 @@
         legendNode: legend,
     });
 
-    sc.onClick = seatOnClick();
+    sc.onClick = seatClickCallback();
 
     // Rest of the functions
     $(document).ready(async function() {
@@ -328,7 +328,7 @@
     });
 
     $(searchReservationBtn).click(function() {
-        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(this).val());
+        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(searchReservationInput).val());
         if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
 
         document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
@@ -337,6 +337,8 @@
     });
 
     $(zoomQuadrantSelect).change(function() {
+        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
+
         sc.map = Array.from(event.seatMap);
 
         const dimensions = sc.getQuadrantDimensions($(zoomQuadrantSelect).val());
@@ -451,7 +453,7 @@
         $(seatDetailsModal).modal();
     };
 
-    function seatOnClick() {
+    function seatClickCallback() {
         return function () {
             switch (this.status()) {
                 case 'available':
@@ -465,15 +467,12 @@
                             toast.danger("You have reached the maximum number of seats allowed per reservation!")
                             return 'available';
                         }
-                    }  
-
+                    }
                     return 'selected';
                 case 'selected':
-                    if (sc.activeNode.find('selected').seatIds.length <= 1) {
-                        $(reserveSeatForm).addClass("d-none");
-                    } else {
-                        $(reserveSeatForm).removeClass("d-none");
-                    }
+                    (sc.activeNode.find('selected').seatIds.length <= 1)
+                        ? $(reserveSeatForm).addClass("d-none")
+                        : $(reserveSeatForm).removeClass("d-none");
                     return 'available';
                 case 'blocked':
                     populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);

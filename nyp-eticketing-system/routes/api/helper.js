@@ -113,6 +113,7 @@ router.put('/reservations/:id', auth.isHelper, async (req, res) => {
     const name = req.body.name;
     const phoneNumber = parseInt(req.body.phoneNumber, 10);
     const noOfExtraAttendees = req.body.noOfExtraAttendees == '' ? 0 : req.body.noOfExtraAttendees;
+    const reservedSeats = req.body.reservedSeats;
     const eventId = req.body.eventId;
 
     if (!name)  return respond.error(res, "Please provide an attendee name!");
@@ -137,6 +138,18 @@ router.put('/reservations/:id', auth.isHelper, async (req, res) => {
             noOfExtraAttendees: noOfExtraAttendees
         },{ 
             where: { id: attendeeId },
+            transaction: t
+        });
+
+        await EventReservedSeat.destroy({ where: { attendeeId: attendeeId }, transaction: t });
+        await EventReservedSeat.bulkCreate(reservedSeats.map(seatNumber => {
+            return {
+                seatNumber: seatNumber, 
+                eventId: eventId, 
+                attendeeId: attendeeId
+            }
+        }),{
+            validate: true,
             transaction: t
         });
 
