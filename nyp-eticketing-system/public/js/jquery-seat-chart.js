@@ -659,14 +659,33 @@ function resizeArray(arr, size, defval) {
     }
 };
 
+function orderByCountAndDedupe(arr) {
+    const counts = new Map();
+
+    arr.forEach(item => {
+        if (!counts.has(item)) {
+            counts.set(item, 1);
+        } else {
+            counts.set(item, counts.get(item)+1);
+        }
+    });
+
+    return (
+        Array.from(counts)
+            .sort((a, b) => b[1] - a[1])
+            .map(([originalItem, count]) => originalItem)
+    );
+ };
+
 // Seat chart class to make our life easier
 class SeatChart {
 	constructor(obj) {
-        this.map = obj.map;
+        this._map = obj.map;
 		this.seatTypes = obj.seatTypes;
 		this.legends = obj.legends;
 		this.rowLabels = obj.rowLabels;
 		this.columnLabels = obj.columnLabels;
+		this.charactersSortedByFrequency = [];
 
 		this.mapNode = obj.mapNode;
 		this.wrapperNode = obj.wrapperNode;
@@ -675,6 +694,22 @@ class SeatChart {
 
 		this.onClick = null;
 	};
+
+	get map() {
+		return this._map;
+	}
+
+	set map(val) {
+		this._map = val;
+		this.charactersSortedByFrequency = orderByCountAndDedupe(
+			[].concat(...this._map.map(row => row.split("")))
+		)
+
+		const index = this.charactersSortedByFrequency.indexOf("_")
+		if (index > -1) { 
+			this.charactersSortedByFrequency.splice(index, 1) 
+		}
+	}
 
 	// Binding and reloading map stuff
 	bindMap() {
@@ -687,7 +722,7 @@ class SeatChart {
                 };
 				return seats;
 			}, {}),
-			map: this.map,
+			map: this._map,
 			naming: {
 				rows: this.rowLabels,
 				getLabel: function (character, row, column) {
@@ -761,7 +796,7 @@ class SeatChart {
 	};
 
 	replaceMapSeatCharacter(seatSettings, newCharacter) {
-		this.map[seatSettings.row] = this.map[seatSettings.row].replaceAt(seatSettings.column, newCharacter);
+		this._map[seatSettings.row] = this._map[seatSettings.row].replaceAt(seatSettings.column, newCharacter);
 	};
 
 	replaceMapSeatClasses(node, classes) {
@@ -773,32 +808,32 @@ class SeatChart {
 	};
 
 	replaceMapSeatCharacters(characterToReplace, newCharacter) {
-		for (let i = 0; i < this.map.length; i++) {
-			this.map[i] = this.map[i].replaceAll(characterToReplace, newCharacter);
+		for (let i = 0; i < this._map.length; i++) {
+			this._map[i] = this._map[i].replaceAll(characterToReplace, newCharacter);
 		}
 	};
 
 	resizeRows(columns, rows) {
 		const defaultRow = defaultSeat.repeat(columns); // The default row is just the one that gets assigned to any new row that's created. We take the number of columns the user input and multiply it by the default seat type (general, G) to get it
-        resizeArray(this.map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
+        resizeArray(this._map, rows, defaultRow); // And then we use the resize function to remove or add rows with the default row depending on the user's input
 	};
 	
 	resizeColumns(columns, rows) {
 		for (let i = 0; i < rows; i++) { // To change the number of columns we have to loop through each row indvidually and resize them
-            const splitRow = [...this.map[i]]; // Since rows are stored as strings in the map, we have to split them into an array
+            const splitRow = [...this._map[i]]; // Since rows are stored as strings in the map, we have to split them into an array
             resizeArray(splitRow, columns, defaultSeat); // Then we just have to join the array into a string and then put them back into the map
-			this.map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
+			this._map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
         }
 	};
 
 	spliceMapRow(startRow, endRow) {
-		this.map = this.map.splice(startRow, Math.max(1, endRow));
+		this._map = this._map.splice(startRow, Math.max(1, endRow));
 	};
 
 	spliceMapCol(startCol, endCol) {
-		for (let i = 0; i < this.map.length; i++) {
-			const splitRow = [...this.map[i]].splice(startCol, Math.max(1, endCol)); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
-			this.map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
+		for (let i = 0; i < this._map.length; i++) {
+			const splitRow = [...this._map[i]].splice(startCol, Math.max(1, endCol)); // Since rows are stored as strings in the map, we have to split them into an array and then splice them
+			this._map[i] = splitRow.join(""); // Then we just have to join the array into a string and then put them back into the map
 		}
 	};
 
@@ -821,20 +856,20 @@ class SeatChart {
 	};
 
 	getQuadrantDimensions(quadrant) {
-		if (this.map.length == 0) {
+		if (this._map.length == 0) {
 			return throwException("The given map has no rows!");
 		}
 	
-		if (this.map[0].length == 0) {
+		if (this._map[0].length == 0) {
 			return throwException("The given map has no columns!");
 		}
 	
 		const rowStart = 0;
 		const colStart = 0;
-		const rowMid = Math.floor(this.map.length / 2);
-		const colMid = Math.floor(this.map[0].length / 2);
-		const rowEnd = this.map.length;
-		const colEnd = this.map[0].length;
+		const rowMid = Math.floor(this._map.length / 2);
+		const colMid = Math.floor(this._map[0].length / 2);
+		const rowEnd = this._map.length;
+		const colEnd = this._map[0].length;
 	
 		switch (quadrant) {
 			case "whole":
@@ -852,71 +887,69 @@ class SeatChart {
 		}
 	};
 
-	// findNearestAvailableSeat(character, row, column) {
-	// 	const seatIdMap = sc.activeNode.seatIdMap;
-	// 	console.log(sc.map[0].length);
-
-	// 	for (let i = 0; i < row; i++) {
-	// 		for (let j = column; j < sc.map[0].length + 1; j++) {
-	// 			console.log(sc.activeNode.get(seatIdMap[i][j]));
-	// 			const seat = sc.activeNode.get(seatIdMap[i][j]);
-	// 			if (seat.length !== 0) {
-	// 				if (seat.settings.character === character && seat.settings.status === "available") {
-	// 					return j;
-	// 				}
-	// 			}
-	// 		}
-	// 		// // Left side checking , left to selected point. 1 .. 3
-	// 		// for (let j = 0; j < column; j++) {
-	// 		// 	console.log("getting seat details")
-	// 		// 	const seat = sc.activeNode.get(seatIdMap[i][j]);
-	// 		// 	if (seat.length !== 0) {
-	// 		// 		if (seat.settings.character === character && seat.settings.status === "available") {
-	// 		// 			return j;
-	// 		// 		}
-	// 		// 	}
-	// 		// }
-	// 		// // right side checking , selected point to right 3..38
-	// 		// for (let j = column; j < sc.map[0].length; j++) {
-	// 		// 	const seat = sc.activeNode.get(seatIdMap[i][j]);
-	// 		// 	if (seat.length !== 0) {
-	// 		// 		if (seat.settings.character === character && seat.settings.status === "available") {
-	// 		// 			return j;
-	// 		// 		}
-	// 		// 	}
-	// 		// }
-	// 	}
-	// }
-
-	findNearestAvailableSeat(character, row, column) {
+	findNearestAvailableSeat(row, column, character) {
 		const seatIdMap = sc.activeNode.seatIdMap;
-		let distance = -1;
-		let closestRow = 0;
-		let closestColumn = 0;
 
-		for (let i = 0; i < seatIdMap.length; i++) {
-			for (let k = 0; k < seatIdMap[i].length; k++) {
-				const curDistance = Math.abs(i - row) + Math.abs(k - column);
-				const seat = sc.activeNode.get(seatIdMap[i][k]);
-				
-				if (seat.length !== 0) {
-					if (seat.settings.character === character && seat.settings.status === "available") {
-						if (row === i && curDistance === 1) {
-							return sc.activeNode.seatIdMap[i][k];
-						}
+		for (let i = 0; i <= row; i++) {
+			const availableSeatOnRight = this.searchRowForAvailableSeat(row, column, character, seatIdMap, false, true);
+			if (availableSeatOnRight !== null) return availableSeatOnRight;
 
-						if (distance === -1 || distance > curDistance) {
-							distance = curDistance;
-							closestRow = i;
-							closestColumn = k;
-						}
-					}
-				}
+			const availableSeatOnLeft = this.searchRowForAvailableSeat(row, column, character, seatIdMap, true, false);
+			if (availableSeatOnLeft !== null) return availableSeatOnLeft;
+		}
+	}
+
+	searchRowForAvailableSeat(row, column, character, seatIdMap, left = false, right = false) {
+		if (row < 0 || row >= sc.map[0].length) {
+			return null;
+		}
+
+		const seat = sc.activeNode.get(seatIdMap[row][column]);
+		if (seat.length !== 0) {
+			if (seat.settings.character === character && seat.settings.status === "available") {
+				return seat;
 			}
 		}
 
-		return sc.activeNode.seatIdMap[closestRow][closestColumn];
+		if (left) return this.searchRowForAvailableSeat(row, column - 1, character, seatIdMap, left, right);
+		else if (right) return this.searchRowForAvailableSeat(row, column + 1, character, seatIdMap, left, right);
 	}
+
+	selectNearestAvailableSeat(row, column, character) {
+		const nearestSeat = this.findNearestAvailableSeat(row, column, character);
+		if (nearestSeat !== null) this.activeNode.get(nearestSeat.settings.id).status('selected');
+		return nearestSeat;
+	}
+
+	// findNearestAvailableSeat(character, row, column) {
+	// 	const seatIdMap = sc.activeNode.seatIdMap;
+	// 	let distance = -1;
+	// 	let closestRow = 0;
+	// 	let closestColumn = 0;
+
+	// 	for (let i = 0; i < seatIdMap.length; i++) {
+	// 		for (let k = 0; k < seatIdMap[i].length; k++) {
+	// 			const curDistance = Math.abs(i - row) + Math.abs(k - column);
+	// 			const seat = sc.activeNode.get(seatIdMap[i][k]);
+				
+	// 			if (seat.length !== 0) {
+	// 				if (seat.settings.character === character && seat.settings.status === "available") {
+	// 					if (row === i && curDistance === 1) {
+	// 						return sc.activeNode.seatIdMap[i][k];
+	// 					}
+
+	// 					if (distance === -1 || distance > curDistance) {
+	// 						distance = curDistance;
+	// 						closestRow = i;
+	// 						closestColumn = k;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return sc.activeNode.seatIdMap[closestRow][closestColumn];
+	// }
 
 	static alphabeticalLabels() {
 		return ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'];

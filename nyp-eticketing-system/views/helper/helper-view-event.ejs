@@ -363,20 +363,26 @@
         if (node.classList.contains("clickable-div") && node.classList.contains("seatCharts-legendCard")) {
             utils.addUnloadListener();
 
-            const seatCharAttr = node.getAttribute("data-seat-character");
-            if (seatCharAttr) {
-                const selectedSeatIds = sc.activeNode.find('selected').seatIds; 
-                let seatId;
+            const character = node.getAttribute("data-seat-character");
 
-                if (selectedSeatIds.length === 0) {
-                    console.log(sc.map.length)
-                    seatId = sc.findNearestAvailableSeat(seatCharAttr, sc.map.length - 1, 0);
-                } else {
-                    let lastSelectedSeat = sc.activeNode.get(selectedSeatIds.slice(-1)[0]);
-                    seatId = sc.findNearestAvailableSeat(seatCharAttr, lastSelectedSeat.settings.row, lastSelectedSeat.settings.column);
+            if (character) {
+                let selectedSeatsCharacters = (sc.activeNode.find('selected').seats).map(seat => seat.settings.character);
+                selectedSeatsCharacters.push(character);
+
+                if (event.seatsPerReservation) {
+                    if (selectedSeatsCharacters.length > event.seatsPerReservation) {
+                        toast.danger("You have reached the maximum number of seats allowed per reservation!")
+                        return;
+                    }
                 }
 
-                sc.activeNode.get(seatId).status('selected');
+                if (selectedSeatsCharacters.length > 0) {
+                    $(reserveSeatForm).removeClass("d-none");
+                    sc.activeNode.find('selected').status('available');
+                    // const sortedCharacters = sc.charactersSortedByFrequency.reverse();
+                    // selectedSeatsCharacters.sort((a, b) => sortedCharacters.indexOf(a) - sortedCharacters.indexOf(b));
+                    selectedSeatsCharacters.forEach(seatCharacter => sc.selectNearestAvailableSeat(sc.map.length - 1, 0, seatCharacter));
+                }
             }
         }
     }, false);
