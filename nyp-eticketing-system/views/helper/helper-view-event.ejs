@@ -387,6 +387,23 @@
         }
     }, false);
 
+    $(waitingListRow).click(function() {
+        const attendee = event.attendees.filter(attendee => attendee.id == this.id);
+        const wasActive = this.classList.contains("table-active");
+
+        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
+        sc.activeNode.find('highlighted').status('reserved');
+        
+        if (attendee.length == 1) {
+            $(reservationNameInput).val((wasActive) ? '' : attendee[0].name);
+            $(reservationPhoneNumberInput).val((wasActive) ? '' : attendee[0].phoneNumber);
+            this.classList.add((wasActive) ? null : "table-active");
+            (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
+        } else {
+            return toast.danger("Something went wrong while retrieving the seats for that attendee!");
+        }
+    });
+
     $(reserveSeatForm).submit(async function (e) {
         e.preventDefault();
 
