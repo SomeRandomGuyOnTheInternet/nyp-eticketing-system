@@ -262,7 +262,7 @@
     const selectedSeatConfirmationWrapper = '#selectedSeatConfirmationWrapper';
     const confirmReservationButton = '#confirmReservationButton';
 
-    const selectableLegendClasses = 'card-hover text-primary font-weight-medium py-2 px-1';
+    const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
     let event;
 
@@ -278,8 +278,6 @@
         legendNode: legend,
     });
 
-    sc.onClick = seatClickCallback();
-
     // Rest of the functions
     $(document).ready(async function() {
         try {
@@ -292,16 +290,15 @@
         sc.seatTypes = event.seatTypes;
         sc.legends = sc.seatTypes.reduce(function(legends, seatType){
             if (!seatType.blocked) {
-                legends.push([seatType.char, "available", seatType.category]);
+                legends.push([seatType.char, "available", seatType.category, selectableLegendClasses]);
             }
             return legends;
         }, []);
         sc.legends.push(["G", "blocked", "Blocked"]);
-        sc.onClick = 
-
+        sc.onClick = onSeatClickCallback();
+        
         sc.bindMap();
         sc.scaleContentWidth();
-
         sc.disableBlockedSeats();
         sc.disableReservedSeats(event.reservedSeats);
     });
@@ -354,23 +351,35 @@
         sc.disableReservedSeats(event.reservedSeats);
     });
 
-    $(waitingListRow).click(function() {
-        const attendee = event.attendees.filter(attendee => attendee.id == this.id);
-        const wasActive = this.classList.contains("table-active");
-
-        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
+    $(clearSearchReservationBtn).click(function() {
         sc.activeNode.find('highlighted').status('reserved');
-
-        if (attendee.length == 1) {
-            $(reservationNameInput).val((wasActive) ? '' : attendee[0].name);
-            $(reservationPhoneNumberInput).val((wasActive) ? '' : attendee[0].phoneNumber);
-
-            this.classList.add((wasActive) ? null : "table-active");
-            (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
-        } else {
-            return toast.danger("Something went wrong while retrieving the seats for that attendee!");
-        }
+        $(searchReservationInput).val('');
+        $(clearSearchReservationBtn).hide();
     });
+
+    document.addEventListener('click', function (e) {
+        const node = e.target;
+
+        if (node.classList.contains("clickable-div") && node.classList.contains("seatCharts-legendCard")) {
+            utils.addUnloadListener();
+
+            const seatCharAttr = node.getAttribute("data-seat-character");
+            if (seatCharAttr) {
+                const selectedSeatIds = sc.activeNode.find('selected').seatIds; 
+                let seatId;
+
+                if (selectedSeatIds.length === 0) {
+                    console.log(sc.map.length)
+                    seatId = sc.findNearestAvailableSeat(seatCharAttr, sc.map.length - 1, 0);
+                } else {
+                    let lastSelectedSeat = sc.activeNode.get(selectedSeatIds.slice(-1)[0]);
+                    seatId = sc.findNearestAvailableSeat(seatCharAttr, lastSelectedSeat.settings.row, lastSelectedSeat.settings.column);
+                }
+
+                sc.activeNode.get(seatId).status('selected');
+            }
+        }
+    }, false);
 
     $(reserveSeatForm).submit(async function (e) {
         e.preventDefault();
@@ -424,7 +433,7 @@
 
         try {
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
-            await ajax.post(routes.index.successFlash, "The reservation has been created successfully!");
+            await ajax.post(routes.index.successFlash, "The reservation has been created successfullyw!");
         } catch (error) {
             await ajax.post(routes.index.errorFlash, "Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
         } finally {
@@ -453,7 +462,7 @@
         $(seatDetailsModal).modal();
     };
 
-    function seatClickCallback() {
+    function onSeatClickCallback() {
         return function () {
             switch (this.status()) {
                 case 'available':

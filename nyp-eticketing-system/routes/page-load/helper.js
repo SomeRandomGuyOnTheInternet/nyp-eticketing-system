@@ -47,6 +47,7 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 				[Op.gt]: 0,
 			}
 		},
+		order: [['CreatedAt', 'ASC']],
 		raw: true
 	});
 

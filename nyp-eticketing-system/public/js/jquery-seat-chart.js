@@ -19,10 +19,11 @@
 			return this.data('seatCharts');
 		}
 		
-		var fn       = this,
-			seats    = {},
-			seatIds  = [],
-			settings = {
+		var fn        = this,
+			seats     = {},
+			seatIds   = [],
+			seatIdMap = [[]],
+			settings  = {
 				animate : false, //requires jQuery UI
 				naming  : {
 					top      : true,
@@ -330,6 +331,8 @@
 			}
 			return columns;
 		})(settings.map[0].split('').length);
+
+		seatIdMap = new Array(settings.map.length).fill(null).map(() => new Array(settings.map[0].split('').length).fill(null));
 		
 		if (settings.naming.top) {
 			var $headerRow = $('<div></div>')
@@ -410,6 +413,7 @@
 						});
 
 						seatIds.push(id);
+						seatIdMap[row][column] = id;
 
 						return seats[id].node();
 					})(settings.naming) :
@@ -420,6 +424,8 @@
 			
 			fn.append($row);
 		});
+
+		seatIdMap.length = settings.map.length;
 	
 		//if there're any legend items to be rendered
 		settings.legend.items.length ? (function(legend) {
@@ -434,7 +440,7 @@
 					.appendTo($rowContainer);
 
 				var $card = $('<div></div>')
-					.addClass('seatCharts-legendCard clickable-div')
+					.addClass('seatCharts-legendCard py-2 px-1')
 					.addClass('card')
 					.addClass(typeof item[3] == "undefined" ? "" : item[3])
 					.addClass('mt-3')
@@ -487,10 +493,11 @@
 	
 		//public methods of seatCharts
 		fn.data('seatCharts', {
-			seats   : seats,
-			seatIds : seatIds,
+			seats     : seats,
+			seatIds   : seatIds,
+			seatIdMap : seatIdMap,
 			//set for one, set for many, get for one
-			status  : function() {
+			status    : function() {
 				var fn = this;
 			
 				return arguments.length == 1 ? fn.seats[arguments[0]].status() : (function(seatsIds, newStatus) {
@@ -502,7 +509,7 @@
 					})();
 				})(arguments[0], arguments[1]);
 			},
-			each    : function(callback) {
+			each      : function(callback) {
 				var fn = this;
 			
 				for (var seatId in fn.seats) {
@@ -513,13 +520,13 @@
 				
 				return true;
 			},
-			node    : function() {
+			node      : function() {
 				var fn = this;
 				//basically create a CSS query to get all seats by their DOM ids
 				return $('#' + fn.seatIds.join(',#'));
 			},
 
-			find    : function(query) {//D, a.available, unavailable
+			find      : function(query) {//D, a.available, unavailable
 				var fn = this;
 			
 				var seatSet = fn.set();
@@ -572,7 +579,7 @@
 					);
 				
 			},
-			set     : function set() {//inherits some methods
+			set       : function set() {//inherits some methods
 				var fn = this;
 				
 				return {
@@ -613,7 +620,7 @@
 				};
 			},
 			//get one object or a set of objects
-			get     : function(seatsIds) {
+			get       : function(seatsIds) {
 				var fn = this;
 
 				return typeof seatsIds == 'string' ? 
@@ -844,6 +851,72 @@ class SeatChart {
 				return [[rowStart, Math.max(1, rowEnd)], [colStart, Math.max(1, colEnd)]];
 		}
 	};
+
+	// findNearestAvailableSeat(character, row, column) {
+	// 	const seatIdMap = sc.activeNode.seatIdMap;
+	// 	console.log(sc.map[0].length);
+
+	// 	for (let i = 0; i < row; i++) {
+	// 		for (let j = column; j < sc.map[0].length + 1; j++) {
+	// 			console.log(sc.activeNode.get(seatIdMap[i][j]));
+	// 			const seat = sc.activeNode.get(seatIdMap[i][j]);
+	// 			if (seat.length !== 0) {
+	// 				if (seat.settings.character === character && seat.settings.status === "available") {
+	// 					return j;
+	// 				}
+	// 			}
+	// 		}
+	// 		// // Left side checking , left to selected point. 1 .. 3
+	// 		// for (let j = 0; j < column; j++) {
+	// 		// 	console.log("getting seat details")
+	// 		// 	const seat = sc.activeNode.get(seatIdMap[i][j]);
+	// 		// 	if (seat.length !== 0) {
+	// 		// 		if (seat.settings.character === character && seat.settings.status === "available") {
+	// 		// 			return j;
+	// 		// 		}
+	// 		// 	}
+	// 		// }
+	// 		// // right side checking , selected point to right 3..38
+	// 		// for (let j = column; j < sc.map[0].length; j++) {
+	// 		// 	const seat = sc.activeNode.get(seatIdMap[i][j]);
+	// 		// 	if (seat.length !== 0) {
+	// 		// 		if (seat.settings.character === character && seat.settings.status === "available") {
+	// 		// 			return j;
+	// 		// 		}
+	// 		// 	}
+	// 		// }
+	// 	}
+	// }
+
+	findNearestAvailableSeat(character, row, column) {
+		const seatIdMap = sc.activeNode.seatIdMap;
+		let distance = -1;
+		let closestRow = 0;
+		let closestColumn = 0;
+
+		for (let i = 0; i < seatIdMap.length; i++) {
+			for (let k = 0; k < seatIdMap[i].length; k++) {
+				const curDistance = Math.abs(i - row) + Math.abs(k - column);
+				const seat = sc.activeNode.get(seatIdMap[i][k]);
+				
+				if (seat.length !== 0) {
+					if (seat.settings.character === character && seat.settings.status === "available") {
+						if (row === i && curDistance === 1) {
+							return sc.activeNode.seatIdMap[i][k];
+						}
+
+						if (distance === -1 || distance > curDistance) {
+							distance = curDistance;
+							closestRow = i;
+							closestColumn = k;
+						}
+					}
+				}
+			}
+		}
+
+		return sc.activeNode.seatIdMap[closestRow][closestColumn];
+	}
 
 	static alphabeticalLabels() {
 		return ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'];
