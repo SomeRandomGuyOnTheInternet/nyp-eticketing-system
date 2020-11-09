@@ -890,11 +890,11 @@ class SeatChart {
 	findNearestAvailableSeat(row, column, character) {
 		const seatIdMap = sc.activeNode.seatIdMap;
 
-		for (let i = 0; i <= row; i++) {
-			const availableSeatOnRight = this.searchRowForAvailableSeat(row, column, character, seatIdMap, false, true);
+		for (let i = row; i >= 0; i--) {
+			const availableSeatOnRight = this.searchRowForAvailableSeat(i, column, character, seatIdMap, false, true);
 			if (availableSeatOnRight !== null) return availableSeatOnRight;
 
-			const availableSeatOnLeft = this.searchRowForAvailableSeat(row, column, character, seatIdMap, true, false);
+			const availableSeatOnLeft = this.searchRowForAvailableSeat(i, column, character, seatIdMap, true, false);
 			if (availableSeatOnLeft !== null) return availableSeatOnLeft;
 		}
 
@@ -902,11 +902,11 @@ class SeatChart {
 	}
 
 	searchRowForAvailableSeat(row, column, character, seatIdMap, left = false, right = false) {
-		if (column < 0 || column >= sc.map.length) {
+		if (row < 0 || row >= sc.map.length) {
 			return null;
 		}
 
-		if (row < 0 || row >= sc.map[0].length) {
+		if (column < 0 || column >= sc.map[0].length) {
 			return null;
 		}
 

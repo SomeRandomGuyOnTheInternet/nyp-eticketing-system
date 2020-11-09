@@ -439,7 +439,7 @@
 
         try {
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
-            await ajax.post(routes.index.successFlash, "The reservation has been created successfullyw!");
+            await ajax.post(routes.index.successFlash, "The reservation has been created successfully!");
         } catch (error) {
             await ajax.post(routes.index.errorFlash, "Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
         } finally {

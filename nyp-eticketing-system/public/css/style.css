@@ -105,6 +105,21 @@ div.col-small-margin {
     hyphens: auto;
 }
 
+.clickable-div {
+    background-position: center;
+    transition: background 0.8s;
+}
+
+.clickable-div:hover {
+    background: #f6f9fd radial-gradient(circle, transparent 1%, #a3d5ff 1%) center/15000%;
+}
+
+.clickable-div:active {
+    background-color: #ecf0f3;
+    background-size: 100%;
+    transition: background 0s;
+}
+
 .clickable-child {
     pointer-events: none;
 }
