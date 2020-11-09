@@ -897,9 +897,15 @@ class SeatChart {
 			const availableSeatOnLeft = this.searchRowForAvailableSeat(row, column, character, seatIdMap, true, false);
 			if (availableSeatOnLeft !== null) return availableSeatOnLeft;
 		}
+
+		return null;
 	}
 
 	searchRowForAvailableSeat(row, column, character, seatIdMap, left = false, right = false) {
+		if (column < 0 || column >= sc.map.length) {
+			return null;
+		}
+
 		if (row < 0 || row >= sc.map[0].length) {
 			return null;
 		}
