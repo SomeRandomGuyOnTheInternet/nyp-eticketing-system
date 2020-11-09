@@ -83,8 +83,8 @@ router.post('/add-event', auth.isPlanner, async (req, res) => {
     const seatMap = JSON.stringify(req.body.seatMap);
     const startDateTime = req.body.startDateTime;
     const prioritiseBackRows = req.body.prioritiseBackRows;
-    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
-    const venueId = req.body.venueId == '' ? null : req.body.venueId;
+    const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
+    const venueId = req.body.venueId === '' ? null : req.body.venueId;
 
     if (!name) {
         return ajax.error(res, "Please enter a event name!");
@@ -139,8 +139,8 @@ router.post('/events/update', auth.isPlanner, async (req, res) => {
     const seatMap = JSON.stringify(req.body.seatMap);
     const startDateTime = req.body.startDateTime;
     const prioritiseBackRows = req.body.prioritiseBackRows;
-    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
-    const venueId = req.body.venueId == '' ? null : req.body.venueId;
+    const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
+    const venueId = req.body.venueId === '' ? null : req.body.venueId;
     
     if (!eventId) {
         return ajax.error(res, "Please provide an event id!");

@@ -111,11 +111,11 @@ div.col-small-margin {
 }
 
 .clickable-div:hover {
-    background: #f6f9fd radial-gradient(circle, transparent 1%, #a3d5ff 1%) center/15000%;
+    background: #f6f9fd radial-gradient(circle, transparent 1%, #e4ebee 1%) center/15000%;
 }
 
 .clickable-div:active {
-    background-color: #ecf0f3;
+    background-color: #e4ebee;
     background-size: 100%;
     transition: background 0s;
 }
@@ -125,8 +125,8 @@ div.col-small-margin {
 }
 
 .highlighted {
-    background-color: #faf6d1;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.15) inset;
+    background-color: #faf6d1 !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.15) inset !important;
 }
 
 input[type=search]::-ms-clear { display: none; width : 0; height: 0; }

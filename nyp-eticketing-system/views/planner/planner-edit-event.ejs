@@ -308,8 +308,8 @@
         utils.addUnloadListener();
 
         EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
-        EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
-        EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
+        EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
+        EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
     });
 
     $(addSeatTypeButton).click(function () {
@@ -341,7 +341,7 @@
         const legendCards = document.querySelectorAll(".seatCharts-legendCard");
         legendCards.forEach(obj => obj.classList.remove("highlighted"));
         legendCards.forEach(obj => {
-            if (obj.getAttribute("data-seat-character") == seatType.char) {
+            if (obj.getAttribute("data-seat-character") === seatType.char) {
                 obj.classList.add("highlighted");
             }
         });
@@ -373,8 +373,8 @@
                 if (helper.id == node.id) helper.selected = false;
             });
 
-            EventHelper.populateSelect(helpers.filter(helper => helper.selected == false), helperSelectInput);
-            EventHelper.populateColumn(helpers.filter(helper => helper.selected == true), helpersCardCol);
+            EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
+            EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         }
     }, false);
 
@@ -407,7 +407,7 @@
             prioritiseBackRows: $(prioritiseBackCheck).is(':checked'),
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
-            helpers: helpers.filter(helper => helper.selected == true)
+            helpers: helpers.filter(helper => helper.selected === true)
         });
 
         try {

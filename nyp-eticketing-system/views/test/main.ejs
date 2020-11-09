@@ -461,11 +461,11 @@
             // This section defines what happens when the user clicks on a seat
             // We have to define what happens according to the clicked seat's status
             click: function () {
-                if (this.status() == 'available') {
+                if (this.status() === 'available') {
                     return 'selected';
-                } else if (this.status() == 'selected') {
+                } else if (this.status() === 'selected') {
                     return 'available';
-                } else if (this.status() == 'reserved') {
+                } else if (this.status() === 'reserved') {
                     return 'reserved';
                 } else {
                     return this.style();

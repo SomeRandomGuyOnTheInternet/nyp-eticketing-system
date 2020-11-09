@@ -393,8 +393,8 @@
 
         document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
         sc.activeNode.find('highlighted').status('reserved');
-        
-        if (attendee.length == 1) {
+
+        if (attendee.length === 1) {
             $(reservationNameInput).val((wasActive) ? '' : attendee[0].name);
             $(reservationPhoneNumberInput).val((wasActive) ? '' : attendee[0].phoneNumber);
             this.classList.add((wasActive) ? null : "table-active");
@@ -412,9 +412,9 @@
         const noOfExtraAttendeesInputVal = $(noOfExtraAttendeesInput).val();
         const selectedSeats = sc.activeNode.find('selected');
 
-        if (selectedSeats.length == 0) return toast.danger("Please select some seats to reserve for the attendee!");
+        if (selectedSeats.length === 0) return toast.danger("Please select some seats to reserve for the attendee!");
         if (reservationNameInputVal === "") return toast.danger("Please enter a name for the attendee!");
-        if (reservationPhoneNumberInputVal == "") return toast.danger("Please enter a phone number for the attendee!");
+        if (reservationPhoneNumberInputVal === "") return toast.danger("Please enter a phone number for the attendee!");
         if (!(/^(8|9)[0-9]{7}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
 
         const sortedSeats = selectedSeats.seats.reduce((sortedSeats, seat) => ({

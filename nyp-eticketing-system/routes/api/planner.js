@@ -66,7 +66,7 @@ router.post('/events', auth.isPlanner, async (req, res) => {
     const name = req.body.name;
     const seatMap = JSON.stringify(req.body.seatMap);
     const startDateTime = req.body.startDateTime;
-    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
+    const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;
@@ -133,7 +133,7 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
     const name = req.body.name;
     const seatMap = JSON.stringify(req.body.seatMap);
     const startDateTime = req.body.startDateTime;
-    const seatsPerReservation = req.body.seatsPerReservation == '' ? null : req.body.seatsPerReservation;
+    const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;

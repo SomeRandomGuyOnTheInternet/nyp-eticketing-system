@@ -169,8 +169,8 @@
         if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
         if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
 
-        if (this.id == "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
-        if (this.id == "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
+        if (this.id === "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
+        if (this.id === "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
 
         sc.reloadMap(); // Reloads the map with the updated map
     });
