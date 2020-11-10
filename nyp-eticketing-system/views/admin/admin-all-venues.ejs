@@ -47,7 +47,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Date Created</th>
-                                    <td scope="col" class="p-3 pb-2"><a class="btn btn-primary responsive-float float-right w-100" href="/admin/add-venue" role="button"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add Venue</a></td>
+                                    <th scope="col" class="p-3 pb-2"><a class="btn btn-primary responsive-float float-right w-100" href="/admin/add-venue" role="button"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add Venue</a></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,9 +56,8 @@
                                         <td scope="row"><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="/admin/venues/<%= venues[i].id %>"><%= venues[i].name %></a></td>
                                         <td><%= moment(venues[i].createdAt).format('Do MMMM YYYY') %></td>
-                                        <td scope="row"></td>
+                                        <td></td>
                                     </tr>
-
                                 <% } %>
                             </tbody>
                         </table>

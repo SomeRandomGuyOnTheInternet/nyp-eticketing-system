@@ -69,7 +69,7 @@
                                         <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
                                         <td><%= planners[i].email %></td>
                                         <td><%= moment(planners[i].createdAt).format('Do MMMM YYYY') %></td>
-                                        <td>
+                                        <td class="text-center">
                                             <a href="/admin/deleteplanner/<%= planners[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
                                                 <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
                                             </a>
