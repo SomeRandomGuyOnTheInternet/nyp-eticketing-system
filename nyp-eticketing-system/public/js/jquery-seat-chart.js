@@ -887,75 +887,69 @@ class SeatChart {
 		}
 	};
 
-	findNearestAvailableSeat(row, column, character) {
+	findAvailableSeatBlock(character, noOfSeats) {
 		const seatIdMap = sc.activeNode.seatIdMap;
+		let availableSeatBlock = [];
+		let fallbackSeats = [];
 
-		for (let i = row; i >= 0; i--) {
-			const availableSeatOnRight = this.searchRowForAvailableSeat(i, column, character, seatIdMap, false, true);
-			if (availableSeatOnRight !== null) return availableSeatOnRight;
+		for (let i = sc.map.length - 1; i >= 0; i--) {
+			let origin = -1;
 
-			const availableSeatOnLeft = this.searchRowForAvailableSeat(i, column, character, seatIdMap, true, false);
-			if (availableSeatOnLeft !== null) return availableSeatOnLeft;
-		}
+			for (let j = 0; j <= sc.map[i].length; j++) {
+				const seat = sc.activeNode.get(seatIdMap[i][j]);
 
-		return null;
-	}
+				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
+					origin = (origin >= 0) ? origin : j;
+					availableSeatBlock.push(seat.settings.id);
+					
+					if (fallbackSeats.length < noOfSeats) {
+						fallbackSeats.push(seat.settings.id);
+					}
+				} else { 
+					origin = -1;
+					availableSeatBlock = [];
+				}
 
-	searchRowForAvailableSeat(row, column, character, seatIdMap, left = false, right = false) {
-		if (row < 0 || row >= sc.map.length) {
-			return null;
-		}
-
-		if (column < 0 || column >= sc.map[0].length) {
-			return null;
-		}
-
-		const seat = sc.activeNode.get(seatIdMap[row][column]);
-		if (seat.length !== 0) {
-			if (seat.settings.character === character && seat.settings.status === "available") {
-				return seat;
+				if (availableSeatBlock.length === noOfSeats) {
+					return availableSeatBlock;
+				}
 			}
 		}
 
-		if (left) return this.searchRowForAvailableSeat(row, column - 1, character, seatIdMap, left, right);
-		else if (right) return this.searchRowForAvailableSeat(row, column + 1, character, seatIdMap, left, right);
-	}
+		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+	};
 
-	selectNearestAvailableSeat(row, column, character) {
-		const nearestSeat = this.findNearestAvailableSeat(row, column, character);
-		if (nearestSeat !== null) this.activeNode.get(nearestSeat.settings.id).status('selected');
-		return nearestSeat;
-	}
+	detectGap(character, noOfSeats) {
+		const seatIdMap = sc.activeNode.seatIdMap;
+		let availableSeatBlock = [];
+		let fallbackSeats = [];
 
-	// findNearestAvailableSeat(character, row, column) {
-	// 	const seatIdMap = sc.activeNode.seatIdMap;
-	// 	let distance = -1;
-	// 	let closestRow = 0;
-	// 	let closestColumn = 0;
+		for (let i = sc.map.length - 1; i >= 0; i--) {
+			let origin = -1;
 
-	// 	for (let i = 0; i < seatIdMap.length; i++) {
-	// 		for (let k = 0; k < seatIdMap[i].length; k++) {
-	// 			const curDistance = Math.abs(i - row) + Math.abs(k - column);
-	// 			const seat = sc.activeNode.get(seatIdMap[i][k]);
-				
-	// 			if (seat.length !== 0) {
-	// 				if (seat.settings.character === character && seat.settings.status === "available") {
-	// 					if (row === i && curDistance === 1) {
-	// 						return sc.activeNode.seatIdMap[i][k];
-	// 					}
+			for (let j = 0; j <= sc.map[i].length; j++) {
+				const seat = sc.activeNode.get(seatIdMap[i][j]);
 
-	// 					if (distance === -1 || distance > curDistance) {
-	// 						distance = curDistance;
-	// 						closestRow = i;
-	// 						closestColumn = k;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
+				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
+					origin = (origin >= 0) ? origin : j;
+					availableSeatBlock.push(seat.settings.id);
+					
+					if (fallbackSeats.length < noOfSeats) {
+						fallbackSeats.push(seat.settings.id);
+					}
+				} else { 
+					origin = -1;
+					availableSeatBlock = [];
+				}
 
-	// 	return sc.activeNode.seatIdMap[closestRow][closestColumn];
-	// }
+				if (availableSeatBlock.length === noOfSeats) {
+					return availableSeatBlock;
+				}
+			}
+		}
+
+		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+	};
 
 	static alphabeticalLabels() {
 		return ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'];

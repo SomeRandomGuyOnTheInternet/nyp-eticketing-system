@@ -111,13 +111,11 @@ div.col-small-margin {
 }
 
 .clickable-div:hover {
-    background: #f6f9fd radial-gradient(circle, transparent 1%, #e4ebee 1%) center/15000%;
+    background: #f6f9fd;
 }
 
 .clickable-div:active {
     background-color: #e4ebee;
-    background-size: 100%;
-    transition: background 0s;
 }
 
 .clickable-child {
@@ -127,6 +125,41 @@ div.col-small-margin {
 .highlighted {
     background-color: #faf6d1 !important;
     box-shadow: 0 1px 5px rgba(0,0,0,0.15) inset !important;
+}
+  
+  .quickFlash {
+    animation-name: quickFlash;
+    animation-duration: 1900ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease;
+    -webkit-animation-name: quickFlash;
+    -webkit-animation-duration: 1900ms;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: ease;
+    -moz-animation-name: quickFlash;
+    -moz-animation-duration: 1900ms;
+    -moz-animation-iteration-count: 1;
+    -moz-animation-timing-function: ease;
+}
+
+@keyframes quickFlash {
+    0% {
+        background-color: rgba(255, 255, 255, 0);
+        opacity: 1;
+    }
+    100% {
+        background-color: inherit;
+    }
+}
+
+@-webkit-keyframes quickFlash {
+    0% {
+        background-color: rgba(255, 255, 255, 0);
+        opacity: 1;
+    }
+    100% {
+        background-color: inherit;
+    }
 }
 
 input[type=search]::-ms-clear { display: none; width : 0; height: 0; }

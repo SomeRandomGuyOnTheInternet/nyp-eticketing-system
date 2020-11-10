@@ -1,10 +1,11 @@
-<!-- TODO: Check for gaps -->
 <!-- TODO: Delete seat reservation -->
-<!-- TODO: Validate the number of seats -->
-<!-- TODO: Hide reservation until seat selected -->
 <!-- TODO: Make button have a loading icon -->
 <!-- TODO: Check whether back rows have empty seats -->
 <!-- TODO: Fix seats not showing up and select in safari -->
+<!-- TODO: flash seat when select -->
+<!-- TODO: gap detection -->
+<!-- TODO: save base map in class, so can use zoom properly -->
+<!-- TODO: detect if flash message exists already -->
 
 <%- include('../templates/head')-%>
 
@@ -366,22 +367,28 @@
             const character = node.getAttribute("data-seat-character");
 
             if (character) {
-                let selectedSeatsCharacters = (sc.activeNode.find('selected').seats).map(seat => seat.settings.character);
-                selectedSeatsCharacters.push(character);
+                let selectedSeatCharacters = (sc.activeNode.find('selected').seats).map(seat => seat.settings.character);
+                selectedSeatCharacters.push(character);
 
                 if (event.seatsPerReservation) {
-                    if (selectedSeatsCharacters.length > event.seatsPerReservation) {
+                    if (selectedSeatCharacters.length > event.seatsPerReservation) {
                         toast.danger("You have reached the maximum number of seats allowed per reservation!")
                         return;
                     }
                 }
 
-                if (selectedSeatsCharacters.length > 0) {
+                if (selectedSeatCharacters.length > 0) {
                     $(reserveSeatForm).removeClass("d-none");
                     sc.activeNode.find('selected').status('available');
+
                     // const sortedCharacters = sc.charactersSortedByFrequency.reverse();
-                    // selectedSeatsCharacters.sort((a, b) => sortedCharacters.indexOf(a) - sortedCharacters.indexOf(b));
-                    selectedSeatsCharacters.forEach(seatCharacter => sc.selectNearestAvailableSeat(sc.map.length - 1, 0, seatCharacter));
+                    // selectedSeatCharacters.sort((a, b) => sortedCharacters.indexOf(a) - sortedCharacters.indexOf(b));
+
+                    const seatCharacterCount = utils.countUniqueCharacters(selectedSeatCharacters);
+                    for (const character in seatCharacterCount) {
+                        const availableSeatBlock = sc.findAvailableSeatBlock(character, seatCharacterCount[character]);
+                        sc.activeNode.get(availableSeatBlock).status('selected');
+                    }
                 }
             }
         }
@@ -515,7 +522,7 @@
                     const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
                     if (attendee.length !== 1) return this.style();
 
-                    populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name}`, this.settings.data.classes);
+                    populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name} • ${attendee[0].phoneNumber}`, this.settings.data.classes);
                     return this.status();
                 default:
                     return this.style();
