@@ -12,16 +12,33 @@
             <!-- Heading  -->
             <div class="row">
                 <!-- Use this row div if you want your section heading to be inline with another element  -->
-                <div class="col-sm-9 col-12 align-self-end">
+                <div class="col-sm-6 col-12 align-self-end">
                     <h2 class="section-heading">Planners</h2>
                 </div>
-                <div class="col-sm-3 col-12 align-self-end">
-                    <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
-                    <button type="button" class="btn btn-primary btn-lg w-100" data-toggle="modal" data-target="#Modal">
-                        <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Planner
-                    </button>
+                    <div class="col-sm-6 col-12 align-self-end">
+                        <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
+                            <div class="card input-card w-100">
+                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                <div class="card-body input-card-body">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <label for="searchReservationInput" class="card-input-label">
+                                                <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                                    Planners</small>
+                                                <!-- The small element is where we actually write down what the input does  -->
+                                            </label>
+                                            <input id="searchPlannerInput" name="searchPlannerInput" class="form-control card-input" type="search"
+                                                placeholder="E.g. John_Doe@mymail.nyp.edu.sg">
+                                        </div>
+                                        <button id="clearSearchPlannerButton" class="btn text-muted" type="button" style="display: none;"><i class="fas fa-times"></i></button>
+                                        <button id="searchPlannerButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
+                                        <!-- This is where the user actually inputs all their stuff  -->
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
                 </div>
-            </div>
             <!-- Table for list of planners -->
             <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
             <!-- Content  -->
@@ -38,12 +55,16 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Date Created</th>
-                                    <th scope="col"></th>
+                                    <th scope="col" class="p-3">
+                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal">
+                                            <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Helpers
+                                        </button>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% for (i = 0; i < planners.length; i++) { %>
-                                    <tr>
+                                    <tr id="<%= planners[i].id %>" class="PlannerRow">
                                         <td><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="#"><%= planners[i].name %></a></td>
                                         <td><%= planners[i].email %></td>
@@ -128,5 +149,52 @@
         </main>
     </div>
 </body>
+
+<script>
+    
+    const searchPlannerInput = '#searchPlannerInput';
+    const searchPlannerButton = '#searchPlannerButton';
+    const clearSearchPlannerButton = '#clearSearchPlannerButton';
+    const plannerRow = ".PlannerRow";
+
+    let planners;
+
+    $(document).ready(async function() {
+        try {
+            planners = (await ajax.get(routes.admin.planners)).map(planner => User.parseApiResult(planner));
+        } catch (error) {
+            return utils.handleError(error);
+        }
+    });
+
+    $(searchPlannerInput).keyup(function(e) {
+        // if (e.keyCode == 13) {
+        //     const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(this).val());
+        //     if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
+
+        //     highlightAttendeeSeats(attendee[0].id);
+        // }
+        if (e.target.value.length === 0) $(clearSearchPlannerButton).hide();
+        else $(clearSearchPlannerButton).show();
+    });
+
+    $(clearSearchPlannerButton).click(function() {
+        document.querySelectorAll(plannerRow).forEach(obj => obj.classList.remove("table-active"));
+        $(searchPlannerInput).val('');
+        $(clearSearchPlannerButton).hide();
+    });
+
+    $(searchPlannerButton).click(function() {
+        document.querySelectorAll(plannerRow).forEach(obj => obj.classList.remove("table-active"));
+        console.log(document.querySelectorAll(plannerRow))
+
+        const planner = planners.filter(planner => planner.email === ($(searchPlannerInput).val()).trim());
+        if (planner.length !== 1) return toast.danger("This planner account does not exist with this email!");
+
+        const row = document.getElementById(planner[0].id);
+        row.classList.add("table-active");
+    });
+   
+</script>
 
 <%- include('../templates/footer')-%>
