@@ -9,6 +9,18 @@ const auth = require('../../utils/api-auth');
 const Venue = require('../../models/Venue');
 const User = require('../../models/User');
 
+
+router.get('/planners', auth.isAdmin, async (req, res) => {
+    try {
+        const planners = await User.getPlanners();
+        
+        return respond.success(res, "All planners have been retrieved successfully!", planners);
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting all the planners. Please try again later!", 500);
+    }
+});
+
 router.get('/helpers', auth.isAdmin, async (req, res) => {
     try {
         const helpers = await User.getHelpers();
@@ -56,6 +68,12 @@ router.post('/venues', auth.isAdmin, async (req, res) => {
     if (!seatMap) return respond.error(res, "Please provide a seat map for the venue!", 400);
 
     try {
+        const existingVenue = await Venue.findOne({
+            where: { name: name }
+        });
+
+        if (existingVenue) return respond.error(res, "Please provide a unqiue name for the venue!", 400);
+
         await Venue.create({
             name: name,
             seatMap: JSON.stringify(seatMap)
