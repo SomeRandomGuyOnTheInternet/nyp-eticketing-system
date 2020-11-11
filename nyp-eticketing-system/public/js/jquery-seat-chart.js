@@ -897,6 +897,7 @@ class SeatChart {
 
 			for (let j = 0; j <= sc.map[i].length; j++) {
 				const seat = sc.activeNode.get(seatIdMap[i][j]);
+				
 				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
 					origin = (origin >= 0) ? origin : j;
 					availableSeatBlock.push(seat.settings.id);
@@ -918,36 +919,44 @@ class SeatChart {
 		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
 	};
 
-	hasGaps(column) {
-		if (column === 0 || column === sc.map[0].length - 1) {
-			return false;
-		}
+	hasGaps(seat) {
+		const seatIdMap = sc.activeNode.seatIdMap;
+		const seatRow = seat.settings.row;
+		const seatColumn = seat.settings.column;
+		const leftSeatColumn = seatColumn - 1;
+		const rightSeatColumn = seatColumn + 1;
+		let leftSideOk = true;
+		let rightSideOk = true;
 
-		for (let i = sc.map.length - 1; i >= 0; i--) {
-			let origin = -1;
-
-			for (let j = 0; j <= sc.map[i].length; j++) {
-				const seat = sc.activeNode.get(seatIdMap[i][j]);
-
-				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
-					origin = (origin >= 0) ? origin : j;
-					availableSeatBlock.push(seat.settings.id);
+		if (leftSeatColumn >= 0) {
+			const leftSeat = sc.activeNode.get(seatIdMap[seatRow][leftSeatColumn]);
+			
+			if (leftSeat.length !== 0 && leftSeat.settings.character === seat.settings.character && leftSeat.settings.status === "available") {
+				if (leftSeatColumn >= 0) {
+					const leftSeat = sc.activeNode.get(seatIdMap[seatRow][leftSeatColumn]);
 					
-					if (fallbackSeats.length < noOfSeats) {
-						fallbackSeats.push(seat.settings.id);
+					if (leftSeat.length !== 0 && leftSeat.settings.character === seat.settings.character && leftSeat.settings.status === "available") {
+						
+					} else {
+						leftSideOk = true;
 					}
-				} else { 
-					origin = -1;
-					availableSeatBlock = [];
+				} else {
+					leftSideOk = true;
 				}
-
-				if (availableSeatBlock.length === noOfSeats) {
-					return availableSeatBlock;
-				}
+			} else {
+				leftSideOk = true;
 			}
+		} else {
+			leftSideOk = true;
 		}
 
-		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+		if (rightSeatColumn >= this.map[0].length) {
+			rightSideOk = true
+		} else {
+			const rightSeat = sc.activeNode.get(seatIdMap[seatRow][rightSeatColumn]);
+		}
+
+		return leftSideOk === true && rightSideOk === true;
 	};
 
 	static alphabeticalLabels() {
