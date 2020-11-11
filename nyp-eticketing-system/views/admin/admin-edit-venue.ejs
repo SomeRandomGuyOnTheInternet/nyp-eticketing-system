@@ -72,13 +72,13 @@
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <div class="row">
                     <div class="col-sm-4">
+                        <button id="cancelEditedVenueButton" class="btn btn-warning btn-lg w-100" type="button">Cancel</button>
+                    </div>
+                    <div class="col-sm-4">
                         <button id="deleteVenueButton" class="btn btn-danger btn-lg w-100" href="/api/delete-venue/<%= venue.id %>" type="button">Delete Venue</button>
                     </div>
                     <div class="col-sm-4">
                         <button id="saveEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
-                    </div>
-                    <div class="col-sm-4">
-                        <button id="cancelEditedVenueButton" class="btn btn-warning btn-lg w-100" type="button">Cancel</button>
                     </div>
                 </div>
             </form>
@@ -200,7 +200,7 @@
         if (check === true) {
             try {
                 await ajax.delete(`${routes.admin.venues}/${venueId}`);
-                await ajax.post(routes.index.dangerFlash, "Venue has been deleted successfully!");
+                await ajax.post(routes.index.errorFlash, "Venue has been deleted successfully!");
 
                 utils.removeUnloadListener();
 

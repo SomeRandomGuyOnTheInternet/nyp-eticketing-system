@@ -186,10 +186,9 @@
 
     $(searchPlannerButton).click(function() {
         document.querySelectorAll(plannerRow).forEach(obj => obj.classList.remove("table-active"));
-        console.log(document.querySelectorAll(plannerRow))
 
-        const planner = planners.filter(planner => planner.email === ($(searchPlannerInput).val()).trim());
-        if (planner.length !== 1) return toast.danger("This planner account does not exist with this email!");
+        const planner = planners.filter(planner => (planner.email).toLocaleLowerCase() || (planner.name).toLocaleLowerCase() === (($(searchPlannerInput).val()).trim()).toLocaleLowerCase());
+        if (planner.length !== 1) return toast.danger("This planner account does not exist with this email or name!");
 
         const row = document.getElementById(planner[0].id);
         row.classList.add("table-active");
