@@ -919,8 +919,9 @@ class SeatChart {
 	};
 
 	hasGaps(column) {
-		if (column === 0 || column === sc.map[0].length - 1) return false;
-		if (column === ) return false;
+		if (column === 0 || column === sc.map[0].length - 1) {
+			return false;
+		}
 
 		for (let i = sc.map.length - 1; i >= 0; i--) {
 			let origin = -1;
