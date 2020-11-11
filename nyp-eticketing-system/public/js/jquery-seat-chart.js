@@ -897,7 +897,6 @@ class SeatChart {
 
 			for (let j = 0; j <= sc.map[i].length; j++) {
 				const seat = sc.activeNode.get(seatIdMap[i][j]);
-
 				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
 					origin = (origin >= 0) ? origin : j;
 					availableSeatBlock.push(seat.settings.id);
@@ -919,10 +918,9 @@ class SeatChart {
 		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
 	};
 
-	detectGap(character, noOfSeats) {
-		const seatIdMap = sc.activeNode.seatIdMap;
-		let availableSeatBlock = [];
-		let fallbackSeats = [];
+	hasGaps(column) {
+		if (column === 0 || column === sc.map[0].length - 1) return false;
+		if (column === ) return false;
 
 		for (let i = sc.map.length - 1; i >= 0; i--) {
 			let origin = -1;

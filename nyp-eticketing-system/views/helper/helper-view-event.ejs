@@ -7,7 +7,6 @@
 <!-- TODO: save base map in class, so can use zoom properly -->
 <!-- TODO: detect if flash message exists already -->
 <!-- TODO: autocomplete on search fields -->
-<!-- TODO: disable legend if there are no seats available in that type -->
 
 <%- include('../templates/head')-%>
 
@@ -571,11 +570,16 @@
     };
 
     updateSeatSelectionButtons = (selectedSeatsLength) => {
-        if (typeof selectedSeatsLength === 'undefined') {
-            $(removeSeatFromSelection).prop('disabled', true);
+        if (event.seatsPerReservation) {
+            if (typeof selectedSeatsLength === 'undefined') {
+                $(removeSeatFromSelection).prop('disabled', true);
+            } else {
+                $(removeSeatFromSelection).prop('disabled', selectedSeatsLength <= 0);
+                $(addSeatToSelection).prop('disabled', selectedSeatsLength >= event.seatsPerReservation);
+            }
         } else {
-            $(removeSeatFromSelection).prop('disabled', selectedSeatsLength <= 0);
-            $(addSeatToSelection).prop('disabled', selectedSeatsLength >= event.seatsPerReservation);
+            $(removeSeatFromSelection).prop('disabled', false);
+            $(addSeatToSelection).prop('disabled', false);
         }
     };
 
