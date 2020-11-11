@@ -117,7 +117,7 @@
                     <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
                     <!-- Table  -->
                     <div class="table-responsive">
-                        <table class="table table-hover table-click table-lg">
+                        <table class="table table-click table-lg">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -135,7 +135,7 @@
                                 <% for (i = 0; i < helpers.length; i++) { %>
                                 <tr id="<%= helpers[i].id %>" class="HelperRow">
                                     <td scope="row"><%= i + 1 %></td>
-                                    <td class="font-weight-medium"><a href="#"><%= helpers[i].name %></a></td>
+                                    <td class="font-weight-medium"><%= helpers[i].name %></td>
                                     <td><%= helpers[i].email %></td>
                                     <td><%= moment(helpers[i].createdAt).format('Do MMMM YYYY') %></td>
                                     <td class="text-center">

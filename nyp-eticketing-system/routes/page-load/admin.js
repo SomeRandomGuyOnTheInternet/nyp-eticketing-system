@@ -13,15 +13,6 @@ const Venue = require('../../models/Venue');
 // Eg: Use router.get('/planners', ...) instead of router.get('/admin-planners', ...) cause then the url will be '/admin/admin-planners' which is super redundant
 // Always keep route urls are short as possible
 
-router.get('/', auth.isAdmin, (req, res) => {
-	// Put your ejs files under your specific folder
-    // Eg: Admin .ejs files should be put under the admin folder
-	res.render('admin/admin-dashboard', { 
-		title: "Dashboard", 
-		user: req.user
-	});
-});
-
 router.get('/planners', auth.isAdmin, async (req, res) => {
 	var planners = await User.getPlanners();
 

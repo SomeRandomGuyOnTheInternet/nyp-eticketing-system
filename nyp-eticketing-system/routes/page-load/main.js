@@ -14,7 +14,7 @@ const auth = require('../../utils/page-load-auth');
 router.get('/', async (req, res) => {
 	if (req.user) {
 		if (req.user.isAdmin) {
-			res.redirect('/admin');
+			res.redirect('/admin/planners');
 		} else if (req.user.isPlanner) {
 			res.redirect('/planner/events');
 		} else if (req.user.isHelper) {
