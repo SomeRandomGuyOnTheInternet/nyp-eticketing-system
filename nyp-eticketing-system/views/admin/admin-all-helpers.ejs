@@ -90,6 +90,20 @@
                                         <label for="password" class="card-input-label">
                                             <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                             <small
+                                                class="card-subtitle mb-2 text-secondary font-weight-normal">Phone Number</small>
+                                            <!-- The small element is where we actually write down what the input does  -->
+                                        </label>
+                                        <input id="phoneNumber" name="phoneNumber" class="form-control card-input" type="tel"
+                                            placeholder="Enter phone number here">
+                                        <!-- This is where the user actually inputs all their stuff  -->
+                                    </div>
+                                </div>
+                                <div class="card input-card mt-3">
+                                    <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                                    <div class="card-body input-card-body">
+                                        <label for="password" class="card-input-label">
+                                            <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                            <small
                                                 class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small>
                                             <!-- The small element is where we actually write down what the input does  -->
                                         </label>
@@ -123,6 +137,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Phone Number</th>
                                     <th scope="col">Date Created</th>
                                     <th scope="col" class="p-3"> 
                                         <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal">
@@ -137,6 +152,7 @@
                                     <td scope="row"><%= i + 1 %></td>
                                     <td class="font-weight-medium"><%= helpers[i].name %></td>
                                     <td><%= helpers[i].email %></td>
+                                    <td><%= helpers[i].phoneNumber %></td>
                                     <td><%= moment(helpers[i].createdAt).format('Do MMMM YYYY') %></td>
                                     <td class="text-center">
                                         <a href="/admin/deletehelper/<%= helpers[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">

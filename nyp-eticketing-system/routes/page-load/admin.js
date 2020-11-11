@@ -84,6 +84,7 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 	let name = req.body.name;
 	let email = req.body.email;
 	let password = req.body.password;
+	let phoneNumber = req.body.phoneNumber;
 
 	if (!name) {
 		flash.error(req, "Please enter a name!");
@@ -105,6 +106,16 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 		flash.error(req, "Please enter a password!");
 		return res.redirect('/admin/helpers');
 	}
+	
+	if (!phoneNumber) {
+		flash.error(req, "Please enter a phone number!");
+		return res.redirect('/admin/helpers');
+	}
+
+	if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))){
+		flash.error(req, "Please enter a valid phone number!");
+		return res.redirect('/admin/helpers')
+	}
 
 	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
 
@@ -117,6 +128,7 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 		email: email,
 		password: password,
 		name: name,
+		phoneNumber: phoneNumber,
 		isAdmin: false,
 		isPlanner: false,
 		isHelper: true,
