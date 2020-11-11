@@ -172,12 +172,8 @@
     });
 
     $(searchHelperInput).keyup(function(e) {
-        // if (e.keyCode == 13) {
-        //     const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(this).val());
-        //     if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
+        if (e.keyCode == 13) searchHelperButton.click();
 
-        //     highlightAttendeeSeats(attendee[0].id);
-        // }
         if (e.target.value.length === 0) $(clearSearchHelperButton).hide();
         else $(clearSearchHelperButton).show();
     });
@@ -192,8 +188,8 @@
         document.querySelectorAll(helperRow).forEach(obj => obj.classList.remove("table-active"));
         console.log(document.querySelectorAll(helperRow))
 
-        const helper = helpers.filter(helper => helper.email === ($(searchHelperInput).val()).trim());
-        if (helper.length !== 1) return toast.danger("This helper account does not exist with this email!");
+        const helper = helpers.filter(helper => (helper.email).toLocaleLowerCase() === ($(searchHelperInput).val()).trim().toLocaleLowerCase() || (helper.name).toLocaleLowerCase() === ($(searchHelperInput).val()).trim().toLocaleLowerCase());
+        if (helper.length < 1) return toast.danger("This helper account does not exist with this email!");
 
         const row = document.getElementById(helper[0].id);
         row.classList.add("table-active");
