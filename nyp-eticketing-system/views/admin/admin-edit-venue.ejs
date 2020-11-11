@@ -71,11 +71,14 @@
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <button id="deleteVenueButton" class="btn btn-danger btn-lg w-100" href="/api/delete-venue/<%= venue.id %>" type="button">Delete Venue</button>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <button id="saveEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
+                    </div>
+                    <div class="col-sm-4">
+                        <button id="cancelEditedVenueButton" class="btn btn-warning btn-lg w-100" type="button">Cancel</button>
                     </div>
                 </div>
             </form>
@@ -96,6 +99,7 @@
     const legend = '#legend';
     const deleteVenueButton = '#deleteVenueButton';
     const saveEditedVenueButton = '#saveEditedVenueButton';
+    const cancelEditedVenueButton =  '#cancelEditedVenueButton';
 
     // Declare the default seat type characters over here
     const defaultSeat = "G";
@@ -227,6 +231,21 @@
             $(saveEditedVenueButton).prop('disabled', false);
         }
     });
+
+    $(cancelEditedVenueButton).click(async function (e) {
+        const check = confirm("Are you sure you want to cancel updating the seat map for this venue?");
+        
+        if (check === true) {
+            try {
+                utils.removeUnloadListener();
+
+                window.location.replace('/admin/venues');
+            } catch (error) {
+                utils.handleError(error);
+            }
+        }
+    });
+
 </script>
 
 <%- include('../templates/footer')-%>
