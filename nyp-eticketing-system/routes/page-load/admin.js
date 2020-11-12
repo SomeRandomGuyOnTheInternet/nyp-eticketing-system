@@ -23,53 +23,6 @@ router.get('/planners', auth.isAdmin, async (req, res) => {
 	});
 });
 
-router.post('/planners', auth.isAdmin, async (req, res) => {
-	let name = req.body.name;
-	let email = req.body.email;
-	let password = req.body.password;
-
-	if (!name) {
-		flash.error(req, "Please enter a name!");
-		return res.redirect('/admin/planners');
-	}
-
-	if (!email) {
-		flash.error(req, "Please enter an email!");
-		return res.redirect('/admin/planners');
-	}
-
-	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-	if (!email.match(mailformat)) {
-		flash.error(req, "Please enter a valid email!");
-		return res.redirect('/admin/planners');
-	}
-
-	if (!password) {
-		flash.error(req, "Please enter a password!");
-		return res.redirect('/admin/planners');
-	}
-
-	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
-
-	if (existingEmail) {
-		flash.error(req, "This email has already been registered!");
-		return res.redirect('/admin/planners');
-	}
-
-	await User.createUser({
-		email: email,
-		password: password,
-		name: name,
-		isAdmin: false,
-		isPlanner: true,
-		isHelper: false,
-		isDeleted: false
-	});
-
-	flash.success(req, "Planner account has been created successfully!");
-	return res.redirect('/admin/planners');
-});
-
 router.get('/helpers', auth.isAdmin, async(req, res) => {
 	var helpers = await User.getHelpers();
 	
@@ -80,64 +33,6 @@ router.get('/helpers', auth.isAdmin, async(req, res) => {
 	});
 });
 
-router.post('/helpers', auth.isAdmin, async (req, res) => {
-	let name = req.body.name;
-	let email = req.body.email;
-	let password = req.body.password;
-	let phoneNumber = req.body.phoneNumber;
-
-	if (!name) {
-		flash.error(req, "Please enter a name!");
-		return res.redirect('/admin/helpers');
-	}
-
-	if (!email) {
-		flash.error(req, "Please enter an email!");
-		return res.redirect('/admin/helpers');
-	}
-	
-	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-	if (!email.match(mailformat)) {
-		flash.error(req, "Please enter a valid email address!");
-		return res.redirect('/admin/planners');
-	}
-
-	if (!password) {
-		flash.error(req, "Please enter a password!");
-		return res.redirect('/admin/helpers');
-	}
-	
-	if (!phoneNumber) {
-		flash.error(req, "Please enter a phone number!");
-		return res.redirect('/admin/helpers');
-	}
-
-	if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))){
-		flash.error(req, "Please enter a valid phone number!");
-		return res.redirect('/admin/helpers')
-	}
-
-	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
-
-	if (existingEmail) {
-		flash.error(req, "This email has already been registered!");
-		return res.redirect('/admin/helpers');
-	}
-
-	await User.createUser({
-		email: email,
-		password: password,
-		name: name,
-		phoneNumber: phoneNumber,
-		isAdmin: false,
-		isPlanner: false,
-		isHelper: true,
-		isDeleted: false
-	});
-
-	flash.success(req, "Helper account has been created successfully!");
-	return res.redirect('/admin/helpers');
-});
 
 // Delete function for planner accounts
 router.get('/deleteplanner/:id', async (req, res) => {

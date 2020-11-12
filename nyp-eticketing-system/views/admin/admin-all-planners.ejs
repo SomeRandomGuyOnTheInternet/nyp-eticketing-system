@@ -86,7 +86,7 @@
             <!-- This part will not be shown to the user until they click on the button that is supposed to launch the modal -->
             <!-- The modal should have the same id as the one you specified in the element with the data-target above -->
             <!-- Note that you can use multiple modals in one page, as long as they are all given different ids -->
-            <form method="POST" name="myForm">
+            <form id="addPlannerForm" method="POST" name="myForm">
                 <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="testModal"
                     aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -140,7 +140,7 @@
                             </div>
                             <!-- This is the footer, where you usually put buttons and stuff -->
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary btn-lg w-100" onclick="ValidateEmail(document.myForm.email)">Register</button>
+                                <button id="registerButton" type="submit" class="btn btn-primary btn-lg w-100">Register</button>
                             </div>
                         </div>
                     </div>
@@ -151,11 +151,16 @@
 </body>
 
 <script>
-    
+
     const searchPlannerInput = '#searchPlannerInput';
     const searchPlannerButton = '#searchPlannerButton';
     const clearSearchPlannerButton = '#clearSearchPlannerButton';
     const plannerRow = ".PlannerRow";
+    const addPlannerForm = "#addPlannerForm";
+    const nameTextbox = "#name";
+    const emailTextbox = "#email";
+    const passwordTextbox = "#password";
+    const registerButton = "#registerButton";
 
     let planners;
 
@@ -188,6 +193,28 @@
 
         const row = document.getElementById(planner[0].id);
         row.classList.add("table-active");
+    });
+
+    $(addPlannerForm).submit(async function(e) {
+        e.preventDefault();
+        $(registerButton).prop('disabled', true);
+
+        try {
+            await ajax.post(routes.admin.planners, {
+                name: $(nameTextbox).val(), 
+                email: $(emailTextbox).val(),
+                password: $(passwordTextbox).val()
+            });
+            await ajax.post(routes.index.successFlash, "Planner account has been created successfully!");
+
+            utils.removeUnloadListener();
+            
+            window.location.replace("/admin/planners");
+        } catch (error) {
+            utils.handleError(error);
+        } finally {
+            $(registerButton).prop('disabled', false);
+        }
     });
    
 </script>
