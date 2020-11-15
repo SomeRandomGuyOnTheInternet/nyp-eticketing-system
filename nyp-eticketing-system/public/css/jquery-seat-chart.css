@@ -139,19 +139,19 @@ div.seatCharts-seat.available {
 }
 
 div.seatCharts-seat.a {
-    background-color: #55b36b;
+    background-color: #3ec75e;
 }
 
 div.seatCharts-seat.b {
-	background-color: #af6553;
+	background-color: #d65e40;
 }
 
 div.seatCharts-seat.c {
-	background-color: #3ca2af;
+	background-color: #2dc9dd;
 }
 
 div.seatCharts-seat.d {
-    background-color: #724fa0;
+    background-color: #7c3ece;
 }
 
 div.seatCharts-seat.e {
@@ -159,28 +159,28 @@ div.seatCharts-seat.e {
 }
 
 div.seatCharts-seat.f {
-    background-image: linear-gradient(45deg, #de8585 18.75%, #3d54ff 18.75%, #3d54ff 50%, #de8585 50%, #de8585 68.75%, #3d54ff 68.75%, #3d54ff 100%);
-    background-size: 11.31px 11.31px;
+	background-color: #d1d42e;
 }
 
 div.seatCharts-seat.g {
-	background-color: #c4c418;
+	background-color: #db8a2e;
 }
 
 div.seatCharts-seat.h {
-	background-color: #c9883f;
+	background-color: #25ddb5;
 }
 
 div.seatCharts-seat.i {
-	background-color: #3a9224;
-}
-
-div.seatCharts-seat.j {
 	background-color: #d8bfd8;
 }
 
+div.seatCharts-seat.j {
+	background-color: #929292;
+}
+
 div.seatCharts-seat.k {
-	background-color: #9971e2;
+    background-image: linear-gradient(45deg, #de8585 18.75%, #3d54ff 18.75%, #3d54ff 50%, #de8585 50%, #de8585 68.75%, #3d54ff 68.75%, #3d54ff 100%);
+    background-size: 11.31px 11.31px;
 }
 
 div.seatCharts-seat.l {
@@ -189,7 +189,7 @@ div.seatCharts-seat.l {
 }
 
 div.seatCharts-seat.m {
-	background-color: #98fb98;
+	background-color: #98cefb;
 }
 
 div.seatCharts-seat.handicapped {
@@ -283,7 +283,9 @@ div.seatCharts-seat.handicapped.reserved {
 }
 
 div.seatCharts-seat.blocked {
-    background-color: #a937b8;
+    background-image: none;
+    background-size: none;
+    background-color: #a937b8 !important;
 }
 
 div.seatCharts-seat.highlighted {
