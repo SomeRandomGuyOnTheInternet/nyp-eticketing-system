@@ -285,6 +285,8 @@
                 return parsedHelper;
             });
 
+            console.log(await ajax.get(routes.planner.helpers))
+
             // at least a single venue is required to create an event, so throw error if it doesn't exists
             if (venues.length < 1) {
                 utils.throwException("There are no venues available! Please contact the admin to create a venue.");
@@ -300,6 +302,8 @@
                 break;
             }
         }
+
+        console.log(helpers, helperSelectInput)
         
         EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
