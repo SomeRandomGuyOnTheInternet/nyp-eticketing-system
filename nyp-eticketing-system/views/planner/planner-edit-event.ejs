@@ -277,7 +277,6 @@
             helpers = (await ajax.get(routes.planner.helpers)).map((helper) => {
                 const parsedHelper = EventHelper.parseApiResult(helper);
                 parsedHelper.selected = false;
-                console.log(parsedHelper)
                 for (i = 0; i < event.helpers.length; i++) {
                     parsedHelper.selected = (parsedHelper.id === event.helpers[i].id || parsedHelper.selected === true);
                 }
@@ -299,8 +298,6 @@
                 break;
             }
         }
-
-        console.log(helpers)
         
         EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
