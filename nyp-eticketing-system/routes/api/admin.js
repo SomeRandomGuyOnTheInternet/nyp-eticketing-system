@@ -9,7 +9,6 @@ const auth = require('../../utils/api-auth');
 const Venue = require('../../models/Venue');
 const User = require('../../models/User');
 
-
 router.get('/planners', auth.isAdmin, async (req, res) => {
     try {
         const planners = await User.getPlanners();

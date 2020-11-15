@@ -249,7 +249,7 @@
             await ajax.post(routes.index.successFlash, "Helper account has been created successfully!");
 
             utils.removeUnloadListener();
-            
+      
             window.location.replace("/admin/helpers");
         } catch (error) {
             utils.handleError(error);
@@ -257,7 +257,6 @@
             $(registerButton).prop('disabled', false);
         }
     });
-   
 </script>
 
 <%- include('../templates/footer')-%> -->

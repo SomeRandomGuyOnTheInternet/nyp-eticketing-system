@@ -51,15 +51,26 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Checkmark (check) Input Card w/o Label  -->
+                    <!-- Radio Input Card  -->
                     <div class="col-sm-6">
                         <div class="card input-card mt-3">
-                            <div class="card-body no-label-card-body">
-                                <div class="form-check form-check-inline ml-2">
-                                    <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true" <%= event.prioritiseBackRows ? "checked" : "" %>>
-                                    <label class="form-check-label px-3" for="prioritiseBackCheck">
-                                        Prioritise seats at the back
-                                    </label>
+                            <div class="card-body inline-check-card-body">
+                                <label for="prioritiseRowLabelCheckForm" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Seat selection algorithm should prioritise</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <div id="prioritiseRowLabelCheckForm" class="py-1"> <!-- All check input elements should be enclosed in a div with a unique id  -->
+                                    <div class="form-check form-check-inline">
+                                        <input id="frontRow" class="form-check-input" type="radio" name="prioritiseRow"  value="frontRow" <%= event.prioritiseBackRows ? "" : "checked" %>>
+                                        <label class="form-check-label px-2" for="frontRow">
+                                            Front Rows
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input id="backRow" class="form-check-input" type="radio" name="prioritiseRow"  value="backRow" <%= event.prioritiseBackRows ? "checked" : "" %>>
+                                        <label class="form-check-label px-2" for="backRow">
+                                            Back Rows
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -202,7 +213,7 @@
     const eventNameInput = document.getElementById('eventNameInput');
     const eventDateTimeInput = document.getElementById('eventDateTimeInput');
     const maxSeatsPerReservationInput = document.getElementById('maxSeatsPerReservationInput');
-    const prioritiseBackCheck = document.getElementById('prioritiseBackCheck');
+    const prioritiseBackRowRadio = document.getElementById('backRow');
     const venueSelectInput = document.getElementById('venueSelectInput');
     const mapWrapper = document.getElementById('tableWrapper');
     const seatMap = document.getElementById('seatMap');
@@ -422,7 +433,7 @@
             seatMap: sc.map,
             startDateTime: eventDateTimeInput.value,
             seatsPerReservation: maxSeatsPerReservationInput.value,
-            prioritiseBackRows: prioritiseBackCheck.checked,
+            prioritiseBackRows: prioritiseBackRowRadio.checked,
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
             helpers: helpers.filter(helper => helper.selected === true)
