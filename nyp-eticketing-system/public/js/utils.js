@@ -1,4 +1,3 @@
-// TODO: Improve ajax error handling by using switch case on error codes
 // TODO: Replace anonymous functions with proper ones
 
 String.prototype.replaceAt = function(index, replacement) {
