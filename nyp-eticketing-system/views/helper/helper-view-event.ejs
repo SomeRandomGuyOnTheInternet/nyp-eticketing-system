@@ -294,7 +294,6 @@
     window.addEventListener("load", async function(e) {
         try {
             const result = await ajax.get(`${routes.helper.events}/${eventId}`);
-            console.log(result)
             event = Event.parseApiResult(result);
         } catch (error) {
             return utils.handleError(error);
@@ -539,7 +538,6 @@
                 case 'highlighted':
                 case 'reserved':
                     const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
-                    console.log(event.attendees)
                     const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
                     if (attendee.length !== 1) return this.style();
 
