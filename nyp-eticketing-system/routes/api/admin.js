@@ -21,6 +21,37 @@ router.get('/planners', auth.isAdmin, async (req, res) => {
     }
 });
 
+router.post('/planners', auth.isAdmin, async (req, res) => {
+	let name = req.body.name;
+	let email = req.body.email;
+    let password = req.body.password;
+
+	if (!name) return respond.error(res, "Please enter a name!", 400);
+	if (!email) return respond.error(res, "Please enter an email!", 400);
+    if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) return respond.error(res, "Please enter a valid email!", 400);
+	if (!password) return respond.error(res, "Please enter a password!", 400);
+
+    try {
+        let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+        if (existingEmail) return respond.error(res, "This email has already been registered!", 400);
+
+        await User.createUser({
+            email: email,
+            password: password,
+            name: name,
+            isAdmin: false,
+            isPlanner: true,
+            isHelper: false,
+            isDeleted: false
+        });
+        
+        return respond.success(res, "Plannner account has been created successfully!");     
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while creating the planner account. Please try again later!", 500);
+    }
+});
+
 router.delete('/planners/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
 
@@ -46,6 +77,40 @@ router.get('/helpers', auth.isAdmin, async (req, res) => {
     } catch (error) {
         console.error(error);
         return respond.error(res, "Something went wrong while getting all the helpers. Please try again later!", 500);
+    }
+});
+
+router.post('/helpers', auth.isAdmin, async (req, res) => {
+	let name = req.body.name;
+	let email = req.body.email;
+	let password = req.body.password;
+	let phoneNumber = req.body.phoneNumber;
+
+	if (!name) return respond.error(res, "Please enter a name!", 400);
+	if (!email) return respond.error(res, "Please enter an email!", 400);
+    if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) return respond.error(res, "Please enter a valid email!", 400);
+    if (!phoneNumber) return respond.error(res, "Please enter a phone number!", 400);
+	if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please enter a valid phone number!", 400);
+	if (!password) return respond.error(res, "Please enter a password!", 400);
+
+    try {
+        let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+        if (existingEmail) return respond.error(res, "This email has already been registered!", 400);
+        
+        await User.createUser({
+            email: email,
+            password: password,
+            name: name,
+            isAdmin: false,
+            isPlanner: false,
+            isHelper: true,
+            isDeleted: false
+        });
+        
+        return respond.success(res, "Helper account has been created successfully!");     
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while creating the helper account. Please try again later!", 500);
     }
 });
 
