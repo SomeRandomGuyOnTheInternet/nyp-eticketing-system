@@ -565,7 +565,7 @@
 
             const seatCharacterCount = utils.countUniqueCharacters(selectedSeatCharacters);
             for (const character in seatCharacterCount) {
-                const availableSeatBlock = sc.findAvailableSeatBlock(character, seatCharacterCount[character], event.prioritiseBackRows);
+                const availableSeatBlock = sc.findAvailableSeatBlock(character, seatCharacterCount[character], Boolean(event.prioritiseBackRows));
                 sc.activeNode.get(availableSeatBlock).status('selected');
             }
         }
