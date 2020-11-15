@@ -1,9 +1,9 @@
-<!-- <%- include('../templates/head')-%>
+<%- include('../templates/head')-%>
 
 <body>
     <%- include('../templates/navbar')-%>
     <div class="container">
-        <! Always enclose everything in a container  -->
+        <!-- Always enclose everything in a container  -->
         <main role="main" class="inner cover">
             <!-- Idk what this element does but every tutorial uses it so eh might as well use it  -->
 
@@ -31,7 +31,7 @@
                                         <input id="searchHelperInput" name="searchHelperInput" class="form-control card-input" type="search"
                                             placeholder="E.g. 173560N@mymail.nyp.edu.sg">
                                     </div>
-                                    <button id="clearSearchHelperButton" class="btn text-muted" type="button" style="display: none;"><i class="fas fa-times"></i></button>
+                                    <button id="clearSearchHelperButton" class="btn text-muted d-none" type="button"><i class="fas fa-times"></i></button>
                                     <button id="searchHelperButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
                                     <!-- This is where the user actually inputs all their stuff  -->
                                 </div>
@@ -39,6 +39,54 @@
                         </div>
                 </div>
             </div>
+
+            <!-- Table for list of helpers -->
+            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
+            <!-- Content  -->
+            <div class="card mt-3">
+                <!-- Put interactible elements in a card, enclosed with card-body  -->
+                <div class="card-body p-0">
+                    <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
+                    <!-- Table  -->
+                    <div class="table-responsive">
+                        <table class="table table-click table-lg">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Phone Number</th>
+                                    <th scope="col">Date Created</th>
+                                    <th scope="col" class="p-3"> 
+                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal">
+                                            <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Helpers
+                                        </button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (i = 0; i < helpers.length; i++) { %>
+                                <tr id="<%= helpers[i].id %>" class="HelperRow">
+                                    <td scope="row"><%= i + 1 %></td>
+                                    <td class="font-weight-medium"><%= helpers[i].name %></td>
+                                    <td><%= helpers[i].email %></td>
+                                    <td><%= helpers[i].phoneNumber %></td>
+                                    <td><%= moment(helpers[i].createdAt).format('Do MMMM YYYY') %></td>
+                                    <td class="text-center">
+                                        <form action="/api/admin/helpers/<%= helpers[i].id %>" class="deleteHelperForm">
+                                            <button type="submit" class="btn btn-link p-0">
+                                                <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal section -->
             <!-- This part will not be shown to the user until they click on the button that is supposed to launch the modal -->
             <!-- The modal should have the same id as the one you specified in the element with the data-target above -->
@@ -121,65 +169,20 @@
                     </div>
                 </div>
             </form>
-
-            <!-- Table for list of helpers -->
-            <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
-            <!-- Content  -->
-            <div class="card mt-3">
-                <!-- Put interactible elements in a card, enclosed with card-body  -->
-                <div class="card-body p-0">
-                    <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
-                    <!-- Table  -->
-                    <div class="table-responsive">
-                        <table class="table table-click table-lg">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Phone Number</th>
-                                    <th scope="col">Date Created</th>
-                                    <th scope="col" class="p-3"> 
-                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal">
-                                            <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Helpers
-                                        </button>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (i = 0; i < helpers.length; i++) { %>
-                                <tr id="<%= helpers[i].id %>" class="HelperRow">
-                                    <td scope="row"><%= i + 1 %></td>
-                                    <td class="font-weight-medium"><%= helpers[i].name %></td>
-                                    <td><%= helpers[i].email %></td>
-                                    <td><%= helpers[i].phoneNumber %></td>
-                                    <td><%= moment(helpers[i].createdAt).format('Do MMMM YYYY') %></td>
-                                    <td class="text-center">
-                                        <a href="/admin/deletehelper/<%= helpers[i].id %>" onclick="return confirm('Are you sure you want to delete this account?')">
-                                            <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </body>
 
 <script>
-    
-    const searchHelperInput = '#searchHelperInput';
-    const searchHelperButton = '#searchHelperButton';
-    const clearSearchHelperButton = '#clearSearchHelperButton';
-    const helperRow = ".HelperRow";
+    const searchHelperInput = document.getElementById('searchHelperInput');
+    const searchHelperButton = document.getElementById('searchHelperButton');
+    const clearSearchHelperButton = document.getElementById('clearSearchHelperButton');
+    const helperRows = document.querySelectorAll('.HelperRow');
+    const deleteHelperForms = document.querySelectorAll('.deleteHelperForm');
 
-    let helpers;
+    let helpers = [];
 
-    $(document).ready(async function() {
+    window.addEventListener("load", async function(e) {
         try {
             helpers = (await ajax.get(routes.admin.helpers)).map(helper => User.parseApiResult(helper));
         } catch (error) {
@@ -187,30 +190,44 @@
         }
     });
 
-    $(searchHelperInput).keyup(function(e) {
+    searchHelperInput.addEventListener('keyup', function (e) {
         if (e.keyCode == 13) searchHelperButton.click();
-
-        if (e.target.value.length === 0) $(clearSearchHelperButton).hide();
-        else $(clearSearchHelperButton).show();
+        clearSearchHelperButton.classList.toggle('d-none', e.target.value.length === 0);
     });
 
-    $(clearSearchHelperButton).click(function() {
-        document.querySelectorAll(helperRow).forEach(obj => obj.classList.remove("table-active"));
-        $(searchHelperInput).val('');
-        $(clearSearchHelperButton).hide();
+    clearSearchHelperButton.addEventListener('click', function (e) {
+        document.querySelectorAll('.HelperRow').forEach(obj => obj.classList.remove("table-active"));
+        searchHelperInput.value = '';
+        clearSearchHelperButton.classList.add('d-none');
     });
 
-    $(searchHelperButton).click(function() {
-        document.querySelectorAll(helperRow).forEach(obj => obj.classList.remove("table-active"));
-        console.log(document.querySelectorAll(helperRow))
+    searchHelperButton.addEventListener('click', function (e) {
+        document.querySelectorAll('.HelperRow').forEach(obj => obj.classList.remove("table-active"));
 
-        const helper = helpers.filter(helper => (helper.email).toLocaleLowerCase() === ($(searchHelperInput).val()).trim().toLocaleLowerCase() || (helper.name).toLocaleLowerCase() === ($(searchHelperInput).val()).trim().toLocaleLowerCase());
-        if (helper.length < 1) return toast.danger("This helper account does not exist with this email!");
+        const helper = helpers.filter(helper => (helper.email).toLocaleLowerCase() === (searchHelperInput.value).trim().toLocaleLowerCase() || (helper.name).toLocaleLowerCase() === (searchHelperInput.value).trim().toLocaleLowerCase());
+        if (helper.length < 1) return toast.danger("This email does not belong to any helper account!");
 
-        const row = document.getElementById(helper[0].id);
-        row.classList.add("table-active");
+        document.getElementById(helper[0].id).classList.add("table-active");    
     });
-   
+
+    deleteHelperForms.forEach(function(element) {
+        element.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const check = confirm("Are you sure you want to delete this helper account?");
+        
+            if (check === true) {
+                try {
+                    await ajax.delete(e.target.action);
+                    await ajax.post(routes.index.successFlash, "Helper account has been deleted successfully!");
+
+                    window.location.replace('/admin/helpers');
+                } catch (error) {
+                    utils.handleError(error);
+                }
+            }
+        });
+    });
 </script>
 
 <%- include('../templates/footer')-%> -->

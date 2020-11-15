@@ -1,12 +1,12 @@
-<!-- TODO: Delete seat reservation -->
 <!-- TODO: Make button have a loading icon -->
 <!-- TODO: Check whether back rows have empty seats -->
 <!-- TODO: Fix seats not showing up and select in safari -->
 <!-- TODO: flash seat when select -->
 <!-- TODO: gap detection -->
 <!-- TODO: save base map in class, so can use zoom properly -->
-<!-- TODO: detect if flash message exists already -->
 <!-- TODO: autocomplete on search fields -->
+<!-- TODO: scroll to highlighted row -->
+<!-- TODO: cleanup data -->
 
 <%- include('../templates/head')-%>
 
@@ -42,7 +42,7 @@
                                     <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="search"
                                         placeholder="E.g. 91864675">
                                 </div>
-                                <button id="clearSearchReservationButton" class="btn text-muted" type="button" style="display: none;"><i class="fas fa-times"></i></button>
+                                <button id="clearSearchReservationButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
                                 <button id="searchReservationButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
                                 <!-- This is where the user actually inputs all their stuff  -->
                             </div>
@@ -104,7 +104,7 @@
 
             <form id="reserveSeatForm" action="/" method="post" class="d-none">
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-                <h3>Reservation</h3>
+                <h3 id="reservationHeading">Reservation</h3>
                 <div class="row">
                     <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                     <div class="col-md-4">
@@ -237,50 +237,49 @@
     </div>
 </body>
 
-<script>
+<script async>
     const eventId = <%= event.id %>;
 
-    const nameHeading = '#nameHeading';
-    const startDateTimeHeading = '#startDateTimeHeading';
-    const searchReservationInput = '#searchReservationInput';
-    const searchReservationBtn = '#searchReservationButton';
-    const clearSearchReservationBtn = '#clearSearchReservationButton';
-    const venueNameHeading = '#venueNameHeading';
-    const zoomQuadrantSelect = '#zoomQuadrantSelect';
-    const venueSelectInput = '#venueSelectInput';
-    const seatChartCard = '#seatChartCard';
-    const mapWrapper = '#tableWrapper';
-    const seatMap = '#seatMap';
-    const legend = '#legend';
-    const editSeatSelection = '#editSeatSelection';
-    const addSeatToSelection = '#addSeatToSelection';
-    const removeSeatFromSelection = '#removeSeatFromSelection';
-    const reserveSeatForm = '#reserveSeatForm';
-    const reservationNameInput = '#reservationNameInput';
-    const reservationPhoneNumberInput = '#reservationPhoneNumberInput';
-    const noOfExtraAttendeesInput = '#noOfExtraAttendeesInput';
-    const reserveSeatButton = '#reserveSeatButton';
-    const seatDetailsModal = '#seatDetailsModal';
-    const seatDetailsSeatCell = '#seatDetailsSeatCell';
-    const seatDetailsSeatId = '#seatDetailsId';
-    const seatDetailsDescription = '#seatDetailsDescription';
-    const waitingListContainer = '#waitingListContainer';
-    const waitingListRow = '.waitingListRow';
-    const waitingListRowDelete = '.waitingListRowDelete';
-    const reservationDetailsModal = '#reservationDetailsModal';
-    const reservationConfirmName = '#reservationConfirmName';
-    const reservationConfirmPhNo = '#reservationConfirmPhNo';
-    const reservationConfirmExtraAttendees = '#reservationConfirmExtraAttendees';
-    const reservationConfirmNoOfExtraAttendees = '#reservationConfirmNoOfExtraAttendees';
-    const selectedSeatConfirmationWrapper = '#selectedSeatConfirmationWrapper';
-    const confirmReservationButton = '#confirmReservationButton';
+    const nameHeading = document.getElementById('nameHeading');
+    const startDateTimeHeading = document.getElementById('startDateTimeHeading');
+    const searchReservationInput = document.getElementById('searchReservationInput');
+    const searchReservationBtn = document.getElementById('searchReservationButton');
+    const clearSearchReservationBtn = document.getElementById('clearSearchReservationButton');
+    const venueNameHeading = document.getElementById('venueNameHeading');
+    const zoomQuadrantSelect = document.getElementById('zoomQuadrantSelect');
+    const venueSelectInput = document.getElementById('venueSelectInput');
+    const seatChartCard = document.getElementById('seatChartCard');
+    const mapWrapper = document.getElementById('tableWrapper');
+    const seatMap = document.getElementById('seatMap');
+    const legend = document.getElementById('legend');
+    const editSeatSelection = document.getElementById('editSeatSelection');
+    const addSeatToSelection = document.getElementById('addSeatToSelection');
+    const removeSeatFromSelection = document.getElementById('removeSeatFromSelection');
+    const reserveSeatForm = document.getElementById('reserveSeatForm');
+    const reservationHeading = document.getElementById('reservationHeading');
+    const reservationNameInput = document.getElementById('reservationNameInput');
+    const reservationPhoneNumberInput = document.getElementById('reservationPhoneNumberInput');
+    const noOfExtraAttendeesInput = document.getElementById('noOfExtraAttendeesInput');
+    const reserveSeatButton = document.getElementById('reserveSeatButton');
+    const seatDetailsModal = document.getElementById('seatDetailsModal');
+    const seatDetailsSeatCell = document.getElementById('seatDetailsSeatCell');
+    const seatDetailsSeatId = document.getElementById('seatDetailsId');
+    const seatDetailsDescription = document.getElementById('seatDetailsDescription');
+    const waitingListContainer = document.getElementById('waitingListContainer');
+    const waitingListRows = document.querySelectorAll('.waitingListRow');
+    const reservationDetailsModal = document.getElementById('reservationDetailsModal');
+    const reservationConfirmName = document.getElementById('reservationConfirmName');
+    const reservationConfirmPhNo = document.getElementById('reservationConfirmPhNo');
+    const reservationConfirmExtraAttendees = document.getElementById('reservationConfirmExtraAttendees');
+    const reservationConfirmNoOfExtraAttendees = document.getElementById('reservationConfirmNoOfExtraAttendees');
+    const selectedSeatConfirmationWrapper = document.getElementById('selectedSeatConfirmationWrapper');
+    const confirmReservationButton = document.getElementById('confirmReservationButton');
 
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
     let selectedSeatType = null;
     let event = null;
 
-    // Seat chart configuration
     let sc = new SeatChart({
         map: [],
         seatTypes: [],
@@ -292,10 +291,10 @@
         legendNode: legend,
     });
 
-    // Rest of the functions
-    $(document).ready(async function() {
+    window.addEventListener("load", async function(e) {
         try {
-            event = Event.parseApiResult(await ajax.get(`${routes.helper.events}/${eventId}`));
+            const result = await ajax.get(`${routes.helper.events}/${eventId}`);
+            event = Event.parseApiResult(result);
         } catch (error) {
             return utils.handleError(error);
         }
@@ -304,55 +303,47 @@
         sc.seatTypes = event.seatTypes;
         sc.legends = sc.seatTypes.reduce(function(legends, seatType){
             if (!seatType.blocked) {
-                legends.push([seatType.char, "available", seatType.category, selectableLegendClasses]);
+                legends.push([seatType.char, 'available', seatType.category, selectableLegendClasses]);
             }
             return legends;
         }, []);
-        sc.legends.push(["G", "blocked", "Blocked"]);
+        sc.legends.push(['G', 'blocked', 'Blocked']);
         sc.onClick = onSeatClickCallback();
         
         sc.bindMap();
         sc.scaleContentWidth();
         sc.disableBlockedSeats();
         sc.disableReservedSeats(event.reservedSeats);
-
-        updateSeatSelectionButtons();
     });
 
-    $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+    window.addEventListener('resize', function (e) {
         sc.scaleContentWidth();
     });
 
-    $(searchReservationInput).keyup(function(e) {
-        if (e.keyCode == 13) {
-            $(searchReservationBtn).click();
-        }
-
-        if (e.target.value.length === 0) $(clearSearchReservationBtn).hide();
-        else $(clearSearchReservationBtn).show();
+    searchReservationInput.addEventListener('keyup', function (e) {
+        if (e.keyCode == 13) searchReservationBtn.click();
+        clearSearchReservationBtn.classList.toggle('d-none', e.target.value.length === 0);
     });
 
-    $(clearSearchReservationBtn).click(function() {
+    clearSearchReservationBtn.addEventListener('click', function (e) {
         sc.activeNode.find('highlighted').status('reserved');
-        $(searchReservationInput).val('');
-        $(clearSearchReservationBtn).hide();
+        searchReservationInput.value = '';
+        clearSearchReservationBtn.classList.add('d-none');
     });
 
-    $(searchReservationBtn).click(function() {
-        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(searchReservationInput).val());
-        if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
+    searchReservationBtn.addEventListener('click', function (e) {
+        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == searchReservationInput.value);
+        
+        if (attendee.length !== 1) return toast.danger('This phone number is not tied to any reservation!');
 
-        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
-
+        waitingListRows.forEach(obj => obj.classList.remove('table-active'));
         highlightAttendeeSeats(attendee[0].id);
     });
 
-    $(zoomQuadrantSelect).change(function() {
-        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
-
+    zoomQuadrantSelect.addEventListener('change', function (e) {
         sc.map = Array.from(event.seatMap);
 
-        const dimensions = sc.getQuadrantDimensions($(zoomQuadrantSelect).val());
+        const dimensions = sc.getQuadrantDimensions(zoomQuadrantSelect.value);
 
         sc.spliceMapRow(dimensions[0][0], dimensions[0][1]);
         sc.spliceMapCol(dimensions[1][0], dimensions[1][1]);
@@ -364,49 +355,53 @@
         sc.disableBlockedSeats();
         sc.disableReservedSeats(event.reservedSeats);
 
-        updateSeatSelectionButtons(0);
+        document.querySelectorAll('.seatCharts-legendCard').forEach(obj => obj.classList.remove('highlighted'));
+        waitingListRows.forEach(obj => obj.classList.remove('table-active'));
+        editSeatSelection.classList.add('d-none');
+        selectedSeatType = null;
     });
 
-    $(clearSearchReservationBtn).click(function() {
+    clearSearchReservationBtn.addEventListener('click', function (e) {
         sc.activeNode.find('highlighted').status('reserved');
-        $(searchReservationInput).val('');
-        $(clearSearchReservationBtn).hide();
+        searchReservationInput.value = '';
+        clearSearchReservationBtn.classList.add('d-none');
     });
 
     document.addEventListener('click', function (e) {
         const node = e.target;
 
-        if (node.classList.contains("seatCharts-legendCard") && node.classList.contains("clickable-div")) {
+        if (node.classList.contains('seatCharts-legendCard') && node.classList.contains('clickable-div')) {
             utils.addUnloadListener();
             
-            const character = node.getAttribute("data-seat-character");
-            const highlighted = node.classList.contains("highlighted");
+            const character = node.getAttribute('data-seat-character');
+            const highlighted = node.classList.contains('highlighted');
 
-            document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove("highlighted"));
+            document.querySelectorAll('.seatCharts-legendCard').forEach(obj => obj.classList.remove('highlighted'));
 
             if (character) {
-                if (highlighted) {
-                    node.classList.remove("highlighted");
-                    selectedSeatType = null;
-                    $(editSeatSelection).addClass("d-none");
-                } else  {
-                    node.classList.add("highlighted");
-                    selectedSeatType = character;
-                    $(editSeatSelection).removeClass("d-none");
-                }
+                node.classList.toggle('highlighted', highlighted === false);
+                editSeatSelection.classList.toggle('d-none', highlighted === true);
+                selectedSeatType = (highlighted === true) ? null : character;
             }
+
+            const selectedSeats = sc.activeNode.find('selected').seats;
+            updateSeatSelectionButtons(selectedSeats.length, (selectedSeats.filter(seat => seat.settings.character === selectedSeatType)).length);
         }
     }, false);
 
-    $(addSeatToSelection).click(function() {
+    addSeatToSelection.addEventListener('click', function (e) {
         if (selectedSeatType !== null) {
             let selectedSeatCharacters = (sc.activeNode.find('selected').seats).map(seat => seat.settings.character);
             selectedSeatCharacters.push(selectedSeatType);
             selectSeatsUsingSelection(selectedSeatCharacters);
+
+            if (selectedSeatCharacters.length === 1) {
+                reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
+            }
         }
     });
 
-    $(removeSeatFromSelection).click(function() {
+    removeSeatFromSelection.addEventListener('click', function (e) {
         if (selectedSeatType !== null) {
             const orgSelectedSeats = sc.activeNode.find('selected').seats;
             let selectedSeats = [];
@@ -424,124 +419,131 @@
                 selectSeatsUsingSelection(selectedSeats);
             } else {
                 sc.activeNode.find('selected').status('available');
-                updateSeatSelectionButtons(0);
+                reserveSeatForm.classList.add('d-none');
+                updateSeatSelectionButtons(selectedSeats.length, (selectedSeats.filter(character => character === selectedSeatType)).length);
             }
         }
     });
 
-    $(waitingListRow).click(function() {
-        const attendee = event.attendees.filter(attendee => attendee.id == this.id);
-        const wasActive = this.classList.contains("table-active");
+    waitingListRows.forEach(function(element) {
+        element.addEventListener('click', function (e) {
+            const attendee = event.attendees.filter(attendee => attendee.id == this.id);
+            const wasActive = this.classList.contains('table-active');
 
-        document.querySelectorAll(waitingListRow).forEach(obj => obj.classList.remove("table-active"));
-        sc.activeNode.find('highlighted').status('reserved');
+            waitingListRows.forEach(obj => obj.classList.remove('table-active'));
+            sc.activeNode.find('highlighted').status('reserved');
 
-        if (attendee.length === 1) {
-            $(reservationNameInput).val((wasActive) ? '' : attendee[0].name);
-            $(reservationPhoneNumberInput).val((wasActive) ? '' : attendee[0].phoneNumber);
-            this.classList.add((wasActive) ? null : "table-active");
-            (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
-        } else {
-            return toast.danger("Something went wrong while retrieving the seats for that attendee!");
-        }
+            if (attendee.length === 1) {
+                reservationNameInput.value = (wasActive) ? '' : attendee[0].name;
+                reservationPhoneNumberInput.value = (wasActive) ? '' : attendee[0].phoneNumber;
+                this.classList.add((wasActive) ? null : 'table-active');
+                (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
+            } else {
+                return toast.danger('Something went wrong while retrieving the seats for that attendee!');
+            }
+        });
     });
 
-    $(reserveSeatForm).submit(async function (e) {
+    reserveSeatForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const reservationNameInputVal = $(reservationNameInput).val();
-        const reservationPhoneNumberInputVal = $(reservationPhoneNumberInput).val();
-        const noOfExtraAttendeesInputVal = $(noOfExtraAttendeesInput).val();
+        const reservationNameInputVal = reservationNameInput.value;
+        const reservationPhoneNumberInputVal = reservationPhoneNumberInput.value;
+        const noOfExtraAttendeesInputVal = noOfExtraAttendeesInput.value;
         const selectedSeats = sc.activeNode.find('selected');
 
-        if (selectedSeats.length === 0) return toast.danger("Please select some seats to reserve for the attendee!");
-        if (reservationNameInputVal === "") return toast.danger("Please enter a name for the attendee!");
-        if (reservationPhoneNumberInputVal === "") return toast.danger("Please enter a phone number for the attendee!");
-        if (!(/^(8|9)[0-9]{7}$/.test(reservationPhoneNumberInputVal))) return toast.danger("Please enter a valid phone number for the attendee!");
+        if (selectedSeats.length === 0) return toast.danger('Please select some seats to reserve for the attendee!');
+        if (reservationNameInputVal === '') return toast.danger('Please enter a name for the attendee!');
+        if (reservationPhoneNumberInputVal === '') return toast.danger('Please enter a phone number for the attendee!');
+        if (!(/^(8|9)[0-9]{7}$/.test(reservationPhoneNumberInputVal))) return toast.danger('Please enter a valid phone number for the attendee!');
 
         const sortedSeats = selectedSeats.seats.reduce((sortedSeats, seat) => ({
             ...sortedSeats,
             [seat.settings.data.category]: [...(sortedSeats[seat.settings.data.category] || []), seat]
         }), {});
 
-        $(selectedSeatConfirmationWrapper).empty();
-        $(reservationConfirmName).text(reservationNameInputVal);
-        $(reservationConfirmPhNo).text(reservationPhoneNumberInputVal);
-        $(reservationConfirmExtraAttendees).toggle(noOfExtraAttendeesInputVal !== '');
-        $(reservationConfirmNoOfExtraAttendees).text(noOfExtraAttendeesInputVal);
+        utils.removeAllChildNodes(selectedSeatConfirmationWrapper);
+        reservationConfirmName.textContent = reservationNameInputVal;
+        reservationConfirmPhNo.textContent = reservationPhoneNumberInputVal;
+        reservationConfirmExtraAttendees.classList.toggle('d-none', noOfExtraAttendeesInputVal === '');
+        reservationConfirmNoOfExtraAttendees.textContent = noOfExtraAttendeesInputVal;
         for (const category in sortedSeats) {
-            $(selectedSeatConfirmationWrapper).append(renderSelectedSeatsOfCategory(category, sortedSeats[category]));
+            selectedSeatConfirmationWrapper.appendChild(createSelectedSeatsInCategoryElement(category, sortedSeats[category]));
         }
 
         $(reservationDetailsModal).modal();
     });
 
-    $(confirmReservationButton).click(async function() {
-        $(confirmReservationButton).prop('disabled', true);
+    confirmReservationButton.addEventListener('click', async function (e) {
+        confirmReservationButton.disabled = true;
         
         let attendee = new EventAttendee({
-            name: $(reservationNameInput).val(),
-            phoneNumber: $(reservationPhoneNumberInput).val(),
+            name: reservationNameInput.value,
+            phoneNumber: reservationPhoneNumberInput.value,
             reservedSeats: sc.activeNode.find('selected').seatIds,
-            noOfExtraAttendees: $(noOfExtraAttendeesInput).val(),
+            noOfExtraAttendees: noOfExtraAttendeesInput.value,
             eventId: eventId
         });
 
         try {
             attendee = await ajax.post(routes.helper.reservations, attendee);
         } catch (error) {
-            $(confirmReservationButton).prop('disabled', false);
+            confirmReservationButton.disabled = true;
             return utils.handleError(error);
-        } 
-
-        utils.removeUnloadListener();
+        }
 
         try {
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
-            await ajax.post(routes.index.successFlash, "The reservation has been created successfully!");
+            await ajax.post(routes.index.successFlash, 'The reservation has been created successfully!');
         } catch (error) {
-            await ajax.post(routes.index.errorFlash, "Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.");
+            await ajax.post(routes.index.errorFlash, 'Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.');
         } finally {
+            utils.removeUnloadListener();
             window.location.reload();
         }
     });
 
     function onSeatClickCallback() {
         return function () {
-            const selectedSeatsLength = sc.activeNode.find('selected').seatIds.length;
+            const allSelectedSeats = sc.activeNode.find('selected').seats;
 
             switch (this.status()) {
                 case 'available':
                     utils.addUnloadListener();
 
-                    $(reserveSeatForm).removeClass("d-none");
+                    reserveSeatForm.classList.remove('d-none');
                     if (event.seatsPerReservation) {
-                        if (selectedSeatsLength >= event.seatsPerReservation) {
-                            toast.danger("You have reached the maximum number of seats allowed per reservation!")
+                        if (allSelectedSeats.length >= event.seatsPerReservation) {
+                            toast.danger('You have reached the maximum number of seats allowed per reservation!')
                             return 'available';
                         }
                     }
 
-                    updateSeatSelectionButtons(selectedSeatsLength);
+                    updateSeatSelectionButtons(allSelectedSeats.length, (allSelectedSeats.filter(seat => seat.settings.characters === selectedSeatType)).length);
+                    if (allSelectedSeats.length === 0) {
+                        reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
+                    }
                     return 'selected';
-                case 'selected':
-                    (selectedSeatsLength <= 1)
-                        ? $(reserveSeatForm).addClass("d-none")
-                        : $(reserveSeatForm).removeClass("d-none");
 
-                    updateSeatSelectionButtons(selectedSeatsLength);
+                case 'selected':
+                    reserveSeatForm.classList.toggle('d-none', allSelectedSeats.length <= 1);
+
+                    updateSeatSelectionButtons(allSelectedSeats.length, (allSelectedSeats.filter(seat => seat.settings.characters === selectedSeatType)).length);
                     return 'available';
+
                 case 'blocked':
                     populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);
                     return 'blocked';
+
                 case 'highlighted':
                 case 'reserved':
                     const seatDetails = event.reservedSeats.filter(seat => seat.seatNumber == this.settings.id);
                     const attendee = event.attendees.filter(attendee => attendee.id == seatDetails[0].attendeeId);
                     if (attendee.length !== 1) return this.style();
 
-                    populateSeatDetailsModal(this.settings.id, `Reserved for ${attendee[0].name} • ${attendee[0].phoneNumber}`, this.settings.data.classes);
+                    populateSeatDetailsModal(`${this.settings.id} • ${this.settings.data.category}`, `Reserved for ${attendee[0].name} • ${attendee[0].phoneNumber}`, this.settings.data.classes);
                     return this.status();
+
                 default:
                     return this.style();
             }
@@ -551,15 +553,15 @@
     selectSeatsUsingSelection = (selectedSeatCharacters) => {
         if (event.seatsPerReservation) {
             if (selectedSeatCharacters.length > event.seatsPerReservation) {
-                toast.danger("You have reached the maximum number of seats allowed per reservation!")
-                return;
+                return toast.danger('You have reached the maximum number of seats allowed per reservation!')
             }
         }
 
         if (selectedSeatCharacters.length > 0) {
-            $(reserveSeatForm).removeClass("d-none");
+            reserveSeatForm.classList.remove('d-none');
+
             sc.activeNode.find('selected').status('available');
-            updateSeatSelectionButtons(selectedSeatCharacters.length);
+            updateSeatSelectionButtons(selectedSeatCharacters.length, (selectedSeatCharacters.filter(character => character === selectedSeatType)).length);
 
             const seatCharacterCount = utils.countUniqueCharacters(selectedSeatCharacters);
             for (const character in seatCharacterCount) {
@@ -569,74 +571,65 @@
         }
     };
 
-    updateSeatSelectionButtons = (selectedSeatsLength) => {
-        if (event.seatsPerReservation) {
-            if (typeof selectedSeatsLength === 'undefined') {
-                $(removeSeatFromSelection).prop('disabled', true);
-            } else {
-                $(removeSeatFromSelection).prop('disabled', selectedSeatsLength <= 0);
-                $(addSeatToSelection).prop('disabled', selectedSeatsLength >= event.seatsPerReservation);
-            }
-        } else {
-            $(removeSeatFromSelection).prop('disabled', false);
-            $(addSeatToSelection).prop('disabled', false);
-        }
+    updateSeatSelectionButtons = (totalNoOfSelectedSeats = 0, noOfSelectedSeatsForCurrentType = 0, totalNoOfSeatsLeftForCurrentType = (sc.activeNode.find(`${selectedSeatType}.available`)).length) => {
+        removeSeatFromSelection.disabled = noOfSelectedSeatsForCurrentType <= 0;
+        addSeatToSelection.disabled = (event.seatsPerReservation) ? (totalNoOfSelectedSeats >= event.seatsPerReservation || totalNoOfSeatsLeftForCurrentType === 0) : false;
     };
 
     highlightAttendeeSeats = (attendeeId) => {
         const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendeeId);
-        if (seatDetails.length === 0) return toast.danger("This attendee does not have any seats reserved for this event!");
+        if (seatDetails.length === 0) return toast.danger('This attendee does not have any seats reserved for this event!');
 
         sc.activeNode.find('highlighted').status('reserved');
         sc.activeNode.get(seatDetails.map(seat => seat.seatNumber)).status('highlighted');
 
-        document.getElementById(seatChartCard.substring(1)).scrollIntoView({behavior: "smooth", block: "nearest", inline: "nearest"});
+        seatChartCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     };
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {
-        $(seatDetailsSeatId).text(seatId);
-        $(seatDetailsDescription).text(description);
-        $(seatDetailsSeatCell)
-            .removeClass()
-            .addClass('seatCharts-seat seatCharts-cell available')
-            .addClass(cssClasses);
-            
+        seatDetailsSeatId.textContent = seatId;
+        seatDetailsDescription.textContent = description;
+
+        let cellClassList = seatDetailsSeatCell.classList;
+        while (cellClassList.length > 0)  cellClassList.remove(cellClassList.item(0));
+        cellClassList.add(...['seatCharts-seat', 'seatCharts-cell', 'available', cssClasses]);
+
         $(seatDetailsModal).modal();
     };
 
-    renderSelectedSeatsOfCategory = (category, seats) => {
-        let $parentDiv = $('<div></div>')
-            .addClass('mt-1 mb-2');
-    
-        $parentDiv.append($('<span></span>')
-            .addClass('h6 text-muted')
-            .text(`${category} Seats`)
-        );
-    
-        let $seatRow = $('<div></div>')
-            .addClass('row-small-margin row mt-2')
-            .appendTo($parentDiv);
+    createSelectedSeatsInCategoryElement = (category, seats) => {
+        const parentDiv = document.createElement('div');
+        parentDiv.classList.add(...['mt-1', 'mb-2']);
+
+        const seatCategoryHeading = document.createElement('span');
+        seatCategoryHeading.classList.add(...['h6', 'text-muted']);
+        seatCategoryHeading.appendChild(document.createTextNode(`${category} Seats`));
+        parentDiv.appendChild(seatCategoryHeading);
+
+        const seatRow = document.createElement('div');
+        seatRow.classList.add(...['row-small-margin', 'row', 'mt-2']);
+        parentDiv.appendChild(seatRow);
     
         for (let i = 0; i < seats.length; i++) {
-            let $seatCol = $('<div></div>')
-                .addClass('col-small-margin col-auto mb-2')
-                .appendTo($seatRow);
-    
-            let $card = $('<div></div>')
-                .addClass('card')
-                .appendTo($seatCol);
-    
-            let $cardBody = $('<div></div>')
-                .addClass('card-body py-2 px-3')
-                .appendTo($card);
-    
-            $cardBody.append($('<span></span>')
-                .addClass('h6')
-                .text(seats[i].settings.id)
-            );
+            const seatCol = document.createElement('div');
+            seatCol.classList.add(...['col-small-margin', 'col-auto', 'mb-2']);
+            seatRow.appendChild(seatCol);
+
+            const card = document.createElement('div');
+            card.classList.add('card');
+            seatCol.appendChild(card);
+
+            const cardBody = document.createElement('div');
+            cardBody.classList.add(...['card-body', 'py-2', 'px-3']);
+            card.appendChild(cardBody);
+
+            const seatNumber = document.createElement('span');
+            seatNumber.classList.add('h6');
+            seatNumber.appendChild(document.createTextNode(seats[i].settings.id));
+            cardBody.appendChild(seatNumber);
         }
     
-        return $parentDiv;
+        return parentDiv;
     };
 </script>
 

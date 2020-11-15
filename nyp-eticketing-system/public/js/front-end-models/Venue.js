@@ -15,8 +15,7 @@ class Venue {
         });
     };
     
-    static populateSelect(venues, selectId) {
-        const select = document.getElementById(selectId.substring(1));
+    static populateSelect(venues, select) {
         [...select.options].forEach(option => option.remove());
 
         for (let i = 0; i < venues.length; i++) {
@@ -29,8 +28,8 @@ class Venue {
         select.selectedIndex = 0;
     };
 
-    static selectedOption(venues, selectId) {
-        const selectVal = document.getElementById(selectId.substring(1)).value;
+    static selectedOption(venues, select) {
+        const selectVal = select.value;
 
         if (!selectVal) throwException('The selected option is not valid. Please try again later!');
         if (isNaN(selectVal)) throwException('The selected option is not valid. Please try again later!');

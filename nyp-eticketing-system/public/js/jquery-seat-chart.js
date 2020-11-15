@@ -747,7 +747,7 @@ class SeatChart {
 	unbindMap() {
 		$('.seatCharts-row').remove();
 		$(this.legendNode).empty();
-		$(`${this.mapNode}, ${this.mapNode} *`).unbind().removeData();
+		$(this.mapNode).unbind().removeData();
 		$(this.mapNode).attr('aria-activedescendant', null);
 	};
 
@@ -917,46 +917,6 @@ class SeatChart {
 		}
 
 		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
-	};
-
-	hasGaps(seat) {
-		const seatIdMap = sc.activeNode.seatIdMap;
-		const seatRow = seat.settings.row;
-		const seatColumn = seat.settings.column;
-		const leftSeatColumn = seatColumn - 1;
-		const rightSeatColumn = seatColumn + 1;
-		let leftSideOk = true;
-		let rightSideOk = true;
-
-		if (leftSeatColumn >= 0) {
-			const leftSeat = sc.activeNode.get(seatIdMap[seatRow][leftSeatColumn]);
-			
-			if (leftSeat.length !== 0 && leftSeat.settings.character === seat.settings.character && leftSeat.settings.status === "available") {
-				if (leftSeatColumn >= 0) {
-					const leftSeat = sc.activeNode.get(seatIdMap[seatRow][leftSeatColumn]);
-					
-					if (leftSeat.length !== 0 && leftSeat.settings.character === seat.settings.character && leftSeat.settings.status === "available") {
-						
-					} else {
-						leftSideOk = true;
-					}
-				} else {
-					leftSideOk = true;
-				}
-			} else {
-				leftSideOk = true;
-			}
-		} else {
-			leftSideOk = true;
-		}
-
-		if (rightSeatColumn >= this.map[0].length) {
-			rightSideOk = true
-		} else {
-			const rightSeat = sc.activeNode.get(seatIdMap[seatRow][rightSeatColumn]);
-		}
-
-		return leftSideOk === true && rightSideOk === true;
 	};
 
 	static alphabeticalLabels() {

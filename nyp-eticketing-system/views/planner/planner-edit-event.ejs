@@ -142,7 +142,7 @@
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <div class="row">
                     <div class="col-sm-6">
-                        <button id="deleteEventButton" class="btn btn-danger btn-lg w-100" href="/api/delete-venue/<%= event.id %>" type="button">Delete Event</button>
+                        <button id="cancelEditedEventButton" class="btn btn-warning btn-lg w-100" type="button">Cancel</button>
                     </div>
                     <div class="col-sm-6">
                         <button id="updateEventButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
@@ -198,24 +198,24 @@
     const eventId = <%= event.id %>;
 
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
-    const editEventForm = '#editEventForm';
-    const eventNameInput = '#eventNameInput';
-    const eventDateTimeInput = '#eventDateTimeInput';
-    const maxSeatsPerReservationInput = '#maxSeatsPerReservationInput';
-    const prioritiseBackCheck = '#prioritiseBackCheck';
-    const venueSelectInput = '#venueSelectInput';
-    const mapWrapper = '#tableWrapper';
-    const seatMap = '#seatMap';
-    const legend = '#editMapLegend';
-    const addSeatTypeCard = '#addSeatTypeCard';
-    const helperSelectInput = '#helperSelectInput';
-    const helpersCardCol = '#helpersCardCol';
-    const deleteEventButton = '#deleteEventButton';
-    const updateEventButton = '#updateEventButton';
-    const addSeatTypeModal = '#addSeatTypeModal';
-    const seatTypeNameInput = '#seatTypeNameInput';
-    const blockSeatTypeCheck = '#blockSeatTypeCheck';
-    const addSeatTypeButton = '#addSeatTypeButton';
+    const editEventForm = document.getElementById('editEventForm');
+    const eventNameInput = document.getElementById('eventNameInput');
+    const eventDateTimeInput = document.getElementById('eventDateTimeInput');
+    const maxSeatsPerReservationInput = document.getElementById('maxSeatsPerReservationInput');
+    const prioritiseBackCheck = document.getElementById('prioritiseBackCheck');
+    const venueSelectInput = document.getElementById('venueSelectInput');
+    const mapWrapper = document.getElementById('tableWrapper');
+    const seatMap = document.getElementById('seatMap');
+    const legend = document.getElementById('editMapLegend');
+    const addSeatTypeCard = document.getElementById('addSeatTypeCard');
+    const helperSelectInput = document.getElementById('helperSelectInput');
+    const helpersCardCol = document.getElementById('helpersCardCol');
+    const cancelEditedEventButton = document.getElementById('cancelEditedEventButton');
+    const updateEventButton = document.getElementById('updateEventButton');
+    const addSeatTypeModal = document.getElementById('addSeatTypeModal');
+    const seatTypeNameInput = document.getElementById('seatTypeNameInput');
+    const blockSeatTypeCheck = document.getElementById('blockSeatTypeCheck');
+    const addSeatTypeButton = document.getElementById('addSeatTypeButton');
 
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
@@ -224,9 +224,12 @@
     const defaultSeatType = "G";
     let selectedSeatType = defaultSeatType; // This variable will contain the character of the seat type we've selected
 
-    let event;
-    let venues;
-    let helpers;
+    let lastSelectedSeat = null;
+    let shiftHeld = false;
+
+    let event = null;
+    let venues = [];
+    let helpers = [];
 
     // Seat chart configuration
     let sc = new SeatChart({
@@ -241,10 +244,25 @@
     });
 
     sc.onClick = function () {
-        sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType : selectedSeatType);
+        if (shiftHeld === true && lastSelectedSeat !== null) {
+            const seats = sc.activeNode.seats;
+            const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            let replaceSeats = false;
+
+            for (const id in seats) {
+                if (id === firstSeat.settings.id) replaceSeats = true;
+                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
+                if (id === lastSeat.settings.id) break;
+            }
+        } else {
+            sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType : selectedSeatType);
+        }
+
+        lastSelectedSeat = this;
     };
 
-    $(document).ready(async function() {
+    window.addEventListener("load", async function(e) {
         try {
             event = Event.parseApiResult(await ajax.get(`${routes.planner.events}/${eventId}`));
             venues = (await ajax.get(routes.planner.venues)).map(venue => Venue.parseApiResult(venue));
@@ -267,7 +285,7 @@
         Venue.populateSelect(venues, venueSelectInput);
         for (i = 0; i < venues.length; i++) {
             if (venues[i].id === event.venue.id) {
-                $(venueSelectInput).val(i);
+                venueSelectInput.value = i;
                 break;
             }
         }
@@ -293,18 +311,26 @@
         });
     });
 
-    $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+    window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         sc.scaleContentWidth();
     });
 
-    $(venueSelectInput).on('change', function() {
+    window.addEventListener('keydown', function (e) {
+        if (e.keyCode === 16) shiftHeld = true;
+    });
+
+    window.addEventListener('keyup', function (e) {
+        if (e.keyCode === 16) shiftHeld = false;
+    });
+
+    venueSelectInput.addEventListener('change', function (e) {
         utils.addUnloadListener();
 
         sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
         sc.reloadMap();
     });
 
-    $(helperSelectInput).on('change', function() {
+    helperSelectInput.addEventListener('change', function (e) {
         utils.addUnloadListener();
 
         EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
@@ -312,13 +338,13 @@
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
     });
 
-    $(addSeatTypeButton).click(function () {
+    addSeatTypeButton.addEventListener('click', function (e) {
         utils.addUnloadListener();
 
         if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         
-        const seatName = $(seatTypeNameInput).val();
-        const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
+        const seatName = seatTypeNameInput.value;
+        const seatIsBlocked = blockSeatTypeCheck.checked;
 
         const seatCharacter = availableSeatCharacters[0];
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
@@ -347,8 +373,8 @@
         });
         
         $(addSeatTypeModal).modal('hide'); // Hides the modal
-        $(seatTypeNameInput).val(''); // Reset input to default state
-        $(blockSeatTypeCheck).prop('checked', false);
+        seatTypeNameInput.value = ''; // Reset input to default state
+        blockSeatTypeCheck.checked = false;
     });
 
     document.addEventListener('click', function (e) {
@@ -363,7 +389,7 @@
 
             if (seatCharAttr) {
                 node.classList.add((highlighted) ? null : "highlighted");
-                selectedSeatType = (highlighted) ? defaultSeatType.char : seatCharAttr;
+                selectedSeatType = (highlighted) ? defaultSeatType : seatCharAttr;
             }
         }
 
@@ -378,33 +404,25 @@
         }
     }, false);
 
-    $(deleteEventButton).click(async function (event) {
-        const check = confirm("Are you sure you want to delete this event?");
-
+    cancelEditedEventButton.addEventListener('click', async function (e) {
+        const check = confirm("Are you sure you want to cancel updating this event's details?");
+        
         if (check === true) {
-            try {
-                await ajax.delete(`${routes.planner.events}/${eventId}`);
-                await ajax.post(routes.index.successFlash, "The venue has been deleted successfully!");
-
-                utils.removeUnloadListener();
-
-                window.location.replace('/planner/events');
-            } catch (error) {
-                utils.handleError(error);
-            }
+            utils.removeUnloadListener();
+            window.location.replace('/planner/events');
         }
     });
 
-    $(editEventForm).submit(async function (e) {
+    editEventForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        $(updateEventButton).prop('disabled', true);
+        updateEventButton.disabled = true;
 
         const event = new Event({
-            name: $(eventNameInput).val(),
+            name: eventNameInput.value,
             seatMap: sc.map,
-            startDateTime: $(eventDateTimeInput).val(),
-            seatsPerReservation: $(maxSeatsPerReservationInput).val(),
-            prioritiseBackRows: $(prioritiseBackCheck).is(':checked'),
+            startDateTime: eventDateTimeInput.value,
+            seatsPerReservation: maxSeatsPerReservationInput.value,
+            prioritiseBackRows: prioritiseBackCheck.checked,
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
             helpers: helpers.filter(helper => helper.selected === true)
@@ -418,7 +436,7 @@
         } catch (error) {
             utils.handleError(error);
         } finally {
-            $(updateEventButton).prop('disabled', false);
+            updateEventButton.disabled = false;
         }
     });
 </script>

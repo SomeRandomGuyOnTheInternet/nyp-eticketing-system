@@ -21,6 +21,23 @@ router.get('/planners', auth.isAdmin, async (req, res) => {
     }
 });
 
+router.delete('/planners/:id', auth.isAdmin, async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const user = await User.findByPk(id);
+        if (!user) return respond.error(res, "That planner does not exist!", 404);
+        if (user.isPlanner === false) return respond.error(res, "That id does not belong to a valid planner!", 404);
+    
+        await User.destroy({ where: { id: user.id } });
+    
+        return respond.success(res, "Planner account has been deleted successfully!");
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting the planner's details. Please try again later!", 500);
+    }
+});
+
 router.get('/helpers', auth.isAdmin, async (req, res) => {
     try {
         const helpers = await User.getHelpers();
@@ -29,6 +46,23 @@ router.get('/helpers', auth.isAdmin, async (req, res) => {
     } catch (error) {
         console.error(error);
         return respond.error(res, "Something went wrong while getting all the helpers. Please try again later!", 500);
+    }
+});
+
+router.delete('/helpers/:id', auth.isAdmin, async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const user = await User.findByPk(id);
+        if (!user) return respond.error(res, "That helper does not exist!", 404);
+        if (user.isHelper === false) return respond.error(res, "That id does not belong to a valid helper!", 404);
+    
+        await User.destroy({ where: { id: user.id } });
+    
+        return respond.success(res, "Helper account has been deleted successfully!");
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting the helper's details. Please try again later!", 500);
     }
 });
 

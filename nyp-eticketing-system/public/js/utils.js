@@ -63,5 +63,10 @@ const utils = {
 			counts[arr[i]] = 1 + (counts[arr[i]] || 0);
         }
         return counts
+    },
+    removeAllChildNodes: function (parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
     }
 };

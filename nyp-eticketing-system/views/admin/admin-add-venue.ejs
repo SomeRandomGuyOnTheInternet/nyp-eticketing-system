@@ -1,4 +1,4 @@
-<!-- TODO: Make sure the starting map isn't static, and is actually created from the input default values -->
+f<!-- TODO: Make sure the starting map isn't static, and is actually created from the input default values -->
 
 <%- include('../templates/head')-%>
 <body>
@@ -78,14 +78,14 @@
 
 <script>
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
-    const createVenueForm = '#createVenueForm';
-    const nameInput = '#nameInput';
-    const columnInput = '#columnInput';
-    const rowInput = '#rowInput';
-    const mapWrapper = '#tableWrapper';
-    const seatMap = '#seatMap';
-    const legend = '#legend';
-    const saveVenueTypeButton = '#saveVenueTypeButton';
+    const createVenueForm = document.getElementById('createVenueForm');
+    const nameInput = document.getElementById('nameInput');
+    const columnInput = document.getElementById('columnInput');
+    const rowInput = document.getElementById('rowInput');
+    const mapWrapper = document.getElementById('tableWrapper');
+    const seatMap = document.getElementById('seatMap');
+    const legend = document.getElementById('legend');
+    const saveVenueTypeButton = document.getElementById('saveVenueTypeButton');
 
     // Declare the default seat type characters over here
     const defaultSeat = "G";
@@ -96,6 +96,9 @@
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
     let selectedSeatType = null; // This variable will contain the character of the seat type the user's selected
+
+    let lastSelectedSeat = null;
+    let shiftHeld = false;
 
     let sc = new SeatChart({
         map: [ // The seat map that the configuration object is instantiated with. For the add venue page we just instantiate with a default map with 4 rows and 6 columns
@@ -120,37 +123,62 @@
     });
 
     sc.onClick = function () {
-        sc.replaceMapSeat(this, selectedSeatType);
+        if (shiftHeld === true && lastSelectedSeat !== null) {
+            const seats = sc.activeNode.seats;
+            const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            let replaceSeats = false;
+
+            for (const id in seats) {
+                if (id === firstSeat.settings.id) replaceSeats = true;
+                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
+                if (id === lastSeat.settings.id) break;
+            }
+        } else {
+            sc.replaceMapSeat(this, selectedSeatType);
+        }
+
+        lastSelectedSeat = this;
     };
 
     // Rest of the functions
-    $(document).ready(function() {
+    window.addEventListener("load", function(e) {
         sc.bindMap();
         sc.scaleContentWidth();
     });
 
-    $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+    window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         sc.scaleContentWidth();
     });
 
-    $(`${columnInput}, ${rowInput}`).change(function () {
-        utils.addUnloadListener();
+    window.addEventListener('keydown', function (e) {
+        if (e.keyCode === 16) shiftHeld = true;
+    });
 
-        const columnVal = $(columnInput).val();
-        const rowVal = $(rowInput).val();
+    window.addEventListener('keyup', function (e) {
+        if (e.keyCode === 16) shiftHeld = false;
+    });
 
-        if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
+    [rowInput, columnInput].forEach(function(element) {
+        element.addEventListener('change', function (e) {
+            utils.addUnloadListener();
 
-        const columns = columnVal.toNum();
-        const rows = rowVal.toNum();
+            const columnVal = columnInput.value;
+            const rowVal = rowInput.value;
 
-        if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
-        if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
+            if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
 
-        if (this.id === "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
-        if (this.id === "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
+            const columns = Number(columnVal);
+            const rows = Number(rowVal);
 
-        sc.reloadMap(); // Reloads the map with the updated map
+            if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
+            if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
+
+            if (e.target.id === rowInput.id) sc.resizeRows(columns, rows); // Changes number of columns
+            if (e.target.id === columnInput.id) sc.resizeColumns(columns, rows); // Changes number of rows
+
+            sc.reloadMap(); // Reloads the map with the updated map
+        });
     });
 
     document.addEventListener('click', function (e) {
@@ -170,13 +198,13 @@
 
     $(createVenueForm).submit(async function (e) {
         e.preventDefault();
-        $(saveVenueTypeButton).prop('disabled', true);
+        saveVenueTypeButton.disabled = true;
 
         sc.replaceMapSeatCharacters(tempEmptySpace, emptySpace);
 
         const venue = new Venue({ 
             id: null, 
-            name: $(nameInput).val(), 
+            name: nameInput.value, 
             seatMap: sc.map 
         });
         
@@ -190,7 +218,7 @@
         } catch (error) {
             utils.handleError(error);
         } finally {
-            $(saveVenueTypeButton).prop('disabled', false);
+            saveVenueTypeButton.disabled = false;
         }
     });
 </script>
