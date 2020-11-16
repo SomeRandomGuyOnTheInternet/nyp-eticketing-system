@@ -158,20 +158,22 @@
                     <div class="card-body p-0">  <!-- We set the card's padding to 0 cause we want the table's edges to be flush with the table  -->
                         <!-- Table  -->
                         <div class="table-responsive">
-                            <table class="table table-hover table-click table-lg"> 
+                            <table class="table table-click table-lg"> 
                                 <thead>
                                     <tr>
                                         <th scope="col">Name</th>
                                         <th scope="col">Phone No.</th>
                                         <th scope="col">No. of Extra Attendees</th>
+                                        <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <% for (i = 0; i < attendeesOnWaitingList.length; i++) { %>
-                                    <tr id="<%= attendeesOnWaitingList[i].id %>" class="waitingListRow">
+                                    <tr class="waitingListRow">
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].name %></a></td>
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].phoneNumber %></a></td>
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].noOfExtraAttendees %></a></td>
+                                        <th scope="row" class="font-weight-medium text-primary"><i id="<%= attendeesOnWaitingList[i].id %>" class="waitingListViewReservationIcon fas fa-eye-slash" style="font-size: 28px; cursor: pointer;"></i></td>
                                     </tr>
                                     <% } %>
                                 </tbody>
@@ -264,6 +266,7 @@
     const seatDetailsDescription = document.getElementById('seatDetailsDescription');
     const waitingListContainer = document.getElementById('waitingListContainer');
     const waitingListRows = document.querySelectorAll('.waitingListRow');
+    const waitingListViewReservationIcon = document.querySelectorAll('.waitingListViewReservationIcon');
     const reservationDetailsModal = document.getElementById('reservationDetailsModal');
     const reservationConfirmName = document.getElementById('reservationConfirmName');
     const reservationConfirmPhNo = document.getElementById('reservationConfirmPhNo');
@@ -392,9 +395,9 @@
             selectedSeatCharacters.push(selectedSeatType);
             selectSeatsUsingSelection(selectedSeatCharacters);
 
-            if (selectedSeatCharacters.length === 1) {
-                reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
-            }
+            // if (selectedSeatCharacters.length === 1) {
+            //     reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
+            // }
         }
     });
 
@@ -422,18 +425,22 @@
         }
     });
 
-    waitingListRows.forEach(function(element) {
+    waitingListViewReservationIcon.forEach(function(element) {
         element.addEventListener('click', function (e) {
             const attendee = event.attendees.filter(attendee => attendee.id == this.id);
-            const wasActive = this.classList.contains('table-active');
+            const wasActive = this.classList.contains('fa-eye');
 
-            waitingListRows.forEach(obj => obj.classList.remove('table-active'));
+            waitingListViewReservationIcon.forEach(obj => {
+                obj.classList.remove('fa-eye');
+                obj.classList.add('fa-eye-slash');
+            });
             sc.activeNode.find('highlighted').status('reserved');
 
             if (attendee.length === 1) {
                 reservationNameInput.value = (wasActive) ? '' : attendee[0].name;
                 reservationPhoneNumberInput.value = (wasActive) ? '' : attendee[0].phoneNumber;
-                this.classList.add((wasActive) ? null : 'table-active');
+                this.classList.toggle('fa-eye-slash', wasActive);
+                this.classList.toggle('fa-eye', !wasActive);
                 (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
             } else {
                 return toast.danger('Something went wrong while retrieving the seats for that attendee!');

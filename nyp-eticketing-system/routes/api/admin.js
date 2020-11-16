@@ -99,6 +99,7 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
         await User.createUser({
             email: email,
             password: password,
+            phoneNumber: phoneNumber,
             name: name,
             isAdmin: false,
             isPlanner: false,

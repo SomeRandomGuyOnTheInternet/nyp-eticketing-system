@@ -219,7 +219,7 @@
 
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
-    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
+    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"];
 
     const defaultSeatType = new SeatType({ char: 'G', category: 'General', blocked: false, classes: 'general' });
     const handicappedSeatType = new SeatType({ char: 'H', category: 'Handicapped', blocked: false, classes: 'handicapped' });
@@ -330,6 +330,7 @@
         
         const seatName = seatTypeNameInput.value;
         const seatIsBlocked = blockSeatTypeCheck.checked;
+        console.log(availableSeatCharacters)
 
         if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         const seatCharacter = availableSeatCharacters[0];
