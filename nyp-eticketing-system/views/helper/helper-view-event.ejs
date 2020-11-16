@@ -499,7 +499,7 @@
         reservationConfirmExtraAttendees.classList.toggle('d-none', noOfExtraAttendeesInputVal === '');
         reservationConfirmNoOfExtraAttendees.textContent = noOfExtraAttendeesInputVal;
         for (const category in sortedSeats) {
-            selectedSeatConfirmationWrapper.appendChild(createSelectedSeatsInCategoryElement(category, sortedSeats[category]));
+            selectedSeatConfirmationWrapper.appendChild(createSelectedSeatsInCategoryNode(category, sortedSeats[category]));
         }
 
         const existingAttendee = event.attendees.filter(attendee => String(attendee.phoneNumber) === reservationPhoneNumberInputVal);
@@ -663,7 +663,7 @@
     };
 
 
-    createSelectedSeatsInCategoryElement = (category, seats) => {
+    createSelectedSeatsInCategoryNode = (category, seats) => {
         const parentDiv = document.createElement('div');
         parentDiv.classList.add(...['mt-1', 'mb-2']);
 
