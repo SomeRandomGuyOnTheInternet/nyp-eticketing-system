@@ -190,7 +190,7 @@
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].name %></a></td>
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].phoneNumber %></a></td>
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].noOfExtraAttendees %></a></td>
-                                        <th scope="row" class="font-weight-medium text-primary"><i id="<%= attendeesOnWaitingList[i].id %>" class="waitingListViewReservationIcon fas fa-eye-slash" style="font-size: 28px; cursor: pointer;"></i></td>
+                                        <th scope="row" class="font-weight-medium text-primary"><i id="<%= attendeesOnWaitingList[i].id %>" class="waitingListViewReservationIcon fas fa-eye-slash" style="font-size: 25px; cursor: pointer;"></i></td>
                                     </tr>
                                     <% } %>
                                 </tbody>
@@ -366,8 +366,11 @@
         const attendee = event.attendees.filter(attendee => attendee.phoneNumber == searchReservationInput.value);
         if (attendee.length !== 1) return toast.danger('This phone number is not tied to any reservation!');
 
-        waitingListRows.forEach(obj => obj.classList.remove('table-active'));
         highlightAttendeeSeats(attendee[0].id);
+        waitingListViewReservationIcon.forEach(obj => {
+            obj.classList.remove('fa-eye');
+            obj.classList.add('fa-eye-slash');
+        });
     });
 
 
@@ -386,10 +389,13 @@
         sc.disableBlockedSeats();
         sc.disableReservedSeats(event.reservedSeats);
 
-        document.querySelectorAll('.seatCharts-legendCard').forEach(obj => obj.classList.remove('highlighted'));
-        waitingListRows.forEach(obj => obj.classList.remove('table-active'));
-        editSeatSelection.classList.add('d-none');
         selectedSeatType = null;
+        document.querySelectorAll('.seatCharts-legendCard').forEach(obj => obj.classList.remove('highlighted'));
+        editSeatSelection.classList.add('d-none');
+        waitingListViewReservationIcon.forEach(obj => {
+            obj.classList.remove('fa-eye');
+            obj.classList.add('fa-eye-slash');
+        });
     });
 
 
@@ -449,18 +455,18 @@
             const attendee = event.attendees.filter(attendee => attendee.id == this.id);
             const wasActive = this.classList.contains('fa-eye');
 
+            sc.activeNode.find('highlighted').status('reserved');
             waitingListViewReservationIcon.forEach(obj => {
                 obj.classList.remove('fa-eye');
                 obj.classList.add('fa-eye-slash');
             });
-            sc.activeNode.find('highlighted').status('reserved');
 
             if (attendee.length === 1) {
+                (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
                 reservationNameInput.value = (wasActive) ? '' : attendee[0].name;
                 reservationPhoneNumberInput.value = (wasActive) ? '' : attendee[0].phoneNumber;
                 this.classList.toggle('fa-eye-slash', wasActive);
                 this.classList.toggle('fa-eye', !wasActive);
-                (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
             } else {
                 return toast.danger('Something went wrong while retrieving the seats for that attendee!');
             }
