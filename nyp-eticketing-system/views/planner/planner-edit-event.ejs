@@ -213,6 +213,8 @@
 </body>
 
 <script>
+    window.LoadingOverlay.show();
+
     const eventId = <%= event.id %>;
 
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
@@ -285,6 +287,8 @@
 
             lastSelectedSeat = this;
         }
+
+        return this.status();
     };
 
     window.addEventListener("load", async function(e) {
@@ -344,6 +348,8 @@
         sc.seatTypes.forEach(seatType => {
             availableSeatCharacters = availableSeatCharacters.filter(sc => sc !== seatType.char);
         });
+
+        window.LoadingOverlay.hide();
     });
 
     window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -450,6 +456,8 @@
 
     editEventForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        window.LoadingOverlay.show();
         updateEventButton.disabled = true;
 
         let reservableSeatCount = 0;
@@ -478,6 +486,7 @@
         } catch (error) {
             utils.handleError(error);
         } finally {
+            window.LoadingOverlay.hide();
             updateEventButton.disabled = false;
         }
     });

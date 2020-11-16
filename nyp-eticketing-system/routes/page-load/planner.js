@@ -1,8 +1,6 @@
 // All planner's webpages are contained here
 
-// TODO: Check whether seats in event or venue are already taken before editing them
 // TODO: When deleting venues, delete any events that take place in them as well
-// TODO: Show loading screen when loading map
 
 const express = require('express');
 const router = express.Router();

@@ -198,6 +198,8 @@
 </body>
 
 <script>
+    window.LoadingOverlay.show();
+
     const addEventForm = document.getElementById('addEventForm');
     const eventNameInput = document.getElementById('eventNameInput');
     const eventDateTimeInput = document.getElementById('eventDateTimeInput');
@@ -295,6 +297,8 @@
         // Bind map
         sc.bindMap();
         sc.scaleContentWidth();
+
+        window.LoadingOverlay.hide();
     });
 
     window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
@@ -392,6 +396,8 @@
 
     addEventForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        window.LoadingOverlay.show();
         createEventButton.disabled = true;
 
         const seats = sc.activeNode.seats;
@@ -421,6 +427,7 @@
         } catch (error) {
             utils.handleError(error);
         } finally {
+            window.LoadingOverlay.hide();
             createEventButton.disabled = false;
         }
     });

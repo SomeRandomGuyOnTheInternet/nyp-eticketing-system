@@ -43,7 +43,6 @@
                                         placeholder="E.g. 91864675">
                                 </div>
                                 <button id="clearSearchReservationButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
-                                <button id="searchReservationButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
                                 <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
@@ -259,6 +258,8 @@
 </body>
 
 <script async>
+    window.LoadingOverlay.show();
+
     const eventId = <%= event.id %>;
 
     const nameHeading = document.getElementById('nameHeading');
@@ -341,6 +342,45 @@
         sc.scaleContentWidth();
         sc.disableBlockedSeats();
         sc.disableReservedSeats(event.reservedSeats);
+
+        new autoComplete({
+            data: {
+                src: event.attendees,
+                key: ["name", "phoneNumber"],
+                cache: false
+            },
+            query: {
+                manipulate: function(query) {
+                    return query.replace("@pizza", "burger");
+                },
+            },
+            trigger: {
+                event: ["input", "focusin", "focusout"]
+            },
+            placeHolder: "e.g. En Qing",
+            selector: "#searchReservationInput",
+            resultsList: {
+                render: true,
+            },
+            maxResults: 5,
+            highlight: true,
+            resultItem: {
+                content: (data, source) => {
+                    source.innerHTML = `${data.match} • ${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
+                },
+                element: "li"
+            },
+            onSelection: feedback => {
+                highlightAttendeeSeats(feedback.selection.value.id);
+                searchReservationInput.value = feedback.selection.value.name;
+                waitingListViewReservationIcon.forEach(obj => {
+                    obj.classList.remove('fa-eye');
+                    obj.classList.add('fa-eye-slash');
+                });
+            }
+        });
+
+        window.LoadingOverlay.hide();
     });
 
 
@@ -350,7 +390,7 @@
 
 
     searchReservationInput.addEventListener('keyup', function (e) {
-        if (e.keyCode == 13) searchReservationBtn.click();
+        if (e.target.value.length === 0) sc.activeNode.find('highlighted').status('reserved');
         clearSearchReservationBtn.classList.toggle('d-none', e.target.value.length === 0);
     });
 
@@ -359,18 +399,6 @@
         sc.activeNode.find('highlighted').status('reserved');
         searchReservationInput.value = '';
         clearSearchReservationBtn.classList.add('d-none');
-    });
-
-
-    searchReservationBtn.addEventListener('click', function (e) {
-        const attendee = event.attendees.filter(attendee => attendee.phoneNumber == searchReservationInput.value);
-        if (attendee.length !== 1) return toast.danger('This phone number is not tied to any reservation!');
-
-        highlightAttendeeSeats(attendee[0].id);
-        waitingListViewReservationIcon.forEach(obj => {
-            obj.classList.remove('fa-eye');
-            obj.classList.add('fa-eye-slash');
-        });
     });
 
 
@@ -524,6 +552,7 @@
 
 
     confirmReservationButton.addEventListener('click', async function (e) {
+        window.LoadingOverlay.show();
         confirmReservationButton.disabled = true;
         
         let attendee = new EventAttendee({
@@ -537,6 +566,7 @@
         try {
             attendee = await ajax.post(routes.helper.reservations, attendee);
         } catch (error) {
+            window.LoadingOverlay.hide();
             confirmReservationButton.disabled = true;
             return utils.handleError(error);
         }
