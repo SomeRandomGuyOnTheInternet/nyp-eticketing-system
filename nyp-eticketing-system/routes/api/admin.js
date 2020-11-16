@@ -9,7 +9,6 @@ const auth = require('../../utils/api-auth');
 const Venue = require('../../models/Venue');
 const User = require('../../models/User');
 
-
 router.get('/planners', auth.isAdmin, async (req, res) => {
     try {
         const planners = await User.getPlanners();
@@ -24,43 +23,49 @@ router.get('/planners', auth.isAdmin, async (req, res) => {
 router.post('/planners', auth.isAdmin, async (req, res) => {
 	let name = req.body.name;
 	let email = req.body.email;
-	let password = req.body.password;
+    let password = req.body.password;
 
-	if (!name) {
-        console.log(name);
-        return respond.error(res, "Please enter a name!", 400);
-	}
+	if (!name) return respond.error(res, "Please enter a name!", 400);
+	if (!email) return respond.error(res, "Please enter an email!", 400);
+    if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) return respond.error(res, "Please enter a valid email!", 400);
+	if (!password) return respond.error(res, "Please enter a password!", 400);
 
-	if (!email) {
-        return respond.error(res, "Please enter an email!", 400);
-	}
+    try {
+        let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+        if (existingEmail) return respond.error(res, "This email has already been registered!", 400);
 
-	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-	if (!email.match(mailformat)) {
-        return respond.error(res, "Please enter a valid email!", 400);
-	}
+        await User.createUser({
+            email: email,
+            password: password,
+            name: name,
+            isAdmin: false,
+            isPlanner: true,
+            isHelper: false,
+            isDeleted: false
+        });
+        
+        return respond.success(res, "Plannner account has been created successfully!");     
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while creating the planner account. Please try again later!", 500);
+    }
+});
 
-	if (!password) {
-        return respond.error(res, "Please enter a password!", 400);
-	}
+router.delete('/planners/:id', auth.isAdmin, async (req, res) => {
+    const id = req.params.id;
 
-	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
-
-	if (existingEmail) {
-        return respond.error(res, "This email has already been registered!", 400);
-	}
-
-	await User.createUser({
-		email: email,
-		password: password,
-		name: name,
-		isAdmin: false,
-		isPlanner: true,
-		isHelper: false,
-		isDeleted: false
-	});
+    try {
+        const user = await User.findByPk(id);
+        if (!user) return respond.error(res, "That planner does not exist!", 404);
+        if (user.isPlanner === false) return respond.error(res, "That id does not belong to a valid planner!", 404);
     
-    return respond.success(res, "Plannner account has been created successfully!");
+        await User.destroy({ where: { id: user.id } });
+    
+        return respond.success(res, "Planner account has been deleted successfully!");
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting the planner's details. Please try again later!", 500);
+    }
 });
 
 router.get('/helpers', auth.isAdmin, async (req, res) => {
@@ -80,49 +85,49 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
 	let password = req.body.password;
 	let phoneNumber = req.body.phoneNumber;
 
-	if (!name) {
-        return respond.error(res, "Please enter a name!", 400);
-	}
+	if (!name) return respond.error(res, "Please enter a name!", 400);
+	if (!email) return respond.error(res, "Please enter an email!", 400);
+    if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) return respond.error(res, "Please enter a valid email!", 400);
+    if (!phoneNumber) return respond.error(res, "Please enter a phone number!", 400);
+	if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please enter a valid phone number!", 400);
+	if (!password) return respond.error(res, "Please enter a password!", 400);
 
-	if (!email) {
-        return respond.error(res, "Please enter an email!", 400);
-	}
-	
-	var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-	if (!email.match(mailformat)) {
-        return respond.error(res, "Please enter a valid email address!", 400);
-	}
+    try {
+        let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+        if (existingEmail) return respond.error(res, "This email has already been registered!", 400);
+        
+        await User.createUser({
+            email: email,
+            password: password,
+            name: name,
+            isAdmin: false,
+            isPlanner: false,
+            isHelper: true,
+            isDeleted: false
+        });
+        
+        return respond.success(res, "Helper account has been created successfully!");     
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while creating the helper account. Please try again later!", 500);
+    }
+});
 
-	if (!password) {
-        return respond.error(res, "Please enter a password!", 400);
-	}
-	
-	if (!phoneNumber) {
-        return respond.error(res, "Please enter a phone number!", 400);
-	}
+router.delete('/helpers/:id', auth.isAdmin, async (req, res) => {
+    const id = req.params.id;
 
-	if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))){
-        return respond.error(res, "Please enter a valid phone number!", 400);
-	}
-
-	let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
-
-	if (existingEmail) {
-        return respond.error(res, "This email has already been registered!", 400);
-	}
-
-	await User.createUser({
-		email: email,
-		password: password,
-		name: name,
-		phoneNumber: phoneNumber,
-		isAdmin: false,
-		isPlanner: false,
-		isHelper: true,
-		isDeleted: false
-	});
-
-	return respond.success(res, "Helper account has been created successfully!");
+    try {
+        const user = await User.findByPk(id);
+        if (!user) return respond.error(res, "That helper does not exist!", 404);
+        if (user.isHelper === false) return respond.error(res, "That id does not belong to a valid helper!", 404);
+    
+        await User.destroy({ where: { id: user.id } });
+    
+        return respond.success(res, "Helper account has been deleted successfully!");
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting the helper's details. Please try again later!", 500);
+    }
 });
 
 router.get('/venues', auth.isAdmin, async (req, res) => {

@@ -1,5 +1,3 @@
-<!-- TODO: Make initial getting of venue details ajax -->
-
 <%- include('../templates/head')-%>
 <body>
     <%- include('../templates/navbar')-%>
@@ -71,13 +69,10 @@
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <button id="cancelEditedVenueButton" class="btn btn-warning btn-lg w-100" type="button">Cancel</button>
                     </div>
-                    <div class="col-sm-4">
-                        <button id="deleteVenueButton" class="btn btn-danger btn-lg w-100" href="/api/delete-venue/<%= venue.id %>" type="button">Delete Venue</button>
-                    </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <button id="saveEditedVenueButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
                     </div>
                 </div>
@@ -90,16 +85,16 @@
     const venueId = <%- venue.id %>;
 
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
-    const updateVenueForm = '#updateVenueForm';
-    const nameInput = '#nameInput';
-    const columnInput = '#columnInput';
-    const rowInput = '#rowInput';
-    const mapWrapper = '#tableWrapper';
-    const seatMap = '#seatMap';
-    const legend = '#legend';
-    const deleteVenueButton = '#deleteVenueButton';
-    const saveEditedVenueButton = '#saveEditedVenueButton';
-    const cancelEditedVenueButton =  '#cancelEditedVenueButton';
+    const updateVenueForm = document.getElementById('updateVenueForm');
+    const nameInput = document.getElementById('nameInput');
+    const columnInput = document.getElementById('columnInput');
+    const rowInput = document.getElementById('rowInput');
+    const mapWrapper = document.getElementById('tableWrapper');
+    const seatMap = document.getElementById('seatMap');
+    const legend = document.getElementById('legend');
+    const deleteVenueButton = document.getElementById('deleteVenueButton');
+    const saveEditedVenueButton = document.getElementById('saveEditedVenueButton');
+    const cancelEditedVenueButton =  document.getElementById('cancelEditedVenueButton');
 
     // Declare the default seat type characters over here
     const defaultSeat = "G";
@@ -110,6 +105,11 @@
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
     let selectedSeatType; // This variable will contain the character of the seat type the user's selected
+
+    let lastSelectedSeat = null;
+    let shiftHeld = false;
+
+    let venue = new Venue({});
 
     let sc = new SeatChart({
         map: [],
@@ -129,13 +129,26 @@
     });
 
     sc.onClick = function () {
-        sc.replaceMapSeat(this, selectedSeatType);
+        if (shiftHeld === true && lastSelectedSeat !== null) {
+            const seats = sc.activeNode.seats;
+            const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            let replaceSeats = false;
+
+            for (const id in seats) {
+                if (id === firstSeat.settings.id) replaceSeats = true;
+                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
+                if (id === lastSeat.settings.id) break;
+            }
+        } else {
+            sc.replaceMapSeat(this, selectedSeatType);
+        }
+
+        lastSelectedSeat = this;
     };
 
-    let venue = new Venue({});
-
     // Rest of the functions
-    $(document).ready(async function() {
+    window.addEventListener("load", async function(e) {
         try {
             const fetchedVenue = await ajax.get(`${routes.admin.venues}/${venueId}`);
             venue.id = fetchedVenue.id;
@@ -150,33 +163,42 @@
         sc.bindMap();
         sc.scaleContentWidth();
 
-        // TODO: Do validation whether map exists before setting the input value
-        $(columnInput).val(sc.map[0].length);
-        $(rowInput).val(sc.map.length);
+        columnInput.value = sc.map[0].length;
+        rowInput.value = sc.map.length;
     });
 
-    $(window).resize(function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+    window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         sc.scaleContentWidth();
     });
 
-    $(`${columnInput}, ${rowInput}`).change(function () {
-        utils.addUnloadListener();
+    window.addEventListener('keydown', function (e) {
+        if (e.keyCode === 16) shiftHeld = true;
+    });
 
-        const columnVal = $(columnInput).val();
-        const rowVal = $(rowInput).val();
+    window.addEventListener('keyup', function (e) {
+        if (e.keyCode === 16) shiftHeld = false;
+    });
 
-        if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
+    [rowInput, columnInput].forEach(function(element) {
+        element.addEventListener('change', function (e) {
+            utils.addUnloadListener();
 
-        const columns = columnVal.toNum();
-        const rows = rowVal.toNum();
+            const columnVal = columnInput.value;
+            const rowVal = rowInput.value;
 
-        if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
-        if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
+            if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
 
-        if (this.id === "rowInput") sc.resizeRows(columns, rows); // Changes number of columns
-        if (this.id === "columnInput") sc.resizeColumns(columns, rows); // Changes number of rows
+            const columns = Number(columnVal);
+            const rows = Number(rowVal);
 
-        sc.reloadMap(); // Reloads the map with the updated map
+            if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
+            if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
+
+            if (e.target.id === rowInput.id) sc.resizeRows(columns, rows); // Changes number of columns
+            if (e.target.id === columnInput.id) sc.resizeColumns(columns, rows); // Changes number of rows
+
+            sc.reloadMap(); // Reloads the map with the updated map
+        });
     });
 
     document.addEventListener('click', function (e) {
@@ -194,30 +216,22 @@
         }
     }, false);
 
-    $(deleteVenueButton).click(async function (e) {
-        const check = confirm("Are you sure you want to delete this venue?");
+    cancelEditedVenueButton.addEventListener('click', async function (e) {
+        const check = confirm("Are you sure you want to cancel updating this venue's details?");
         
         if (check === true) {
-            try {
-                await ajax.delete(`${routes.admin.venues}/${venueId}`);
-                await ajax.post(routes.index.errorFlash, "Venue has been deleted successfully!");
-
-                utils.removeUnloadListener();
-
-                window.location.replace('/admin/venues');
-            } catch (error) {
-                utils.handleError(error);
-            }
+            utils.removeUnloadListener();
+            window.location.replace('/admin/venues');
         }
     });
 
-    $(updateVenueForm).submit(async function (e) {
+    updateVenueForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        $(saveEditedVenueButton).prop('disabled', true);
+        saveEditedVenueButton.disabled = true;
 
         sc.replaceMapSeatCharacters(tempEmptySpace, emptySpace);
 
-        venue.name = $(nameInput).val();
+        venue.name = nameInput.value;
         venue.seatMap = sc.map;
         
         try {
@@ -228,24 +242,9 @@
         } catch (error) {
             utils.handleError(error);
         } finally {
-            $(saveEditedVenueButton).prop('disabled', false);
+            saveEditedVenueButton.disabled = false;
         }
     });
-
-    $(cancelEditedVenueButton).click(async function (e) {
-        const check = confirm("Are you sure you want to cancel updating the seat map for this venue?");
-        
-        if (check === true) {
-            try {
-                utils.removeUnloadListener();
-
-                window.location.replace('/admin/venues');
-            } catch (error) {
-                utils.handleError(error);
-            }
-        }
-    });
-
 </script>
 
 <%- include('../templates/footer')-%>

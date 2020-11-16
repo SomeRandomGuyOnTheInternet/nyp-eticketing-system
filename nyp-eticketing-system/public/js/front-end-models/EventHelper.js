@@ -22,8 +22,7 @@ class EventHelper extends User {
         });
     };
 
-    static populateSelect(helpers, selectId) {
-        let select = document.getElementById(selectId.substring(1));
+    static populateSelect(helpers, select) {
         [...select.options].forEach(option => option.remove());
 
         const defaultOption = document.createElement('option');
@@ -41,8 +40,8 @@ class EventHelper extends User {
         select.selectedIndex = 0;
     };
 
-    static selectedOption(helpers, selectId) {
-        const selectVal = document.getElementById(selectId.substring(1)).value;
+    static selectedOption(helpers, select) {
+        const selectVal = select.value;
         
         if (!selectVal) {
             utils.throwException('The selected option is not valid. Please try again later!');

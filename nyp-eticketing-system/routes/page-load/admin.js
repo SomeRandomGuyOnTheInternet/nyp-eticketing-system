@@ -34,26 +34,6 @@ router.get('/helpers', auth.isAdmin, async(req, res) => {
 });
 
 
-// Delete function for planner accounts
-router.get('/deleteplanner/:id', async (req, res) => {
-	const id = req.params.id;
-
-	await User.destroy({ where: { id: id } });
-
-	flash.success(req, 'Planner account has been deleted successfully!');
-	res.redirect('/admin/planners');
-});
-
-// Delete function for helper accounts
-router.get('/deletehelper/:id', async (req, res) => {
-	const id = req.params.id;
-
-	await User.destroy({ where: { id: id } });
-
-	flash.success(req, 'Helper account has been deleted successfully!');
-	res.redirect('/admin/helpers');
-});
-
 router.get('/venues', auth.isAdmin, async (req, res) => {
 	const venues = await Venue.getAllVenues();
 

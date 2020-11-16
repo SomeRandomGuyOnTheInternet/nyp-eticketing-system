@@ -27,7 +27,7 @@
                                             <input id="searchVenueInput" name="searchVenueInput" class="form-control card-input" type="search"
                                                 placeholder="E.g. Auditorium">
                                         </div>
-                                        <button id="clearSearchVenueButton" class="btn text-muted" type="button" style="display: none;"><i class="fas fa-times"></i></button>
+                                        <button id="clearSearchVenueButton" class="btn text-muted d-none" type="button"><i class="fas fa-times"></i></button>
                                         <button id="searchVenueButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
                                         <!-- This is where the user actually inputs all their stuff  -->
                                     </div>
@@ -56,7 +56,13 @@
                                         <td scope="row"><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="/admin/venues/<%= venues[i].id %>"><%= venues[i].name %></a></td>
                                         <td><%= moment(venues[i].createdAt).format('Do MMMM YYYY') %></td>
-                                        <td></td>
+                                        <td class="text-center">
+                                            <form action="/api/admin/venues/<%= venues[i].id %>" class="deleteVenueForm">
+                                                <button type="submit" class="btn btn-link p-0">
+                                                    <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 <% } %>
                             </tbody>
@@ -70,49 +76,60 @@
 </body>
 
 <script>
-    
-    const searchVenueInput = '#searchVenueInput';
-    const searchVenueButton = '#searchVenueButton';
-    const clearSearchVenueButton = '#clearSearchVenueButton';
-    const venueRow = ".VenueRow";
+    const searchVenueInput = document.getElementById('searchVenueInput');
+    const searchVenueButton = document.getElementById('searchVenueButton');
+    const clearSearchVenueButton = document.getElementById('clearSearchVenueButton');
+    const venueRows = document.querySelectorAll('.VenueRow');
+    const deleteVenueForms = document.querySelectorAll('.deleteVenueForm');
 
-    let venues;
+    let venues = [];
 
-    $(document).ready(async function() {
+    window.addEventListener("load", async function(e) {
         try {
-            venues = (await ajax.get(routes.admin.venues)).map(venue => Venue.parseApiResult(venue));
+            venues = (await ajax.get(routes.admin.venues)).map(venue => User.parseApiResult(venue));
         } catch (error) {
             return utils.handleError(error);
         }
     });
 
-    $(searchVenueInput).keyup(function(e) {
-        // if (e.keyCode == 13) {
-        //     const attendee = event.attendees.filter(attendee => attendee.phoneNumber == $(this).val());
-        //     if (attendee.length !== 1) return toast.danger("This phone number is not tied to any reservation!");
-
-        //     highlightAttendeeSeats(attendee[0].id);
-        // }
-        if (e.target.value.length === 0) $(clearSearchVenueButton).hide();
-        else $(clearSearchVenueButton).show();
+    searchVenueInput.addEventListener('keyup', function (e) {
+        if (e.keyCode == 13) searchVenueButton.click();
+        clearSearchVenueButton.classList.toggle('d-none', e.target.value.length === 0);
     });
 
-    $(clearSearchVenueButton).click(function() {
-        document.querySelectorAll(venueRow).forEach(obj => obj.classList.remove("table-active"));
-        $(searchVenueInput).val('');
-        $(clearSearchVenueButton).hide();
+    clearSearchVenueButton.addEventListener('click', function (e) {
+        document.querySelectorAll('.VenueRow').forEach(obj => obj.classList.remove("table-active"));
+        searchVenueInput.value = '';
+        clearSearchVenueButton.classList.add('d-none');
     });
 
-    $(searchVenueButton).click(function() {
-        document.querySelectorAll(venueRow).forEach(obj => obj.classList.remove("table-active"));
+    searchVenueButton.addEventListener('click', function (e) {
+        document.querySelectorAll('.VenueRow').forEach(obj => obj.classList.remove("table-active"));
 
-        const venue = venues.filter(venue => (venue.name).toLocaleLowerCase() === (($(searchVenueInput).val()).trim()).toLocaleLowerCase());
-        if (venue.length !== 1) return toast.danger("This venue name does not exist!");
+        const venue = venues.filter(venue => (venue.name).toLocaleLowerCase() === (searchVenueInput.value).trim().toLocaleLowerCase());
+        if (venue.length < 1) return toast.danger("This name does not belong to any available venues!");
 
-        const row = document.getElementById(venue[0].id);
-        row.classList.add("table-active");
+        document.getElementById(venue[0].id).classList.add("table-active");    
     });
-   
+
+    deleteVenueForms.forEach(function(element) {
+        element.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const check = confirm("Are you sure you want to delete this venue?");
+        
+            if (check === true) {
+                try {
+                    await ajax.delete(e.target.action);
+                    await ajax.post(routes.index.successFlash, "Venue has been deleted successfully!");
+
+                    window.location.replace('/admin/venues');
+                } catch (error) {
+                    utils.handleError(error);
+                }
+            }
+        });
+    });
 </script>
 
 <%- include('../templates/footer')-%>

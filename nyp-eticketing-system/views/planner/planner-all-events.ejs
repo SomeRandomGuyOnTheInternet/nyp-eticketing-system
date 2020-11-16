@@ -7,14 +7,7 @@
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Table card card section  -->
             <!-- Heading  -->
-            <div class="row"> <!-- Use this row div if you want your section heading to be inline with another element  -->
-                <div class="col-sm-9 col-12 align-self-end">
-                    <h2 class="section-heading">Events</h2>
-                </div>
-                <div class="col-sm-3 col-12 align-self-end">
-                    <a class="btn btn-lg btn-primary responsive-float float-right" href="/planner/add-event" role="button"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add Event</a>
-                </div>
-            </div>
+            <h2 class="section-heading">Events</h2>
             <div class="mt-0"></div> <!-- This spacing is different from the rest cause having multiple inline elements in the heading kinda screws up the spacing, so have to set it to zero to make it look consistent with the rest -->
             <!-- Content  -->
             <div class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
@@ -29,6 +22,9 @@
                                     <th scope="col">Venue</th>
                                     <th scope="col">Date</th>
                                     <th scope="col">Time</th>
+                                    <th scope="col" class="p-3"> 
+                                        <a class="btn btn-lg btn-primary responsive-float float-right" href="/planner/add-event" role="button"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add Event</a>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -39,6 +35,13 @@
                                         <td><%= events[i]['Venue.name'] %></td>
                                         <td><%= moment(events[i].startDateTime).format('Do MMMM YYYY') %></td>
                                         <td><%= moment(events[i].startDateTime).format('h:mm a') %></td>
+                                        <td class="text-center">
+                                            <form action="/api/planner/events/<%= events[i].id %>" class="deleteEventForm">
+                                                <button type="submit" class="btn btn-link p-0">
+                                                    <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 <% } %>
                             </tbody>
@@ -50,5 +53,28 @@
         </main>
     </div>
 </body>
+
+<script>
+    const deleteEventForms = document.querySelectorAll('.deleteEventForm');
+
+    deleteEventForms.forEach(function(element) {
+        element.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const check = confirm("Are you sure you want to delete this helper account?");
+        
+            if (check === true) {
+                try {
+                    await ajax.delete(e.target.action);
+                    await ajax.post(routes.index.successFlash, "Event has been deleted successfully!");
+
+                    window.location.replace('/planner/events');
+                } catch (error) {
+                    utils.handleError(error);
+                }
+            }
+        });
+    });
+</script>
 
 <%- include('../templates/footer')-%>

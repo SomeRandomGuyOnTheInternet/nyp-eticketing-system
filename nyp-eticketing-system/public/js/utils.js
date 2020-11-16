@@ -1,4 +1,3 @@
-// TODO: Improve ajax error handling by using switch case on error codes
 // TODO: Replace anonymous functions with proper ones
 
 String.prototype.replaceAt = function(index, replacement) {
@@ -63,5 +62,10 @@ const utils = {
 			counts[arr[i]] = 1 + (counts[arr[i]] || 0);
         }
         return counts
+    },
+    removeAllChildNodes: function (parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
     }
 };

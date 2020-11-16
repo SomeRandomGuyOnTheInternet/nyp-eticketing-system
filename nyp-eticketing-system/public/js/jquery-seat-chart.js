@@ -675,7 +675,10 @@ function orderByCountAndDedupe(arr) {
             .sort((a, b) => b[1] - a[1])
             .map(([originalItem, count]) => originalItem)
     );
- };
+};
+
+const maybe = (condition, op) => arg => condition ? op(arg) : arg;
+const range = (start, end) => Array.from({ length: end - start }, (_, i) => start + i);
 
 // Seat chart class to make our life easier
 class SeatChart {
@@ -701,14 +704,14 @@ class SeatChart {
 
 	set map(val) {
 		this._map = val;
-		this.charactersSortedByFrequency = orderByCountAndDedupe(
-			[].concat(...this._map.map(row => row.split("")))
-		)
+		// this.charactersSortedByFrequency = orderByCountAndDedupe(
+		// 	[].concat(...this._map.map(row => row.split("")))
+		// )
 
-		const index = this.charactersSortedByFrequency.indexOf("_")
-		if (index > -1) { 
-			this.charactersSortedByFrequency.splice(index, 1) 
-		}
+		// const index = this.charactersSortedByFrequency.indexOf("_")
+		// if (index > -1) { 
+		// 	this.charactersSortedByFrequency.splice(index, 1) 
+		// }
 	}
 
 	// Binding and reloading map stuff
@@ -747,7 +750,7 @@ class SeatChart {
 	unbindMap() {
 		$('.seatCharts-row').remove();
 		$(this.legendNode).empty();
-		$(`${this.mapNode}, ${this.mapNode} *`).unbind().removeData();
+		$(this.mapNode).unbind().removeData();
 		$(this.mapNode).attr('aria-activedescendant', null);
 	};
 
@@ -887,12 +890,12 @@ class SeatChart {
 		}
 	};
 
-	findAvailableSeatBlock(character, noOfSeats) {
+	findAvailableSeatBlock(character, noOfSeats, prioritiseBackRows = true) {
 		const seatIdMap = sc.activeNode.seatIdMap;
 		let availableSeatBlock = [];
 		let fallbackSeats = [];
 
-		for (let i = sc.map.length - 1; i >= 0; i--) {
+		maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length)).forEach((i) => {
 			let origin = -1;
 
 			for (let j = 0; j <= sc.map[i].length; j++) {
@@ -914,49 +917,9 @@ class SeatChart {
 					return availableSeatBlock;
 				}
 			}
-		}
+		});
 
 		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
-	};
-
-	hasGaps(seat) {
-		const seatIdMap = sc.activeNode.seatIdMap;
-		const seatRow = seat.settings.row;
-		const seatColumn = seat.settings.column;
-		const leftSeatColumn = seatColumn - 1;
-		const rightSeatColumn = seatColumn + 1;
-		let leftSideOk = true;
-		let rightSideOk = true;
-
-		if (leftSeatColumn >= 0) {
-			const leftSeat = sc.activeNode.get(seatIdMap[seatRow][leftSeatColumn]);
-			
-			if (leftSeat.length !== 0 && leftSeat.settings.character === seat.settings.character && leftSeat.settings.status === "available") {
-				if (leftSeatColumn >= 0) {
-					const leftSeat = sc.activeNode.get(seatIdMap[seatRow][leftSeatColumn]);
-					
-					if (leftSeat.length !== 0 && leftSeat.settings.character === seat.settings.character && leftSeat.settings.status === "available") {
-						
-					} else {
-						leftSideOk = true;
-					}
-				} else {
-					leftSideOk = true;
-				}
-			} else {
-				leftSideOk = true;
-			}
-		} else {
-			leftSideOk = true;
-		}
-
-		if (rightSeatColumn >= this.map[0].length) {
-			rightSideOk = true
-		} else {
-			const rightSeat = sc.activeNode.get(seatIdMap[seatRow][rightSeatColumn]);
-		}
-
-		return leftSideOk === true && rightSideOk === true;
 	};
 
 	static alphabeticalLabels() {

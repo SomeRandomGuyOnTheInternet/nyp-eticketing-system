@@ -1,7 +1,5 @@
 <!-- TODO: Complete documentation for this part -->
 <!-- TODO: Delete seat types -->
-<!-- TODO: Delete student helper -->
-<!-- TODO: Drag and select seats for helpers -->
 <!-- TODO: Pagination -->
 
 <%- include('../templates/head')-%>
@@ -51,15 +49,26 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Checkmark (check) Input Card w/o Label  -->
+                    <!-- Radio Input Card  -->
                     <div class="col-sm-6">
                         <div class="card input-card mt-3">
-                            <div class="card-body no-label-card-body">
-                                <div class="form-check form-check-inline ml-2">
-                                    <input id="prioritiseBackCheck" name="prioritiseBackCheck"  class="form-check-input lg-check" type="checkbox" value="true">
-                                    <label class="form-check-label px-3" for="prioritiseBackCheck">
-                                        Prioritise seats at the back
-                                    </label>
+                            <div class="card-body inline-check-card-body">
+                                <label for="prioritiseRowLabelCheckForm" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Seat selection algorithm should prioritise</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <div id="prioritiseRowLabelCheckForm" class="py-1"> <!-- All check input elements should be enclosed in a div with a unique id  -->
+                                    <div class="form-check form-check-inline">
+                                        <input id="frontRow" class="form-check-input" type="radio" name="prioritiseRow"  value="frontRow">
+                                        <label class="form-check-label px-2" for="frontRow">
+                                            Front Rows
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input id="backRow" class="form-check-input" type="radio" name="prioritiseRow"  value="backRow" checked>
+                                        <label class="form-check-label px-2" for="backRow">
+                                            Back Rows
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -190,23 +199,23 @@
 
 <script>
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
-    const addEventForm = '#addEventForm';
-    const eventNameInput = '#eventNameInput';
-    const eventDateTimeInput = '#eventDateTimeInput';
-    const maxSeatsPerReservationInput = '#maxSeatsPerReservationInput';
-    const prioritiseBackCheck = '#prioritiseBackCheck';
-    const venueSelectInput = '#venueSelectInput';
-    const mapWrapper = '#tableWrapper';
-    const seatMap = '#seatMap';
-    const legend = '#editMapLegend';
-    const addSeatTypeCard = '#addSeatTypeCard';
-    const helperSelectInput = '#helperSelectInput';
-    const helpersCardCol = '#helpersCardCol';
-    const createEventButton = '#createEventButton';
-    const addSeatTypeModal = '#addSeatTypeModal';
-    const seatTypeNameInput = '#seatTypeNameInput';
-    const blockSeatTypeCheck = '#blockSeatTypeCheck';
-    const addSeatTypeButton = '#addSeatTypeButton';
+    const addEventForm = document.getElementById('addEventForm');
+    const eventNameInput = document.getElementById('eventNameInput');
+    const eventDateTimeInput = document.getElementById('eventDateTimeInput');
+    const maxSeatsPerReservationInput = document.getElementById('maxSeatsPerReservationInput');
+    const prioritiseBackRowRadio = document.getElementById('backRow');
+    const venueSelectInput = document.getElementById('venueSelectInput');
+    const mapWrapper = document.getElementById('tableWrapper');
+    const seatMap = document.getElementById('seatMap');
+    const legend = document.getElementById('editMapLegend');
+    const addSeatTypeCard = document.getElementById('addSeatTypeCard');
+    const helperSelectInput = document.getElementById('helperSelectInput');
+    const helpersCardCol = document.getElementById('helpersCardCol');
+    const createEventButton = document.getElementById('createEventButton');
+    const addSeatTypeModal = document.getElementById('addSeatTypeModal');
+    const seatTypeNameInput = document.getElementById('seatTypeNameInput');
+    const blockSeatTypeCheck = document.getElementById('blockSeatTypeCheck');
+    const addSeatTypeButton = document.getElementById('addSeatTypeButton');
 
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
@@ -215,6 +224,9 @@
     const defaultSeatType = new SeatType({ char: 'G', category: 'General', blocked: false, classes: 'general' });
     const handicappedSeatType = new SeatType({ char: 'H', category: 'Handicapped', blocked: false, classes: 'handicapped' });
     let selectedSeatType = defaultSeatType.char; // This variable will contain the character of the seat type we've selected
+
+    let lastSelectedSeat = null;
+    let shiftHeld = false;
 
     let venues = [];
     let helpers = [];
@@ -234,10 +246,25 @@
     });
 
     sc.onClick = function () {
-        sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType.char : selectedSeatType);
+        if (shiftHeld === true && lastSelectedSeat !== null) {
+            const seats = sc.activeNode.seats;
+            const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            let replaceSeats = false;
+
+            for (const id in seats) {
+                if (id === firstSeat.settings.id) replaceSeats = true;
+                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
+                if (id === lastSeat.settings.id) break;
+            }
+        } else {
+            sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType.char : selectedSeatType);
+        }
+
+        lastSelectedSeat = this;
     };
 
-    $(document).ready(async function() {
+    window.addEventListener("load", async function(e) {
         try {
             venues = (await ajax.get(routes.planner.venues)).map(venue => Venue.parseApiResult(venue));
             helpers = (await ajax.get(routes.planner.helpers)).map((helper) => {
@@ -271,18 +298,26 @@
         sc.scaleContentWidth();
     });
 
-    $(window).on('resize', function() { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
+    window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container
         sc.scaleContentWidth();
     });
 
-    $(venueSelectInput).on('change', function() {
+    window.addEventListener('keydown', function (e) {
+        if (e.keyCode === 16) shiftHeld = true;
+    });
+
+    window.addEventListener('keyup', function (e) {
+        if (e.keyCode === 16) shiftHeld = false;
+    });
+
+    venueSelectInput.addEventListener('change', function (e) {
         utils.addUnloadListener();
 
         sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
         sc.reloadMap();
     });
 
-    $(helperSelectInput).on('change', function() {
+    helperSelectInput.addEventListener('change', function (e) {
         utils.addUnloadListener();
 
         EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
@@ -290,11 +325,11 @@
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
     });
 
-    $(addSeatTypeButton).click(function () {
+    addSeatTypeButton.addEventListener('click', function (e) {
         utils.addUnloadListener();
         
-        const seatName = $(seatTypeNameInput).val();
-        const seatIsBlocked = $(blockSeatTypeCheck).is(':checked');
+        const seatName = seatTypeNameInput.value;
+        const seatIsBlocked = blockSeatTypeCheck.checked;
 
         if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         const seatCharacter = availableSeatCharacters[0];
@@ -324,8 +359,8 @@
         });
         
         $(addSeatTypeModal).modal('hide'); // Hides the modal
-        $(seatTypeNameInput).val(''); // Reset input to default state
-        $(blockSeatTypeCheck).prop('checked', false);
+        seatTypeNameInput.value; // Reset input to default state
+        blockSeatTypeCheck.checked = false;
     });
 
     document.addEventListener('click', function (e) {
@@ -355,16 +390,16 @@
         }
     }, false);
 
-    $(addEventForm).submit(async function (e) {
+    addEventForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        $(createEventButton).prop('disabled', true);
+        createEventButton.disabled = true;
 
         const event = new Event({
-            name: $(eventNameInput).val(),
+            name: eventNameInput.value,
             seatMap: sc.map,
-            startDateTime: $(eventDateTimeInput).val(),
-            seatsPerReservation: $(maxSeatsPerReservationInput).val(),
-            prioritiseBackRows: $(prioritiseBackCheck).is(':checked'),
+            startDateTime: eventDateTimeInput.value,
+            seatsPerReservation: maxSeatsPerReservationInput.value,
+            prioritiseBackRows: prioritiseBackRowRadio.checked,
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
             helpers: helpers.filter(helper => helper.selected === true)
@@ -380,7 +415,7 @@
         } catch (error) {
             utils.handleError(error);
         } finally {
-            $(createEventButton).prop('disabled', false);
+            createEventButton.disabled = false;
         }
     });
 </script>
