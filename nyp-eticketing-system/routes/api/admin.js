@@ -166,10 +166,7 @@ router.post('/venues', auth.isAdmin, async (req, res) => {
     if (!seatMap) return respond.error(res, "Please provide a seat map for the venue!", 400);
 
     try {
-        const existingVenue = await Venue.findOne({
-            where: { name: name }
-        });
-
+        const existingVenue = await Venue.findOne({ where: { name: name } });
         if (existingVenue) return respond.error(res, "Please provide a unqiue name for the venue!", 400);
 
         await Venue.create({

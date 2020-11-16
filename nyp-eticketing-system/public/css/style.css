@@ -38,6 +38,10 @@ select {
     border-radius: 0;
 }
 
+.pointer-cursor {
+    cursor: pointer !important;
+}
+
 .card-hover {
     cursor: pointer;
 }

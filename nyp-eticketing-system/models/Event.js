@@ -24,6 +24,9 @@ const Event = db.define('Event', {
         type: Sequelize.BOOLEAN,
         defaultValue: false
     },
+    noOfReservableSeats: {
+        type: Sequelize.INTEGER
+    },
     isDeleted: {
         type: Sequelize.BOOLEAN,
         defaultValue: false

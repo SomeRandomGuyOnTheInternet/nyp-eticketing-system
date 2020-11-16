@@ -82,7 +82,7 @@
                 <!-- Content  -->
                 <div class="row">
                     <!-- Venues Select Input Card  -->
-                    <div class="col-sm-6">
+                    <div id="venueSelect" class="col-sm-6">
                         <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
                                 <label for="venueSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
@@ -90,6 +90,16 @@
                                 </label>
                                 <select id="venueSelectInput" name="venueSelectInput" class="form-control card-input" tabindex="0"> <!-- This is where the user actually inputs all their stuff  -->
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="noOfReservationContainer" class="col-sm-6 d-none">
+                        <div class="card input-card mt-3">
+                            <div class="card-body input-card-body">
+                                <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">No. of Available Seats</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <span id="noOfReservation" class="h4 text-primary">1000 / 1200</span>
                             </div>
                         </div>
                     </div>
@@ -118,11 +128,11 @@
                             <a href="#addSeatTypeModal" class="stretched-link" data-toggle="modal" data-target="#addSeatTypeModal"></a> <!-- On pressing this card, the add seat type button will show up -->
                         </div>
                     </div>
-                    <div class="col-md-9">
+                    <div id="legendContainer" class="col-md-9">
                         <div id="editMapLegend" class="row px-0">
                         </div>
                         <div class="mt-3"></div>
-                        <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
+                        <span id="legendClickInfo" class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
                     </div>
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
@@ -211,10 +221,15 @@
     const eventDateTimeInput = document.getElementById('eventDateTimeInput');
     const maxSeatsPerReservationInput = document.getElementById('maxSeatsPerReservationInput');
     const prioritiseBackRowRadio = document.getElementById('backRow');
+    const venueSelect = document.getElementById('venueSelect');
     const venueSelectInput = document.getElementById('venueSelectInput');
+    const noOfReservationContainer = document.getElementById('noOfReservationContainer');
+    const noOfReservation = document.getElementById('noOfReservation');
     const mapWrapper = document.getElementById('tableWrapper');
     const seatMap = document.getElementById('seatMap');
     const legend = document.getElementById('editMapLegend');
+    const legendContainer = document.getElementById('legendContainer');
+    const legendClickInfo = document.getElementById('legendClickInfo');
     const addSeatTypeCard = document.getElementById('addSeatTypeCard');
     const helperSelectInput = document.getElementById('helperSelectInput');
     const helpersCardCol = document.getElementById('helpersCardCol');
@@ -238,7 +253,7 @@
     let event = null;
     let venues = [];
     let helpers = [];
-
+    
     // Seat chart configuration
     let sc = new SeatChart({
         map: [],
@@ -252,22 +267,24 @@
     });
 
     sc.onClick = function () {
-        if (shiftHeld === true && lastSelectedSeat !== null) {
-            const seats = sc.activeNode.seats;
-            const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
-            const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
-            let replaceSeats = false;
+        if (event.reservedSeats.length === 0) {
+            if (shiftHeld === true && lastSelectedSeat !== null) {
+                const seats = sc.activeNode.seats;
+                const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+                const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+                let replaceSeats = false;
 
-            for (const id in seats) {
-                if (id === firstSeat.settings.id) replaceSeats = true;
-                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
-                if (id === lastSeat.settings.id) break;
+                for (const id in seats) {
+                    if (id === firstSeat.settings.id) replaceSeats = true;
+                    if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
+                    if (id === lastSeat.settings.id) break;
+                }
+            } else {
+                sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType : selectedSeatType);
             }
-        } else {
-            sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType : selectedSeatType);
-        }
 
-        lastSelectedSeat = this;
+            lastSelectedSeat = this;
+        }
     };
 
     window.addEventListener("load", async function(e) {
@@ -284,9 +301,7 @@
             });
 
             // at least a single venue is required to create an event, so throw error if it doesn't exists
-            if (venues.length < 1) {
-                utils.throwException("There are no venues available! Please contact the admin to create a venue.");
-            }
+            if (venues.length < 1) utils.throwException("There are no venues available! Please contact the admin to create a venue.");
         } catch (error) {
             return utils.handleError(error);
         }
@@ -302,18 +317,29 @@
         EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         
+        if (event.reservedSeats.length > 0) {
+            addSeatTypeCard.classList.add('d-none');
+            legendContainer.classList.remove('col-md-9');
+            legendContainer.classList.add('col-md-12');
+            legendClickInfo.classList.add('d-none');
+            venueSelectInput.disabled = true;
+            noOfReservationContainer.classList.remove('d-none');
+            noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
+        }
+
         sc.map = event.seatMap;
         sc.seatTypes = event.seatTypes;
         sc.legends = sc.seatTypes.reduce(function(legends, seatType){
             if (seatType.char !== defaultSeatType) {
-                legends.push([seatType.char, "available", seatType.category.concat((seatType.blocked) ? " (Blocked)" : ""), selectableLegendClasses]);
+                legends.push([seatType.char, "available", seatType.category.concat((seatType.blocked) ? " (Blocked)" : ""), (event.reservedSeats.length > 0) ? null : selectableLegendClasses]);
             }
             return legends;
         }, []);
-        
+
         // Bind map
         sc.bindMap();
         sc.scaleContentWidth();
+        sc.disableReservedSeats(event.reservedSeats);
 
         sc.seatTypes.forEach(seatType => {
             availableSeatCharacters = availableSeatCharacters.filter(sc => sc !== seatType.char);
@@ -387,7 +413,7 @@
     });
 
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('seatCharts-legendCard')) {
+        if (e.target.classList.contains('seatCharts-legendCard') && e.target.classList.contains('clickable-div')) {
             utils.addUnloadListener();
 
             const node = e.target;
@@ -426,12 +452,19 @@
         e.preventDefault();
         updateEventButton.disabled = true;
 
+        let reservableSeatCount = 0;
+        const seats = sc.activeNode.seats;
+        for (const id in seats) {
+            if (Boolean(seats[id].settings.data.blocked) === false) reservableSeatCount++;
+        }
+
         const event = new Event({
             name: eventNameInput.value,
             seatMap: sc.map,
             startDateTime: eventDateTimeInput.value,
             seatsPerReservation: maxSeatsPerReservationInput.value,
             prioritiseBackRows: prioritiseBackRowRadio.checked,
+            noOfReservableSeats: reservableSeatCount,
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
             helpers: helpers.filter(helper => helper.selected === true)
@@ -439,8 +472,8 @@
 
         try {
             await ajax.update(`${routes.planner.events}/${eventId}`, event.convertToApiFormat());
-            toast.success("The event has been successfully updated!");
 
+            toast.success("The event has been successfully updated!");
             utils.removeUnloadListener();
         } catch (error) {
             utils.handleError(error);

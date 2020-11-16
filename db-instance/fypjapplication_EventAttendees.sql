@@ -1,5 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.21, for macos10.15 (x86_64)
 --
+-- Host: 127.0.0.1    Database: fypjapplication
 -- ------------------------------------------------------
 -- Server version	8.0.21
 
@@ -20,7 +21,7 @@
 
 LOCK TABLES `EventAttendees` WRITE;
 /*!40000 ALTER TABLE `EventAttendees` DISABLE KEYS */;
-INSERT INTO `EventAttendees` VALUES (1,'Lester Chua',90616192,3,'2020-11-14 08:15:12','2020-11-14 08:15:12',12),(2,'Bryan',96210786,3,'2020-11-14 10:53:50','2020-11-14 11:04:22',8),(3,'Gail',94573812,0,'2020-11-14 10:53:50','2020-11-14 11:04:22',7);
+INSERT INTO `EventAttendees` VALUES (1,'Lester Chua',90616192,0,'2020-11-14 08:15:12','2020-11-16 13:24:43',12),(2,'Bryan',96210786,0,'2020-11-14 10:53:50','2020-11-16 12:04:30',8),(3,'Gail',94573812,0,'2020-11-14 10:53:50','2020-11-14 11:04:22',7);
 /*!40000 ALTER TABLE `EventAttendees` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -33,4 +34,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-11-16  0:11:28
+-- Dump completed on 2020-11-16 21:34:39

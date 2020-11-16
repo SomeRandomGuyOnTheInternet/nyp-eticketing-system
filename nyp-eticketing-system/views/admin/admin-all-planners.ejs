@@ -201,7 +201,6 @@
             e.preventDefault();
 
             const check = confirm("Are you sure you want to delete this planner account?");
-        
             if (check === true) {
                 try {
                     await ajax.delete(e.target.action);
@@ -217,6 +216,7 @@
 
     addPlannerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+        
         registerButton.disabled = true;
 
         try {
@@ -227,8 +227,7 @@
             });
             await ajax.post(routes.index.successFlash, "Planner account has been created successfully!");
 
-            utils.removeUnloadListener();
-            
+            utils.removeUnloadListener(); 
             window.location.replace("/admin/planners");
         } catch (error) {
             utils.handleError(error);

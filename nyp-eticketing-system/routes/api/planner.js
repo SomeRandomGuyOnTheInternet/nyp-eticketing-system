@@ -4,7 +4,6 @@ const express = require('express');
 const router = express.Router();
 
 const sequelize = require('../../config/DBConfig');
-
 const respond = require('../../utils/respond');
 const auth = require('../../utils/api-auth');
 
@@ -28,9 +27,7 @@ router.get('/helpers', auth.isPlanner, async (req, res) => {
 
 router.get('/venues', auth.isPlanner, async (req, res) => {
     try {
-        let venues = await Venue.findAll({
-            order: [['name', 'ASC']]
-        });
+        let venues = await Venue.findAll({ order: [['name', 'ASC']] });
 
         venues.forEach(v => v.seatMap = JSON.parse(v.seatMap));
 
@@ -46,7 +43,6 @@ router.get('/events/:id', auth.isPlanner, async (req, res) => {
 
     try {
         let event = await Event.findByPk(eventId, { raw: true });
-
         if (!event) return respond.error(res, "Please provide a valid event ID!");
 
         event.seatMap = JSON.parse(event.seatMap);
@@ -68,6 +64,7 @@ router.post('/events', auth.isPlanner, async (req, res) => {
     const startDateTime = req.body.startDateTime;
     const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
+    const noOfReservableSeats = req.body.noOfReservableSeats;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;
     const eventHelpers = req.body.eventHelpers;
@@ -76,6 +73,9 @@ router.post('/events', auth.isPlanner, async (req, res) => {
     if (!name) return respond.error(res, "Please provide a event name!");
     if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
     if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
+    if (isNaN(noOfReservableSeats)) return respond.error(res, "Please provide a valid number of reservable seats for this event!");
+    if (noOfReservableSeats < 0) return respond.error(res, "Please provide a higher number of reservable seats for this event!");
+    if (noOfReservableSeats > 2000) return respond.error(res, "Please provide a lower number of reservable seats for this event!");
     if (seatsPerReservation) {
         if (isNaN(seatsPerReservation)) return respond.error(res, "Please provide a valid max number of seats per reservation!");
         else if (seatsPerReservation < 1) return respond.error(res, "Please provide a higher number of seats per reservation!");
@@ -99,6 +99,7 @@ router.post('/events', auth.isPlanner, async (req, res) => {
             startDateTime: startDateTime,
             seatsPerReservation: seatsPerReservation,
             prioritiseBackRows: prioritiseBackRows,
+            noOfReservableSeats: noOfReservableSeats,
             venueId: venueId
         },{
             transaction: t
@@ -135,6 +136,7 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
     const startDateTime = req.body.startDateTime;
     const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
+    const noOfReservableSeats = req.body.noOfReservableSeats;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;
     const eventHelpers = req.body.eventHelpers;
@@ -143,11 +145,22 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
     if (!name) return respond.error(res, "Please provide a event name!");
     if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
     if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
+    if (isNaN(noOfReservableSeats)) return respond.error(res, "Please provide a valid number of reservable seats for this event!");
+    if (noOfReservableSeats < 0) return respond.error(res, "Please provide a higher number of reservable seats for this event!");
+    if (noOfReservableSeats > 2000) return respond.error(res, "Please provide a lower number of reservable seats for this event!");
     if (seatsPerReservation) {
         if (isNaN(seatsPerReservation)) return respond.error(res, "Please provide a valid max number of seats per reservation!");
         else if (seatsPerReservation < 1) return respond.error(res, "Please provide a higher number of seats per reservation!");
         else if (seatsPerReservation > 10) return respond.error(res, "Please provide a lower number of seats per reservation!");
     }
+
+    const parsedDateTime = Date.parse(startDateTime);
+    const maxDate = new Date().setFullYear(new Date().getFullYear() + 5);
+    const minDate = new Date().setFullYear(new Date().getFullYear() - 5);
+
+    if (isNaN(parsedDateTime)) return respond.error(res, "Please provide a valid start date/time for the event!");
+    if (parsedDateTime > maxDate) return respond.error(res, "Please provide a lower start date/time for the event!");
+    if (parsedDateTime < minDate) return respond.error(res, "Please provide a higher start date/time for the event!");
 
     seatTypes.forEach(s => s.eventId = eventId);
     eventHelpers.forEach(h => h.eventId = eventId);
@@ -155,6 +168,7 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
     let t = await sequelize.transaction();
 
     try {
+
         await Event.update(
 			{
                 name: name,
@@ -162,12 +176,11 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
                 startDateTime: startDateTime,
                 seatsPerReservation: seatsPerReservation,
                 prioritiseBackRows: prioritiseBackRows,
+                noOfReservableSeats: noOfReservableSeats,
                 venueId: venueId
             },
             { 
-                where: { 
-                    id: eventId 
-                },
+                where: { id: eventId },
                 transaction: t
             },
         );
@@ -214,6 +227,22 @@ router.delete('/events/:id', auth.isPlanner, async (req, res) => {
 
         console.error(error);
         return respond.error(res, "Something went wrong while deleting this event!", 500);
+    }
+});
+
+router.get('/reservations/:id', auth.isPlanner, async (req, res) => {
+    const eventId = req.params.id;
+
+    try {
+        let event = await Event.findByPk(eventId, { raw: true });
+        if (!event) return respond.error(res, "Please provide a valid event ID!");
+        
+        const reservation = await EventReservedSeat.getEventReservedSeat(eventId);
+
+        return respond.success(res, "Event reservations have been retrieved successfully!", reservation);
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while getting the event reservations. Please try again later!", 500);
     }
 });
 

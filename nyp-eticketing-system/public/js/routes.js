@@ -13,10 +13,12 @@ const routes = {
         helpers: "/api/planner/helpers",
         events: "/api/planner/events",
         venues: "/api/planner/venues",
+        reservations: "/api/planner/reservations",
     },
     helper: {
         events: "/api/helper/events",
-        reservations: "/api/helper/reservations",
+        reservations: "/api/helper/event/reservations",
+        attendees: "/api/helper/event/attendees",
         sendConfirmationSMS: "/api/helper/sms-reservation-confirm",
     }
 };

@@ -1,9 +1,12 @@
 <!-- TODO: Make button have a loading icon -->
-<!-- TODO: flash seat when select -->
 <!-- TODO: gap detection -->
 <!-- TODO: save base map in class, so can use zoom properly -->
 <!-- TODO: autocomplete on search fields -->
 <!-- TODO: scroll to highlighted row -->
+<!-- TODO: on event fully booked, remove all waiting list people and send message to all waiting list -->
+<!-- TODO: update reserved seats on time out -->
+<!-- TODO: undo map seat replacements -->
+<!-- TODO: show arrow to indicate the user to scroll up or down instead of scroll straight away -->
 
 <%- include('../templates/head')-%>
 
@@ -86,12 +89,26 @@
             <div id="legend" class="seatCharts-legend row">
             </div>
             <div id="editSeatSelection" class="mt-3 d-none">
-                <button id="addSeatToSelection" type="button" class="btn btn-lg btn-primary mr-2">
-                    <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Seat
-                </button>
-                <button id="removeSeatFromSelection" type="button" class="btn btn-lg btn-danger">
+                <div class="row">
+                    <div class="col-md-3 col-6" style="padding-right: 0;">
+                        <div class="card input-card"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="noOfSeatsInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">No. of Seats</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <input id="noOfSeatsInput" name="noOfSeatsInput" class="form-control card-input" type="number" value="0" min="0" max="10" placeholder="e.g. 3">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-auto col-6">
+                        <button id="applyNoOfSeats" type="button" class="btn btn-lg btn-primary mr-2 h-100">
+                            <i class="fas fa-check"></i>&nbsp;&nbsp;Apply
+                        </button>
+                    </div>
+                </div>
+                <!-- <button id="removeSeatFromSelection" type="button" class="btn btn-lg btn-danger">
                     <i class="fas fa-minus"></i>&nbsp;&nbsp;Remove Seat
-                </button>
+                </button> -->
             </div>
             <% if (event.seatsPerReservation !== null) { %>
             <div class="text-secondary mt-3 text-break">
@@ -139,7 +156,7 @@
                                 <label for="noOfExtraAttendeesInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">No. of Extra Attendees</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="noOfExtraAttendeesInput" name="noOfExtraAttendeesInput" class="form-control card-input" type="number" min="1" max="5" placeholder="Leave empty if no extra attendees">
+                                <input id="noOfExtraAttendeesInput" name="noOfExtraAttendeesInput" class="form-control card-input" type="number" min="0" max="5" placeholder="Leave empty if no extra attendees">
                             </div>
                         </div>
                     </div>
@@ -221,6 +238,11 @@
                                 <div class="col-7 pr-0">
                                     <div id="selectedSeatConfirmationWrapper" class="mb-3">
                                     </div>
+                                    <div id="reservationConfirmPreviousReservations" class="text-primary font-weight-medium mt-3 text-break pointer-cursor d-none">
+                                        <span id="reservationConfirmNoOfPreviousReservations" class="font-weight-bold">0</span> seats previously reserved
+                                    </div>
+                                    <div id="previousSeatReservationsWrapper" class="mb-3 d-none">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -250,8 +272,8 @@
     const seatMap = document.getElementById('seatMap');
     const legend = document.getElementById('legend');
     const editSeatSelection = document.getElementById('editSeatSelection');
-    const addSeatToSelection = document.getElementById('addSeatToSelection');
-    const removeSeatFromSelection = document.getElementById('removeSeatFromSelection');
+    const applyNoOfSeats = document.getElementById('applyNoOfSeats');
+    const noOfSeatsInput = document.getElementById('noOfSeatsInput');
     const reserveSeatForm = document.getElementById('reserveSeatForm');
     const reservationHeading = document.getElementById('reservationHeading');
     const reservationNameInput = document.getElementById('reservationNameInput');
@@ -270,11 +292,15 @@
     const reservationConfirmExtraAttendees = document.getElementById('reservationConfirmExtraAttendees');
     const reservationConfirmNoOfExtraAttendees = document.getElementById('reservationConfirmNoOfExtraAttendees');
     const selectedSeatConfirmationWrapper = document.getElementById('selectedSeatConfirmationWrapper');
+    const reservationConfirmPreviousReservations = document.getElementById('reservationConfirmPreviousReservations');
+    const reservationConfirmNoOfPreviousReservations = document.getElementById('reservationConfirmNoOfPreviousReservations');
+    const previousSeatReservationsWrapper = document.getElementById('previousSeatReservationsWrapper');
     const confirmReservationButton = document.getElementById('confirmReservationButton');
 
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
     let selectedSeatType = null;
+
     let event = null;
 
     let sc = new SeatChart({
@@ -287,6 +313,7 @@
         wrapperNode: mapWrapper,
         legendNode: legend,
     });
+
 
     window.addEventListener("load", async function(e) {
         try {
@@ -313,14 +340,17 @@
         sc.disableReservedSeats(event.reservedSeats);
     });
 
+
     window.addEventListener('resize', function (e) {
         sc.scaleContentWidth();
     });
+
 
     searchReservationInput.addEventListener('keyup', function (e) {
         if (e.keyCode == 13) searchReservationBtn.click();
         clearSearchReservationBtn.classList.toggle('d-none', e.target.value.length === 0);
     });
+
 
     clearSearchReservationBtn.addEventListener('click', function (e) {
         sc.activeNode.find('highlighted').status('reserved');
@@ -328,14 +358,15 @@
         clearSearchReservationBtn.classList.add('d-none');
     });
 
+
     searchReservationBtn.addEventListener('click', function (e) {
         const attendee = event.attendees.filter(attendee => attendee.phoneNumber == searchReservationInput.value);
-        
         if (attendee.length !== 1) return toast.danger('This phone number is not tied to any reservation!');
 
         waitingListRows.forEach(obj => obj.classList.remove('table-active'));
         highlightAttendeeSeats(attendee[0].id);
     });
+
 
     zoomQuadrantSelect.addEventListener('change', function (e) {
         sc.map = Array.from(event.seatMap);
@@ -358,11 +389,13 @@
         selectedSeatType = null;
     });
 
+
     clearSearchReservationBtn.addEventListener('click', function (e) {
         sc.activeNode.find('highlighted').status('reserved');
         searchReservationInput.value = '';
         clearSearchReservationBtn.classList.add('d-none');
     });
+
 
     document.addEventListener('click', function (e) {
         const node = e.target;
@@ -382,70 +415,55 @@
             }
 
             const selectedSeats = sc.activeNode.find('selected').seats;
-            updateSeatSelectionButtons(selectedSeats.length, (selectedSeats.filter(seat => seat.settings.character === selectedSeatType)).length);
+            updateSeatSelectionInput(selectedSeats.length, (selectedSeats.filter(seat => seat.settings.character === selectedSeatType)).length);
         }
     }, false);
 
-    addSeatToSelection.addEventListener('click', function (e) {
+
+    applyNoOfSeats.addEventListener('click', function (e) {
         if (selectedSeatType !== null) {
-            let selectedSeatCharacters = (sc.activeNode.find('selected').seats).map(seat => seat.settings.character);
-            selectedSeatCharacters.push(selectedSeatType);
-            selectSeatsUsingSelection(selectedSeatCharacters);
+            const noOfSeats = Number(noOfSeatsInput.value);
 
-            if (selectedSeatCharacters.length === 1) {
-                reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
-            }
-        }
-    });
-
-    removeSeatFromSelection.addEventListener('click', function (e) {
-        if (selectedSeatType !== null) {
-            const orgSelectedSeats = sc.activeNode.find('selected').seats;
-            let selectedSeats = [];
-            let skippedSeat = false;
-
-            for (let i = 0; i < orgSelectedSeats.length; i++) {
-                if (orgSelectedSeats[i].settings.character === selectedSeatType && skippedSeat === false) {
-                    skippedSeat = true;
-                } else {
-                    selectedSeats.push(orgSelectedSeats[i].settings.character);
+            let selectedSeatCharacters = (sc.activeNode.find('selected').seats).reduce(function(filtered, seat) {
+                if (seat.settings.character !== selectedSeatType) {
+                    filtered.push(seat.settings.character);
                 }
-            }
-            
-            if (selectedSeats.length > 0) {
-                selectSeatsUsingSelection(selectedSeats);
-            } else {
-                sc.activeNode.find('selected').status('available');
-                reserveSeatForm.classList.add('d-none');
-                updateSeatSelectionButtons(selectedSeats.length, (selectedSeats.filter(character => character === selectedSeatType)).length);
-            }
+                return filtered;
+            }, []);
+
+            if (isNaN(noOfSeats)) return toast.danger("Please provide a valid number of seats!");
+            if (noOfSeats < 0) return toast.danger("Please provide a higher number of seats!");
+            if (noOfSeats > (sc.activeNode.find(`${selectedSeatType}.available`)).length) return toast.danger("Please provide a lower number of seats!");
+
+            for (var i = 0; i < noOfSeats; i++) selectedSeatCharacters.push(selectedSeatType);
+
+            selectSeatsUsingSelection(selectedSeatCharacters);
         }
     });
+
 
     waitingListRows.forEach(function(element) {
         element.addEventListener('click', function (e) {
             const attendee = event.attendees.filter(attendee => attendee.id == this.id);
-            const wasActive = this.classList.contains('table-active');
+            if (attendee.length !== 1) return toast.danger('Something went wrong while retrieving the seats for that attendee!');
 
+            const wasActive = this.classList.contains('table-active');
             waitingListRows.forEach(obj => obj.classList.remove('table-active'));
             sc.activeNode.find('highlighted').status('reserved');
 
-            if (attendee.length === 1) {
-                reservationNameInput.value = (wasActive) ? '' : attendee[0].name;
-                reservationPhoneNumberInput.value = (wasActive) ? '' : attendee[0].phoneNumber;
-                this.classList.add((wasActive) ? null : 'table-active');
-                (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
-            } else {
-                return toast.danger('Something went wrong while retrieving the seats for that attendee!');
-            }
+            reservationNameInput.value = (wasActive) ? '' : attendee[0].name;
+            reservationPhoneNumberInput.value = (wasActive) ? '' : attendee[0].phoneNumber;
+            this.classList.add((wasActive) ? null : 'table-active');
+            (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
         });
     });
+
 
     reserveSeatForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const reservationNameInputVal = reservationNameInput.value;
-        const reservationPhoneNumberInputVal = reservationPhoneNumberInput.value;
+        const reservationNameInputVal = reservationNameInput.value.trim();
+        const reservationPhoneNumberInputVal = reservationPhoneNumberInput.value.trim();
         const noOfExtraAttendeesInputVal = noOfExtraAttendeesInput.value;
         const selectedSeats = sc.activeNode.find('selected');
 
@@ -459,6 +477,7 @@
             [seat.settings.data.category]: [...(sortedSeats[seat.settings.data.category] || []), seat]
         }), {});
 
+        sc.activeNode.find('highlighted').status('reserved');
         utils.removeAllChildNodes(selectedSeatConfirmationWrapper);
         reservationConfirmName.textContent = reservationNameInputVal;
         reservationConfirmPhNo.textContent = reservationPhoneNumberInputVal;
@@ -468,8 +487,26 @@
             selectedSeatConfirmationWrapper.appendChild(createSelectedSeatsInCategoryElement(category, sortedSeats[category]));
         }
 
+        const existingAttendee = event.attendees.filter(attendee => String(attendee.phoneNumber) === reservationPhoneNumberInputVal);
+        if (existingAttendee.length === 1) {
+            const noOfReservedSeats = (event.reservedSeats.filter(seat => seat.attendeeId === existingAttendee[0].id)).length;
+            reservationConfirmNoOfPreviousReservations.innerText = noOfReservedSeats;
+            reservationConfirmPreviousReservations.classList.remove("d-none");
+        } else {
+            reservationConfirmPreviousReservations.classList.add("d-none");
+        }
+        
         $(reservationDetailsModal).modal();
     });
+
+
+    reservationConfirmPreviousReservations.addEventListener('click', async function (e) {
+        const existingAttendee = event.attendees.filter(attendee => String(attendee.phoneNumber) === reservationPhoneNumberInput.value.trim());
+        if (existingAttendee.length === 1)  highlightAttendeeSeats(existingAttendee[0].id);
+
+        $(reservationDetailsModal).modal('hide');
+    });
+
 
     confirmReservationButton.addEventListener('click', async function (e) {
         confirmReservationButton.disabled = true;
@@ -500,6 +537,7 @@
         }
     });
 
+
     function onSeatClickCallback() {
         return function () {
             const allSelectedSeats = sc.activeNode.find('selected').seats;
@@ -516,16 +554,16 @@
                         }
                     }
 
-                    updateSeatSelectionButtons(allSelectedSeats.length, (allSelectedSeats.filter(seat => seat.settings.characters === selectedSeatType)).length);
-                    if (allSelectedSeats.length === 0) {
-                        reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
-                    }
+                    updateSeatSelectionInput(allSelectedSeats.length, (allSelectedSeats.filter(seat => seat.settings.character === selectedSeatType)).length + 1);
+                    // if (allSelectedSeats.length === 0) {
+                    //     reservationHeading.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' });
+                    // }
                     return 'selected';
 
                 case 'selected':
                     reserveSeatForm.classList.toggle('d-none', allSelectedSeats.length <= 1);
 
-                    updateSeatSelectionButtons(allSelectedSeats.length, (allSelectedSeats.filter(seat => seat.settings.characters === selectedSeatType)).length);
+                    updateSeatSelectionInput(allSelectedSeats.length, (allSelectedSeats.filter(seat => seat.settings.character === selectedSeatType)).length - 1);
                     return 'available';
 
                 case 'blocked':
@@ -547,6 +585,7 @@
         };
     };
 
+
     selectSeatsUsingSelection = (selectedSeatCharacters) => {
         if (event.seatsPerReservation) {
             if (selectedSeatCharacters.length > event.seatsPerReservation) {
@@ -558,30 +597,44 @@
             reserveSeatForm.classList.remove('d-none');
 
             sc.activeNode.find('selected').status('available');
-            updateSeatSelectionButtons(selectedSeatCharacters.length, (selectedSeatCharacters.filter(character => character === selectedSeatType)).length);
+            updateSeatSelectionInput(selectedSeatCharacters.length, (selectedSeatCharacters.filter(character => character === selectedSeatType)).length);
 
             const seatCharacterCount = utils.countUniqueCharacters(selectedSeatCharacters);
             for (const character in seatCharacterCount) {
                 const availableSeatBlock = sc.findAvailableSeatBlock(character, seatCharacterCount[character], Boolean(event.prioritiseBackRows));
                 sc.activeNode.get(availableSeatBlock).status('selected');
             }
+        } else {
+            sc.activeNode.find('selected').status('available');
         }
     };
 
-    updateSeatSelectionButtons = (totalNoOfSelectedSeats = 0, noOfSelectedSeatsForCurrentType = 0, totalNoOfSeatsLeftForCurrentType = (sc.activeNode.find(`${selectedSeatType}.available`)).length) => {
-        removeSeatFromSelection.disabled = noOfSelectedSeatsForCurrentType <= 0;
-        addSeatToSelection.disabled = (event.seatsPerReservation) ? (totalNoOfSelectedSeats >= event.seatsPerReservation || totalNoOfSeatsLeftForCurrentType === 0) : false;
+
+    updateSeatSelectionInput = (totalNoOfSelectedSeats = 0, noOfSelectedSeatsForCurrentType = 0) => {
+        if (selectedSeatType !== null) {
+            const limit = (event.seatsPerReservation) ? event.seatsPerReservation : event.noOfReservableSeats;
+            const totalNoOfAvailableSeatsInCurrentType = (sc.activeNode.find(`${selectedSeatType}.available`)).length;
+
+            noOfSeatsInput.value = noOfSelectedSeatsForCurrentType;
+            noOfSeatsInput.max = Math.min(noOfSelectedSeatsForCurrentType + (limit - totalNoOfSelectedSeats), totalNoOfAvailableSeatsInCurrentType);
+        }
     };
+
 
     highlightAttendeeSeats = (attendeeId) => {
         const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendeeId);
         if (seatDetails.length === 0) return toast.danger('This attendee does not have any seats reserved for this event!');
 
         sc.activeNode.find('highlighted').status('reserved');
-        sc.activeNode.get(seatDetails.map(seat => seat.seatNumber)).status('highlighted');
+        
+        const seatsToBeHighlighted = sc.activeNode.get(seatDetails.map(seat => seat.seatNumber));
+        if (seatsToBeHighlighted.length !== seatDetails.length) return toast.danger('Please zoom out to view all the seats reserved by the attendee!');
 
-        seatChartCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        seatsToBeHighlighted.status('highlighted');
+
+        // seatChartCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     };
+
 
     populateSeatDetailsModal = (seatId, description, cssClasses) => {
         seatDetailsSeatId.textContent = seatId;
@@ -593,6 +646,7 @@
 
         $(seatDetailsModal).modal();
     };
+
 
     createSelectedSeatsInCategoryElement = (category, seats) => {
         const parentDiv = document.createElement('div');

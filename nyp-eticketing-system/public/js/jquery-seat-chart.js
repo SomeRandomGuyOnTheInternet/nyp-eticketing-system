@@ -892,14 +892,16 @@ class SeatChart {
 
 	findAvailableSeatBlock(character, noOfSeats, prioritiseBackRows = true) {
 		const seatIdMap = sc.activeNode.seatIdMap;
+		const sortedRows = maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length));
+
 		let availableSeatBlock = [];
 		let fallbackSeats = [];
 
-		maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length)).forEach((i) => {
+		for (let i = 0; i < sortedRows.length; i++) {
 			let origin = -1;
 
-			for (let j = 0; j <= sc.map[i].length; j++) {
-				const seat = sc.activeNode.get(seatIdMap[i][j]);
+			for (let j = 0; j <= sc.map[sortedRows[i]].length; j++) {
+				const seat = sc.activeNode.get(seatIdMap[sortedRows[i]][j]);
 				
 				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
 					origin = (origin >= 0) ? origin : j;
@@ -917,7 +919,7 @@ class SeatChart {
 					return availableSeatBlock;
 				}
 			}
-		});
+		}
 
 		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
 	};

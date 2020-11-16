@@ -11,6 +11,7 @@ class Event {
         this.helpers = obj.helpers;
         this.reservedSeats = obj.reservedSeats;
         this.attendees = obj.attendees;
+        this.noOfReservableSeats = obj.noOfReservableSeats;
     }
 
     static parseApiResult(result) {
@@ -21,6 +22,7 @@ class Event {
             startDateTime: result.startDateTime,
             seatsPerReservation: result.seatsPerReservation,
             prioritiseBackRows: result.prioritiseBackRows,
+            noOfReservableSeats: result.noOfReservableSeats,
             venue: Venue.parseApiResult(result.venue),
             seatTypes: result.seatTypes ? result.seatTypes?.map(seatType => SeatType.parseApiResult(seatType)) : [],
             helpers: result.helpers ? result.helpers.map(helper => EventHelper.parseApiResult(helper)) : [],
@@ -37,6 +39,7 @@ class Event {
             startDateTime: this.startDateTime,
             seatsPerReservation: this.seatsPerReservation,
             prioritiseBackRows: this.prioritiseBackRows,
+            noOfReservableSeats: this.noOfReservableSeats,
             venueId: this.venue?.id,
             seatTypes: this.seatTypes?.map(seatType => seatType.convertToApiFormat(this.id)),
             eventHelpers: this.helpers?.map(helper => helper.convertToApiFormat(this.id))

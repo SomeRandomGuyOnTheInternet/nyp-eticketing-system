@@ -198,7 +198,6 @@
 </body>
 
 <script>
-    // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
     const addEventForm = document.getElementById('addEventForm');
     const eventNameInput = document.getElementById('eventNameInput');
     const eventDateTimeInput = document.getElementById('eventDateTimeInput');
@@ -394,12 +393,19 @@
         e.preventDefault();
         createEventButton.disabled = true;
 
+        const seats = sc.activeNode.seats;
+        let reservableSeatCount = 0;
+        for (const id in seats) {
+            if (Boolean(seats[id].settings.data.blocked) === false) reservableSeatCount++
+        }
+
         const event = new Event({
             name: eventNameInput.value,
             seatMap: sc.map,
             startDateTime: eventDateTimeInput.value,
             seatsPerReservation: maxSeatsPerReservationInput.value,
             prioritiseBackRows: prioritiseBackRowRadio.checked,
+            noOfReservableSeats: reservableSeatCount,
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
             helpers: helpers.filter(helper => helper.selected === true)
@@ -410,7 +416,6 @@
             await ajax.post(routes.index.successFlash, "A new event has been created successfully!");
 
             utils.removeUnloadListener();
-            
             window.location.replace("/planner/events");
         } catch (error) {
             utils.handleError(error);
