@@ -1,7 +1,5 @@
 // All planner's webpages are contained here
 
-// TODO: When deleting venues, delete any events that take place in them as well
-
 const express = require('express');
 const router = express.Router();
 
