@@ -16,27 +16,26 @@
                     <h2 class="section-heading">Planners</h2>
                 </div>
                     <div class="col-sm-6 col-12 align-self-end">
-                        <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
-                            <div class="card input-card w-100">
-                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                                <div class="card-body input-card-body">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1">
-                                            <label for="searchReservationInput" class="card-input-label">
-                                                <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
-                                                    Planners</small>
-                                                <!-- The small element is where we actually write down what the input does  -->
-                                            </label>
-                                            <input id="searchPlannerInput" name="searchPlannerInput" class="form-control card-input" type="search"
-                                                placeholder="E.g. John_Doe@mymail.nyp.edu.sg">
-                                        </div>
-                                        <button id="clearSearchPlannerButton" class="btn text-muted d-none" type="button"><i class="fas fa-times"></i></button>
-                                        <button id="searchPlannerButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
-                                        <!-- This is where the user actually inputs all their stuff  -->
+                        <div class="card input-card w-100">
+                            <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <label for="searchReservationInput" class="card-input-label">
+                                            <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                            <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                                Helpers</small>
+                                            <!-- The small element is where we actually write down what the input does  -->
+                                        </label>
+                                        <input id="searchPlannerInput" name="searchPlannerInput" class="form-control card-input" type="search"
+                                            placeholder="E.g. Vignesh">
                                     </div>
+                                    <button id="clearSearchPlannerButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
+                                    <button class="btn text-muted" disabled><i class="fas fa-search"></i></button>
+                                    <!-- This is where the user actually inputs all their stuff  -->
                                 </div>
                             </div>
+                        </div>
                     </div>
                 </div>
             <!-- Table for list of planners -->
@@ -64,7 +63,7 @@
                             </thead>
                             <tbody>
                                 <% for (i = 0; i < planners.length; i++) { %>
-                                    <tr id="<%= planners[i].id %>" class="PlannerRow">
+                                    <tr id="<%= planners[i].id %>" class="plannerRow">
                                         <td><%= i + 1 %></td>
                                         <td class="font-weight-medium"><%= planners[i].name %></td>
                                         <td><%= planners[i].email %></td>
@@ -153,11 +152,12 @@
 </body>
 
 <script>
+    window.LoadingOverlay.show();
     
     const searchPlannerInput = document.getElementById('searchPlannerInput');
     const searchPlannerButton = document.getElementById('searchPlannerButton');
     const clearSearchPlannerButton = document.getElementById('clearSearchPlannerButton');
-    const plannerRow = document.querySelectorAll('.PlannerRow');
+    const plannerRow = document.querySelectorAll('.plannerRow');
     const deletePlannerForms = document.querySelectorAll('.deletePlannerForm');
     const addPlannerForm = document.getElementById('addPlannerForm');
     const nameTextbox = document.getElementById('name');
@@ -166,34 +166,54 @@
     const passwordTextbox = document.getElementById('password');
     const registerButton = document.getElementById('registerButton');
 
-    let planners = [];
-
     window.addEventListener("load", async function(e) {
-        try {
-            planners = (await ajax.get(routes.admin.planners)).map(planner => User.parseApiResult(planner));
-        } catch (error) {
-            return utils.handleError(error);
-        }
-    });
+        new autoComplete({
+            data: {
+                src: async () => {
+                    return (await ajax.get(routes.admin.planners)).map(planner => User.parseApiResult(planner));
+                },
+                key: ["name"]
+            },
+            trigger: {
+                event: ["input", "focusin", "focusout"]
+            },
+            placeHolder: "e.g. John Doe",
+            selector: "#searchPlannerInput",
+            highlight: true,
+            resultsList: {
+                render: true,
+            },
+            resultItem: {
+                content: (data, source) => {
+                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${data.value.email}`;
+                },
+                element: "li"
+            },
+            onSelection: feedback => {
+                const plannerRows = document.querySelectorAll('.plannerRow');
+                plannerRows.forEach(obj => obj.classList.remove("table-active"));
 
+                const selectedRow = document.getElementById(feedback.selection.value.id);
+                selectedRow.classList.add("table-active");
+                selectedRow.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+
+                searchPlannerInput.value = feedback.selection.value.name;
+            }
+        });
+        
+        window.LoadingOverlay.hide();
+    });
+    
     searchPlannerInput.addEventListener('keyup', function (e) {
-        if (e.keyCode == 13) searchPlannerButton.click();
+        if (e.target.value.length === 0) document.querySelectorAll('.plannerRow').forEach(obj => obj.classList.remove("table-active"));
         clearSearchPlannerButton.classList.toggle('d-none', e.target.value.length === 0);
     });
 
+
     clearSearchPlannerButton.addEventListener('click', function (e) {
-        document.querySelectorAll('.PlannerRow').forEach(obj => obj.classList.remove("table-active"));
+        document.querySelectorAll('.helperRow').forEach(obj => obj.classList.remove("table-active"));
         searchPlannerInput.value = '';
         clearSearchPlannerButton.classList.add('d-none');
-    });
-
-    searchPlannerButton.addEventListener('click', function (e) {
-        document.querySelectorAll('.PlannerRow').forEach(obj => obj.classList.remove("table-active"));
-
-        const planner = planners.filter(planner => (planner.email).toLocaleLowerCase() === (searchPlannerInput.value).trim().toLocaleLowerCase() || (planner.name).toLocaleLowerCase() === (searchPlannerInput.value).trim().toLocaleLowerCase());
-        if (planner.length < 1) return toast.danger("This email does not belong to any planner account!");
-
-        document.getElementById(planner[0].id).classList.add("table-active");    
     });
    
     deletePlannerForms.forEach(function(element) {

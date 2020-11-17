@@ -120,6 +120,16 @@ div.col-small-margin {
     hyphens: auto;
 }
 
+.testimonial-group > .row {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.testimonial-group > .row > .col-auto {
+    display: inline-block;
+}
+
 .clickable-div {
     background-position: center;
     transition: background 0.8s;
@@ -156,6 +166,27 @@ div.col-small-margin {
     -moz-animation-iteration-count: 1;
     -moz-animation-timing-function: ease;
 }
+
+.fade-out {
+    animation: fade 2s;
+    -webkit-animation: fade 2s;
+    -moz-animation: fade 2s;
+  }
+  
+  @keyframes fade {
+    from { opacity: 1 }
+    to { opacity: 0 }
+  }
+
+  @-moz-keyframes fade {
+    from { opacity: 1 }
+    to { opacity: 0 }
+  }
+
+  @-webkit-keyframes fade {
+    from { opacity: 1 }
+    to { opacity: 0 }
+  }
 
 @keyframes quickFlash {
     0% {

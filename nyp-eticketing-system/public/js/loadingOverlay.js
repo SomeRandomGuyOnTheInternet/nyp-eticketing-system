@@ -5,13 +5,13 @@ class LoadingOverlay
         this.options = {
             'overlayBackgroundColor': '#ffffff',
             'overlayOpacity': 0.6,
-            'spinnerIcon': 'ball-scale-ripple-multiple',
+            'spinnerIcon': 'square-jelly-box',
             'spinnerColor': '#0f5caf',
             'spinnerSize': '3x',
             'overlayIDName': 'overlay',
             'spinnerIDName': 'spinner',
         };
-        this.stylesheetBaseURL = 'https://cdn.jsdelivr.net/npm/load-awesome@1.1.0/css/';
+        this.stylesheetBaseURL = '/css/loaders/';
         this.spinner = null;
         this.spinnerStylesheetURL = null;
         this.numberOfEmptyDivForSpinner = {

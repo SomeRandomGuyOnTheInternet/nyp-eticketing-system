@@ -6,19 +6,19 @@
     position: absolute;
     z-index: 1000;
     padding: 0;
-    width: 50%;
+    min-width: 50%;
     box-shadow: 0 12.5px 15px rgba(0,0,0,0.05);
     transition: all 0.1s ease-in-out;
     -webkit-transition: all -webkit-transform 0.1s ease;
 }
   
 .autoComplete_result {
-    padding: 0.75rem;
-    max-width: 280px;
+    width: auto;
+    padding: 0.75rem 1rem;
     border-bottom: 0.05rem solid #e3e3e3;
     list-style: none;
     text-align: left;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 400;
     color: #113c69;
     transition: all 0.1s ease-in-out;
@@ -43,6 +43,16 @@
     outline: none;
     background-color:#e4f2ff
 }
+
+.autoComplete_result:first-child:hover {
+    background: rgb(233,244,255);
+    background: linear-gradient(0deg, rgba(233,244,255,1) 30%, rgba(255,255,255,1) 100%);
+}
+
+.autoComplete_result:first-child:focus {
+    background: rgb(228,242,255);
+    background: linear-gradient(0deg, rgba(228,242,255,1) 30%, rgba(255,255,255,1) 100%);
+}
   
 .autoComplete_highlighted {
     opacity: 1;
@@ -58,6 +68,20 @@
 .autoComplete_selected {
     cursor: pointer;
     background-color: #e4f2ff;
+}
+
+.autoComplete_selected:first-child {
+    background: rgb(228,242,255);
+    background: linear-gradient(0deg, rgba(228,242,255,1) 30%, rgba(255,255,255,1) 100%);
+}
+
+input[type=search] + ul#autoComplete_list{
+    display: none;
+  
+}
+
+input[type=search]:focus + ul#autoComplete_list {
+    display: block;
 }
   
 @media only screen and (max-width: 600px) {

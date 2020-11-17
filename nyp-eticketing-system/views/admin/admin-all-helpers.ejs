@@ -16,27 +16,26 @@
                     <h2 class="section-heading">Helpers</h2>
                 </div>
                 <div class="col-sm-6 col-12 align-self-end">
-                    <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
-                        <div class="card input-card w-100">
-                            <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                            <div class="card-body input-card-body">
-                                <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <label for="searchReservationInput" class="card-input-label">
-                                            <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                            <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
-                                                Helpers</small>
-                                            <!-- The small element is where we actually write down what the input does  -->
-                                        </label>
-                                        <input id="searchHelperInput" name="searchHelperInput" class="form-control card-input" type="search"
-                                            placeholder="E.g. 173560N@mymail.nyp.edu.sg">
-                                    </div>
-                                    <button id="clearSearchHelperButton" class="btn text-muted d-none" type="button"><i class="fas fa-times"></i></button>
-                                    <button id="searchHelperButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
-                                    <!-- This is where the user actually inputs all their stuff  -->
+                    <div class="card input-card w-100">
+                        <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card-body input-card-body">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <label for="searchReservationInput" class="card-input-label">
+                                        <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                            Helpers</small>
+                                        <!-- The small element is where we actually write down what the input does  -->
+                                    </label>
+                                    <input id="searchHelperInput" name="searchHelperInput" class="form-control card-input" type="search"
+                                        placeholder="E.g. Vignesh">
                                 </div>
+                                <button id="clearSearchHelperButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
+                                <button class="btn text-muted" disabled><i class="fas fa-search"></i></button>
+                                <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
 
@@ -66,7 +65,7 @@
                             </thead>
                             <tbody>
                                 <% for (i = 0; i < helpers.length; i++) { %>
-                                <tr id="<%= helpers[i].id %>" class="HelperRow">
+                                <tr id="<%= helpers[i].id %>" class="helperRow">
                                     <td scope="row"><%= i + 1 %></td>
                                     <td class="font-weight-medium"><%= helpers[i].name %></td>
                                     <td><%= helpers[i].email %></td>
@@ -174,10 +173,11 @@
 </body>
 
 <script>
+    window.LoadingOverlay.show();
+
     const searchHelperInput = document.getElementById('searchHelperInput');
-    const searchHelperButton = document.getElementById('searchHelperButton');
     const clearSearchHelperButton = document.getElementById('clearSearchHelperButton');
-    const helperRows = document.querySelectorAll('.HelperRow');
+    const helperRows = document.querySelectorAll('.helperRow');
     const deleteHelperForms = document.querySelectorAll('.deleteHelperForm');
     const addHelperForm = document.getElementById('addHelperForm');
     const nameTextbox = document.getElementById('name');
@@ -186,34 +186,53 @@
     const passwordTextbox = document.getElementById('password');
     const registerButton = document.getElementById('registerButton');
 
-    let helpers = [];
-
     window.addEventListener("load", async function(e) {
-        try {
-            helpers = (await ajax.get(routes.admin.helpers)).map(helper => User.parseApiResult(helper));
-        } catch (error) {
-            return utils.handleError(error);
-        }
-    });
+        new autoComplete({
+            data: {
+                src: async () => {
+                    return (await ajax.get(routes.admin.helpers)).map(helper => User.parseApiResult(helper));
+                },
+                key: ["name", "phoneNumber"]
+            },
+            trigger: {
+                event: ["input", "focusin", "focusout"]
+            },
+            placeHolder: "e.g. Vignesh",
+            selector: "#searchHelperInput",
+            highlight: true,
+            resultsList: {
+                render: true,
+            },
+            resultItem: {
+                content: (data, source) => {
+                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
+                },
+                element: "li"
+            },
+            onSelection: feedback => {
+                document.querySelectorAll('.helperRow').forEach(obj => obj.classList.remove("table-active"));
 
+                const selectedRow = document.getElementById(feedback.selection.value.id);
+                selectedRow.classList.add("table-active");
+                selectedRow.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+
+                searchHelperInput.value = feedback.selection.value.name;
+            }
+        });
+        
+        window.LoadingOverlay.hide();
+    });
+    
     searchHelperInput.addEventListener('keyup', function (e) {
-        if (e.keyCode == 13) searchHelperButton.click();
+        if (e.target.value.length === 0) document.querySelectorAll('.helperRow').forEach(obj => obj.classList.remove("table-active"));
         clearSearchHelperButton.classList.toggle('d-none', e.target.value.length === 0);
     });
 
+
     clearSearchHelperButton.addEventListener('click', function (e) {
-        document.querySelectorAll('.HelperRow').forEach(obj => obj.classList.remove("table-active"));
+        document.querySelectorAll('.helperRow').forEach(obj => obj.classList.remove("table-active"));
         searchHelperInput.value = '';
         clearSearchHelperButton.classList.add('d-none');
-    });
-
-    searchHelperButton.addEventListener('click', function (e) {
-        document.querySelectorAll('.HelperRow').forEach(obj => obj.classList.remove("table-active"));
-
-        const helper = helpers.filter(helper => (helper.email).toLocaleLowerCase() === (searchHelperInput.value).trim().toLocaleLowerCase() || (helper.name).toLocaleLowerCase() === (searchHelperInput.value).trim().toLocaleLowerCase());
-        if (helper.length < 1) return toast.danger("This email does not belong to any helper account!");
-
-        document.getElementById(helper[0].id).classList.add("table-active");    
     });
 
     deleteHelperForms.forEach(function(element) {

@@ -5,6 +5,7 @@
 <!-- TODO: update reserved seats on 5s -->
 <!-- TODO: show arrow to indicate the user to scroll up or down instead of scroll straight away -->
 <!-- TODO: custom message -->
+<!-- TODO: convert flash message to notifications -->
 <!-- TODO: delete seat types -->
 <!-- TODO: show whether seats are to be booked from top to bottom/bottom to top -->
 <!-- TODO: show password thing for first time users -->
@@ -41,7 +42,7 @@
                                         <!-- The small element is where we actually write down what the input does  -->
                                     </label>
                                     <input id="searchReservationInput" name="searchReservationInput" class="form-control card-input" type="search"
-                                        placeholder="E.g. 91864675">
+                                        placeholder="E.g. En Qing">
                                 </div>
                                 <button id="clearSearchReservationButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
                                 <button class="btn text-muted" disabled><i class="fas fa-search"></i></button>
@@ -259,7 +260,7 @@
     </div>
 </body>
 
-<script async>
+<script>
     window.LoadingOverlay.show();
 
     const eventId = <%= event.id %>;
@@ -362,7 +363,7 @@
             },
             resultItem: {
                 content: (data, source) => {
-                    source.innerHTML = `${data.match} • ${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
+                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
                 },
                 element: "li"
             },
@@ -530,7 +531,7 @@
         if (existingAttendee.length === 1) {
             const noOfReservedSeats = (event.reservedSeats.filter(seat => seat.attendeeId === existingAttendee[0].id)).length;
             reservationConfirmNoOfPreviousReservations.innerText = noOfReservedSeats;
-            reservationConfirmPreviousReservations.classList.remove("d-none");
+            reservationConfirmPreviousReservations.classList.toggle("d-none", noOfReservedSeats === 0);
         } else {
             reservationConfirmPreviousReservations.classList.add("d-none");
         }
@@ -561,21 +562,29 @@
 
         try {
             attendee = await ajax.post(routes.helper.reservations, attendee);
+            await ajax.post(routes.index.successFlash, 'The reservation has been created successfully!');
         } catch (error) {
-            window.LoadingOverlay.hide();
             confirmReservationButton.disabled = true;
+            window.LoadingOverlay.hide();
             return utils.handleError(error);
         }
 
         try {
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
-            await ajax.post(routes.index.successFlash, 'The reservation has been created successfully!');
         } catch (error) {
             await ajax.post(routes.index.errorFlash, 'Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.');
-        } finally {
-            utils.removeUnloadListener();
-            window.location.reload();
         }
+
+        if (sc.activeNode.find('available').seats.length === 0) {
+            try {
+                await ajax.delete(`${routes.helper.events}/${eventId}/extra-attendees`);
+            } catch (error) {
+                await ajax.post(routes.index.errorFlash, 'Something went wrong while deleting all the attendees in the waiting list due to the event being fully booked!');
+            }
+        }
+
+        utils.removeUnloadListener();
+        window.location.reload();
     });
 
 

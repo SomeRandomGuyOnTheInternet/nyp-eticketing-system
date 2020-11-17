@@ -12,28 +12,27 @@
                     <h2 class="section-heading">Venues</h2>
                 </div>
                 <div class="col-sm-6 col-12 align-self-end">
-                        <!-- If you want something to launch a modal, you need to add a data-toggle and data-target attribute as shown in this example. The data-target must match the id of the modal you created -->
-                            <div class="card input-card w-100">
-                                <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
-                                <div class="card-body input-card-body">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1">
-                                            <label for="searchReservationInput" class="card-input-label">
-                                                <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                                <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
-                                                    Venues</small>
-                                                <!-- The small element is where we actually write down what the input does  -->
-                                            </label>
-                                            <input id="searchVenueInput" name="searchVenueInput" class="form-control card-input" type="search"
-                                                placeholder="E.g. Auditorium">
-                                        </div>
-                                        <button id="clearSearchVenueButton" class="btn text-muted d-none" type="button"><i class="fas fa-times"></i></button>
-                                        <button id="searchVenueButton" class="btn text-primary" type="button"><i class="fas fa-search"></i></button>
-                                        <!-- This is where the user actually inputs all their stuff  -->
-                                    </div>
+                    <div class="card input-card w-100">
+                        <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card-body input-card-body">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <label for="searchVenuesInput" class="card-input-label">
+                                        <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                        <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                            Helpers</small>
+                                        <!-- The small element is where we actually write down what the input does  -->
+                                    </label>
+                                    <input id="searchVenueInput" name="searchVenueInput" class="form-control card-input" type="search"
+                                        placeholder="E.g. Auditorium">
                                 </div>
+                                <button id="clearSearchVenueButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
+                                <button class="btn text-muted" disabled><i class="fas fa-search"></i></button>
+                                <!-- This is where the user actually inputs all their stuff  -->
                             </div>
+                        </div>
                     </div>
+                </div>
             </div>
             <div class="mt-0"></div> <!-- This spacing is different from the rest cause having multiple inline elements in the heading kinda screws up the spacing, so have to set it to zero to make it look consistent with the rest -->
             <!-- Content  -->
@@ -52,7 +51,7 @@
                             </thead>
                             <tbody>
                                 <% for (i = 0; i < venues.length; i++) { %>
-                                    <tr id="<%= venues[i].id %>" class="VenueRow">
+                                    <tr id="<%= venues[i].id %>" class="venueRow">
                                         <td scope="row"><%= i + 1 %></td>
                                         <td class="font-weight-medium"><a href="/admin/venues/<%= venues[i].id %>"><%= venues[i].name %></a></td>
                                         <td><%= moment(venues[i].createdAt).format('Do MMMM YYYY') %></td>
@@ -79,37 +78,56 @@
     const searchVenueInput = document.getElementById('searchVenueInput');
     const searchVenueButton = document.getElementById('searchVenueButton');
     const clearSearchVenueButton = document.getElementById('clearSearchVenueButton');
-    const venueRows = document.querySelectorAll('.VenueRow');
+    const venueRows = document.querySelectorAll('.venueRow');
     const deleteVenueForms = document.querySelectorAll('.deleteVenueForm');
 
     let venues = [];
 
     window.addEventListener("load", async function(e) {
-        try {
-            venues = (await ajax.get(routes.admin.venues)).map(venue => User.parseApiResult(venue));
-        } catch (error) {
-            return utils.handleError(error);
-        }
-    });
+        new autoComplete({
+            data: {
+                src: async () => {
+                    return (await ajax.get(routes.admin.venues)).map(venue => Venue.parseApiResult(venue));
+                },
+                key: ["name"]
+            },
+            placeHolder: "e.g. Auditorium",
+            selector: "#searchVenueInput",
+            highlight: true,
+            resultsList: {
+                render: true,
+            },
+            resultItem: {
+                content: (data, source) => {
+                    source.innerHTML = data.match;
+                },
+                element: "li"
+            },
+            onSelection: feedback => {
+                const venueRows = document.querySelectorAll('.venueRow');
+                venueRows.forEach(obj => obj.classList.remove("table-active"));
 
+                const selectedRow = document.getElementById(feedback.selection.value.id);
+                selectedRow.classList.add("table-active");
+                selectedRow.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+
+                searchVenueInput.value = feedback.selection.value.name;
+            }
+        });
+        
+        window.LoadingOverlay.hide();
+    });
+    
     searchVenueInput.addEventListener('keyup', function (e) {
-        if (e.keyCode == 13) searchVenueButton.click();
+        if (e.target.value.length === 0) document.querySelectorAll('.venueRow').forEach(obj => obj.classList.remove("table-active"));
         clearSearchVenueButton.classList.toggle('d-none', e.target.value.length === 0);
     });
 
+
     clearSearchVenueButton.addEventListener('click', function (e) {
-        document.querySelectorAll('.VenueRow').forEach(obj => obj.classList.remove("table-active"));
+        document.querySelectorAll('.venueRow').forEach(obj => obj.classList.remove("table-active"));
         searchVenueInput.value = '';
         clearSearchVenueButton.classList.add('d-none');
-    });
-
-    searchVenueButton.addEventListener('click', function (e) {
-        document.querySelectorAll('.VenueRow').forEach(obj => obj.classList.remove("table-active"));
-
-        const venue = venues.filter(venue => (venue.name).toLocaleLowerCase() === (searchVenueInput.value).trim().toLocaleLowerCase());
-        if (venue.length < 1) return toast.danger("This name does not belong to any available venues!");
-
-        document.getElementById(venue[0].id).classList.add("table-active");    
     });
 
     deleteVenueForms.forEach(function(element) {
