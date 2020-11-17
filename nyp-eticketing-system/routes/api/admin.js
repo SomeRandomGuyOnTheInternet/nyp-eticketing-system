@@ -211,6 +211,7 @@ router.delete('/venues/:id', auth.isAdmin, async (req, res) => {
     
     try {
         await Venue.destroy({ where: { id: id } });
+        await Event.destroy({ where: { venueId: id } })
 
         return respond.success(res, "The venue has been deleted successfully!");
     } catch (error) {

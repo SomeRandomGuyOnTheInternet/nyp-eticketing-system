@@ -4,7 +4,6 @@
 <!-- TODO: on event fully booked, remove all waiting list people and send message to all waiting list -->
 <!-- TODO: update reserved seats on 5s -->
 <!-- TODO: show arrow to indicate the user to scroll up or down instead of scroll straight away -->
-<!-- TODO: cancel reserservation -->
 <!-- TODO: custom message -->
 <!-- TODO: delete seat types -->
 <!-- TODO: show whether seats are to be booked from top to bottom/bottom to top -->
@@ -586,14 +585,19 @@
 
         const check = confirm("Are you sure you want to delete this seat reservation?");
         if (check === true) {
+            seatReservationDeleteBtn.disabled = true;
+            window.LoadingOverlay.show();
+
             try {
                 await ajax.delete(`${routes.helper.events}/${eventId}/seats/${seatNumber}`);
                 await ajax.post(routes.index.successFlash, 'Successfully deleted reservation!');
-            } catch (error) {
-                await ajax.post(routes.index.errorFlash, 'Something went wrong while deleting the reservation! Please try again later.');
-            } finally {
                 utils.removeUnloadListener();
                 window.location.reload();
+            } catch (error) {
+                utils.handleError(error);
+            } finally {
+                window.LoadingOverlay.hide();
+                seatReservationDeleteBtn.disabled = false;
             }
         }
     });
