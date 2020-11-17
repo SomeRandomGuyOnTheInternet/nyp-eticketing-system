@@ -1,12 +1,14 @@
-<!-- TODO: Make button have a loading icon -->
 <!-- TODO: gap detection -->
 <!-- TODO: save base map in class, so can use zoom properly -->
 <!-- TODO: autocomplete on search fields -->
-<!-- TODO: scroll to highlighted row -->
 <!-- TODO: on event fully booked, remove all waiting list people and send message to all waiting list -->
-<!-- TODO: update reserved seats on time out -->
-<!-- TODO: undo map seat replacements -->
+<!-- TODO: update reserved seats on 5s -->
 <!-- TODO: show arrow to indicate the user to scroll up or down instead of scroll straight away -->
+<!-- TODO: cancel reserservation -->
+<!-- TODO: custom message -->
+<!-- TODO: delete seat types -->
+<!-- TODO: show whether seats are to be booked from top to bottom/bottom to top -->
+<!-- TODO: show password thing for first time users -->
 
 <%- include('../templates/head')-%>
 
@@ -215,7 +217,9 @@
                                     <br>
                                     <span id="seatDetailsDescription" class="align-self-center"></span>
                                 </div>
-                                <!-- <i id="seatDetailsDelete" class="d-flex justify-content-end align-items-center fa fa-trash text-danger" style="font-size: 25px;"></i> -->
+                                <button id="seatReservationDeleteBtn" type="button" class="btn btn-lg btn-link flex justify-content-end align-items-center d-none" data-seat-number="">
+                                    <i class="d- fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -242,8 +246,6 @@
                                     </div>
                                     <div id="reservationConfirmPreviousReservations" class="text-primary font-weight-medium mt-3 text-break pointer-cursor d-none">
                                         <span id="reservationConfirmNoOfPreviousReservations" class="font-weight-bold">0</span> seats previously reserved
-                                    </div>
-                                    <div id="previousSeatReservationsWrapper" class="mb-3 d-none">
                                     </div>
                                 </div>
                             </div>
@@ -288,6 +290,7 @@
     const seatDetailsSeatCell = document.getElementById('seatDetailsSeatCell');
     const seatDetailsSeatId = document.getElementById('seatDetailsId');
     const seatDetailsDescription = document.getElementById('seatDetailsDescription');
+    const seatReservationDeleteBtn = document.getElementById('seatReservationDeleteBtn');
     const waitingListContainer = document.getElementById('waitingListContainer');
     const waitingListRows = document.querySelectorAll('.waitingListRow');
     const waitingListViewReservationIcon = document.querySelectorAll('.waitingListViewReservationIcon');
@@ -347,24 +350,17 @@
         new autoComplete({
             data: {
                 src: event.attendees,
-                key: ["name", "phoneNumber"],
-                cache: false
-            },
-            query: {
-                manipulate: function(query) {
-                    return query.replace("@pizza", "burger");
-                },
+                key: ["name", "phoneNumber"]
             },
             trigger: {
                 event: ["input", "focusin", "focusout"]
             },
             placeHolder: "e.g. En Qing",
             selector: "#searchReservationInput",
+            highlight: true,
             resultsList: {
                 render: true,
             },
-            maxResults: 5,
-            highlight: true,
             resultItem: {
                 content: (data, source) => {
                     source.innerHTML = `${data.match} • ${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
@@ -584,6 +580,25 @@
     });
 
 
+    seatReservationDeleteBtn.addEventListener('click', async function (e) {
+        const seatNumber = seatReservationDeleteBtn.getAttribute("data-seat-number");
+        if (!seatNumber) return toast.danger("Something went wrong while deleting this reservation. Please try again later!");
+
+        const check = confirm("Are you sure you want to delete this seat reservation?");
+        if (check === true) {
+            try {
+                await ajax.delete(`${routes.helper.events}/${eventId}/seats/${seatNumber}`);
+                await ajax.post(routes.index.successFlash, 'Successfully deleted reservation!');
+            } catch (error) {
+                await ajax.post(routes.index.errorFlash, 'Something went wrong while deleting the reservation! Please try again later.');
+            } finally {
+                utils.removeUnloadListener();
+                window.location.reload();
+            }
+        }
+    });
+
+
     function onSeatClickCallback() {
         return function () {
             const allSelectedSeats = sc.activeNode.find('selected').seats;
@@ -611,6 +626,7 @@
 
                 case 'blocked':
                     populateSeatDetailsModal(this.settings.id, `Blocked for ${this.settings.data.category}`, this.settings.data.classes);
+                    seatReservationDeleteBtn.classList.add("d-none");
                     return 'blocked';
 
                 case 'highlighted':
@@ -620,6 +636,8 @@
                     if (attendee.length !== 1) return this.style();
 
                     populateSeatDetailsModal(`${this.settings.id} • ${this.settings.data.category}`, `Reserved for ${attendee[0].name} • ${attendee[0].phoneNumber}`, this.settings.data.classes);
+                    seatReservationDeleteBtn.classList.remove("d-none");
+                    seatReservationDeleteBtn.setAttribute("data-seat-number", this.settings.id);
                     return this.status();
 
                 default:
