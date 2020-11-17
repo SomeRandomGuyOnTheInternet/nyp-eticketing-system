@@ -1,4 +1,3 @@
-// TODO: Show error if no input
 
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
