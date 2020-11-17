@@ -1,5 +1,4 @@
 <!-- TODO: Complete documentation for this part -->
-<!-- TODO: Delete seat types -->
 
 <%- include('../templates/head')-%>
 
@@ -93,13 +92,23 @@
                             </div>
                         </div>
                     </div>
-                    <div id="noOfReservationContainer" class="col-sm-6 d-none">
+                    <div id="noOfReservationContainer" class="col-sm-3 d-none">
                         <div class="card input-card mt-3">
                             <div class="card-body input-card-body">
                                 <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle mb-2 text-secondary font-weight-normal">No. of Available Seats</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
                                 <span id="noOfReservation" class="h4 text-primary">1000 / 1200</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="percentageOfReservationContainer" class="col-sm-3 d-none">
+                        <div class="card input-card mt-3">
+                            <div class="card-body input-card-body">
+                                <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">% of Reserved Seat</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <span id="percenetageOfReservation" class="h4 text-primary">69%</span>
                             </div>
                         </div>
                     </div>
@@ -227,6 +236,8 @@
     const venueSelectInput = document.getElementById('venueSelectInput');
     const noOfReservationContainer = document.getElementById('noOfReservationContainer');
     const noOfReservation = document.getElementById('noOfReservation');
+    const percentageOfReservationContainer = document.getElementById('percentageOfReservationContainer');
+    const percenetageOfReservation = document.getElementById('percenetageOfReservation');
     const mapWrapper = document.getElementById('tableWrapper');
     const seatMap = document.getElementById('seatMap');
     const legend = document.getElementById('editMapLegend');
@@ -329,14 +340,17 @@
             venueSelectInput.disabled = true;
             noOfReservationContainer.classList.remove('d-none');
             noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
+            percentageOfReservationContainer.classList.remove('d-none');
+            percenetageOfReservation.innerText = `${Math.round(((event.reservedSeats.length / event.noOfReservableSeats) * 100 + Number.EPSILON) * 100) / 100}%`;
         }
 
         sc.map = event.seatMap;
         sc.seatTypes = event.seatTypes;
-        sc.legends = sc.seatTypes.reduce(function(legends, seatType){
-            if (seatType.char !== defaultSeatType) {
-                legends.push([seatType.char, "available", seatType.category.concat((seatType.blocked) ? " (Blocked)" : ""), (event.reservedSeats.length > 0) ? null : selectableLegendClasses]);
+        sc.legends = sc.seatTypes.reduce(function(legends, seatType) {
+            if (event.reservedSeats.length === 0 && seatType.char === defaultSeatType) {
+                return legends;
             }
+            legends.push([seatType.char, "available", seatType.category.concat((seatType.blocked) ? " (Blocked)" : ""), (event.reservedSeats.length > 0) ? null : selectableLegendClasses]);
             return legends;
         }, []);
 

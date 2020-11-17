@@ -23,11 +23,9 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 
     try {
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
-
         if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
 
         let event = await Event.findByPk(eventId, { raw: true });
-
         if (!event) return respond.error(res, "Please provide a valid event ID!");
 
         event.seatMap = JSON.parse(event.seatMap);
@@ -40,6 +38,32 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
     } catch (error) {
         console.error(error);
         return respond.error(res, "Something went wrong while getting the event details. Please try again later!", 500);
+    }
+});
+
+router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) => {
+    const eventId = req.params.id;
+    const seatNumber = req.params.seatNumber;
+
+    try {
+        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+        if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
+
+        const reservedSeat = await EventReservedSeat.findOne({
+            where: { 
+                eventId: eventId,
+                seatNumber: seatNumber
+
+            }
+        });
+        if (!reservedSeat) return respond.error(res, "No reservations were found with this seat number for this event!", 404);
+
+        reservedSeat.destroy();
+
+        return respond.success(res, "Successfully deleted seat reservation!");
+    } catch (error) {
+        console.error(error);
+        return respond.error(res, "Something went wrong while deleting the reservation. Please try again later!", 500);
     }
 });
 
@@ -165,45 +189,6 @@ router.put('/event/reservations/:id', auth.isHelper, async (req, res) => {
 });
 
 router.post('/sms-reservation-confirm', auth.isHelper, async (req, res) => {
-    const attendeeId = req.body.attendeeId;
-
-    if (!attendeeId) {
-        return respond.error(res, "Please provide an attendee id to send the confirmation to!");
-    }
-
-    try {
-        const attendee = await EventAttendee.getEventAttendeeById(attendeeId);
-        const reservedSeats = await EventReservedSeat.getAttendeeReservedSeat(attendee.id);
-        const event = await Event.getEventById(attendee.eventId);
-        
-        const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
-
-        const sms = await axios.post(
-            'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
-            `SMSAccount=${process.env.SMS_USERNAME}&Pwd=${process.env.SMS_PASSWORD}&Mobile=${attendee.phoneNumber}&Message=${message}`, 
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            }
-        );
-    
-        const dataRes = XML.parse(sms.data);
-    
-        if (dataRes._Data === "Success") {
-            return respond.success(res, "Successfully sent confirmation!");
-        } else {
-            console.error(dataRes._Data)
-            return respond.error(res, "Please provide a valid eight digit mobile number!");
-        }
-    } catch (error) {
-        console.error(error);
-        return respond.error(res, "Something went wrong while getting the attendee details for sending the SMS. Please try again later!", 500);
-    }
-});
-
-
-router.post('/event/attendees', auth.isHelper, async (req, res) => {
     const attendeeId = req.body.attendeeId;
 
     if (!attendeeId) {
