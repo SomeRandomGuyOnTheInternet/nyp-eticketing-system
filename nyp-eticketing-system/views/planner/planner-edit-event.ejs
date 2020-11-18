@@ -539,6 +539,7 @@
                 noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
                 percentageOfReservationContainer.classList.remove('d-none');
                 percenetageOfReservation.innerText = `${Math.round(((event.reservedSeats.length / event.noOfReservableSeats) * 100 + Number.EPSILON) * 100) / 100}%`;
+                sc.activeNode.find('reserved').status('available');
                 sc.disableReservedSeats(event.reservedSeats);
             }
             await new Promise(resolve => setTimeout(resolve, 5000));

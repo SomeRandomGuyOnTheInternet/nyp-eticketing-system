@@ -5,7 +5,7 @@ class LoadingOverlay
         this.options = {
             'overlayBackgroundColor': '#ffffff',
             'overlayOpacity': 0.6,
-            'spinnerIcon': 'square-jelly-box',
+            'spinnerIcon': 'ball-clip-rotate-pulse',
             'spinnerColor': '#0f5caf',
             'spinnerSize': '3x',
             'overlayIDName': 'overlay',
