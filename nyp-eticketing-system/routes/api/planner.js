@@ -65,6 +65,7 @@ router.post('/events', auth.isPlanner, async (req, res) => {
     const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
     const noOfReservableSeats = req.body.noOfReservableSeats;
+    const fullyBookedMessage = req.body.fullyBookedMessage === '' ? null : req.body.fullyBookedMessage;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;
     const eventHelpers = req.body.eventHelpers;
@@ -73,6 +74,7 @@ router.post('/events', auth.isPlanner, async (req, res) => {
     if (!name) return respond.error(res, "Please provide a event name!");
     if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
     if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
+    if (!fullyBookedMessage) return respond.error(res, "Please provide a message to be sent to attendees in the waiting list to notify them about the event being fully booked!");
     if (isNaN(noOfReservableSeats)) return respond.error(res, "Please provide a valid number of reservable seats for this event!");
     if (noOfReservableSeats < 0) return respond.error(res, "Please provide a higher number of reservable seats for this event!");
     if (noOfReservableSeats > 2000) return respond.error(res, "Please provide a lower number of reservable seats for this event!");
@@ -100,6 +102,7 @@ router.post('/events', auth.isPlanner, async (req, res) => {
             seatsPerReservation: seatsPerReservation,
             prioritiseBackRows: prioritiseBackRows,
             noOfReservableSeats: noOfReservableSeats,
+            fullyBookedMessage: fullyBookedMessage,
             venueId: venueId
         },{
             transaction: t
@@ -137,6 +140,7 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
     const seatsPerReservation = req.body.seatsPerReservation === '' ? null : req.body.seatsPerReservation;
     const prioritiseBackRows = req.body.prioritiseBackRows;
     const noOfReservableSeats = req.body.noOfReservableSeats;
+    const fullyBookedMessage = req.body.fullyBookedMessage === '' ? null : req.body.fullyBookedMessage;
     const venueId = req.body.venueId;
     const seatTypes = req.body.seatTypes;
     const eventHelpers = req.body.eventHelpers;
@@ -145,6 +149,7 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
     if (!name) return respond.error(res, "Please provide a event name!");
     if (!seatMap) return respond.error(res, "Please provide a seat map for the event!");
     if (!startDateTime) return respond.error(res, "Please provide a valid start date/time for the event!");
+    if (!fullyBookedMessage) return respond.error(res, "Please provide a message to be sent to attendees in the waiting list to notify them about the event being fully booked!");
     if (isNaN(noOfReservableSeats)) return respond.error(res, "Please provide a valid number of reservable seats for this event!");
     if (noOfReservableSeats < 0) return respond.error(res, "Please provide a higher number of reservable seats for this event!");
     if (noOfReservableSeats > 2000) return respond.error(res, "Please provide a lower number of reservable seats for this event!");
@@ -177,6 +182,7 @@ router.put('/events/:id', auth.isPlanner, async (req, res) => {
                 seatsPerReservation: seatsPerReservation,
                 prioritiseBackRows: prioritiseBackRows,
                 noOfReservableSeats: noOfReservableSeats,
+                fullyBookedMessage: fullyBookedMessage,
                 venueId: venueId
             },
             { 

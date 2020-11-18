@@ -112,6 +112,8 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
         if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
 
+        const event = await Event.findByPk(eventId);
+
         let attendeesWithExtraAttendees = await EventAttendee.findAll({ 
             where: {
                 noOfExtraAttendees: { [sequelize.Op.not]: 0 }
@@ -124,7 +126,7 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
         }
 
         for (let i = 0; i < attendeesWithExtraAttendees.length; i++) {
-            await sendSMS(attendeesWithExtraAttendees[i].phoneNumber, "Your entry in the waiting list has been removed because the event is fully booked.");
+            await sendSMS(attendeesWithExtraAttendees[i].phoneNumber, event.fullyBookedMessage);
         }
 
         return respond.success(res, "Successfully deleted extra attendees from the waiting list!");

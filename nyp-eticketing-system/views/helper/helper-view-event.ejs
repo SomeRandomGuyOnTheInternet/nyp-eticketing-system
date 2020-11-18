@@ -572,7 +572,7 @@
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
             await ajax.post(routes.notification.success, 'Confirmation SMS has been sent successfully to the attendee!');
         } catch (error) {
-            await ajax.post(routes.notification.success, 'Something went wrong while sending the confirmation SMS to the attendee! Please provide them with their reservation details manually.');
+            await ajax.post(routes.notification.danger, 'Something went wrong while sending the confirmation SMS to the attendee! Please provide them with their reservation details manually.');
         }
 
         if (sc.activeNode.find('available').seats.length === 0) {

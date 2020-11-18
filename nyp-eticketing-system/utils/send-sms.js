@@ -9,6 +9,8 @@ module.exports = (phoneNumber, message) => {
             if (!phoneNumber) throw new Error("Please provide a phone number!");
             if (!message) return new Error("Please provide a message!");
 
+            message = "(NYP eTicketing System) " + message;
+
             const sms = await axios.post(
                 'https://sms.sit.nyp.edu.sg/SMSWebService/sms.asmx/sendMessage', 
                 `SMSAccount=${process.env.SMS_USERNAME}&Pwd=${process.env.SMS_PASSWORD}&Mobile=${phoneNumber}&Message=${message}`, 

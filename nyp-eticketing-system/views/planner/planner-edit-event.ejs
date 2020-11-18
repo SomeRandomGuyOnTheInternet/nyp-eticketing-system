@@ -52,7 +52,7 @@
                         <div class="card input-card mt-3">
                             <div class="card-body inline-check-card-body">
                                 <label for="prioritiseRowLabelCheckForm" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Seat selection algorithm should prioritise</small> <!-- The small element is where we actually write down what the input does  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Seats should be filled in</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
                                 <div id="prioritiseRowLabelCheckForm" class="py-1"> <!-- All check input elements should be enclosed in a div with a unique id  -->
                                     <div class="form-check form-check-inline">
@@ -68,6 +68,17 @@
                                         </label>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Message on Event Full Input Card  -->
+                    <div class="col-sm-12">
+                        <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                            <div class="card-body input-card-body">
+                                <label for="fullyBookedMessageInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">SMS to send attendees upon fully booking event</small> <!-- The small element is where we actually write down what the input does  -->
+                                </label>
+                                <textarea id="fullyBookedMessageInput" name="fullyBookedMessageInput" class="form-control card-input" rows="2" placeholder="Enter a message here to send to attendees once they are removed from the waiting list"><%= event.fullyBookedMessage ? event.fullyBookedMessage : "The event has been fully booked, thus your entry in the waiting list has been revoked. Sorry for the inconvenience and we hope to see you soon!" %></textarea>
                             </div>
                         </div>
                     </div>
@@ -232,6 +243,7 @@
     const eventDateTimeInput = document.getElementById('eventDateTimeInput');
     const maxSeatsPerReservationInput = document.getElementById('maxSeatsPerReservationInput');
     const prioritiseBackRowRadio = document.getElementById('backRow');
+    const fullyBookedMessageInput = document.getElementById('fullyBookedMessageInput');
     const venueSelect = document.getElementById('venueSelect');
     const venueSelectInput = document.getElementById('venueSelectInput');
     const noOfReservationContainer = document.getElementById('noOfReservationContainer');
@@ -487,6 +499,7 @@
             seatsPerReservation: maxSeatsPerReservationInput.value,
             prioritiseBackRows: prioritiseBackRowRadio.checked,
             noOfReservableSeats: reservableSeatCount,
+            fullyBookedMessage: fullyBookedMessageInput.value,
             venue: Venue.selectedOption(venues, venueSelectInput),
             seatTypes: sc.seatTypes,
             helpers: helpers.filter(helper => helper.selected === true)
