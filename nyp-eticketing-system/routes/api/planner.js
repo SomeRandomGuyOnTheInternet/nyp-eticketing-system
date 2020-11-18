@@ -236,7 +236,7 @@ router.delete('/events/:id', auth.isPlanner, async (req, res) => {
     }
 });
 
-router.get('/reservations/:id', auth.isPlanner, async (req, res) => {
+router.get('/events/:id/reservations', auth.isPlanner, async (req, res) => {
     const eventId = req.params.id;
 
     try {
