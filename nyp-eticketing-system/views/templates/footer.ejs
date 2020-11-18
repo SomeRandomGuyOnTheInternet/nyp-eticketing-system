@@ -10,9 +10,25 @@
     </div>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(async function() {
             $("body").tooltip({ selector: '[data-toggle=tooltip]' }); // This just ensures that the tooltips shown are the custom bootstrap ones, instead of the system ones
             $('.toast').not('.hide').toast('show'); // Show all unhidden toasts on page load
+            <% if (locals.user) { %>
+            const notifications = await ajax.get(routes.notification.getAllUnseen);
+            for (let i = 0; i < notifications.length; i++) {
+                switch (notifications[i].type) {
+                    case "success":
+                        toast.notify.success(notifications[i].message);
+                        break;
+                    case "danger":
+                        toast.notify.danger(notifications[i].message);
+                        break;
+                    default:
+                        toast.notify.success(notifications[i].message);
+                        break;
+                }
+            }
+            <% } %> 
         });
     </script>
 </html>

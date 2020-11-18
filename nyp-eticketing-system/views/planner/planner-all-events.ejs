@@ -66,7 +66,7 @@
             if (check === true) {
                 try {
                     await ajax.delete(e.target.action);
-                    await ajax.post(routes.index.successFlash, "Event has been deleted successfully!");
+                    await ajax.post(routes.notification.success, "Event has been deleted successfully!");
 
                     window.location.replace('/planner/events');
                 } catch (error) {

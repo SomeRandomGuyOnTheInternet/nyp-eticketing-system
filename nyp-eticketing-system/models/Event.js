@@ -1,4 +1,3 @@
-const { truncate } = require('lodash');
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
 
@@ -26,6 +25,9 @@ const Event = db.define('Event', {
     },
     noOfReservableSeats: {
         type: Sequelize.INTEGER
+    },
+    fullyBookedMessage: {
+        type: Sequelize.STRING
     },
     isDeleted: {
         type: Sequelize.BOOLEAN,

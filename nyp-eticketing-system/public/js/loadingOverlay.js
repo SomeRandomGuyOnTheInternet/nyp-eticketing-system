@@ -99,9 +99,9 @@ class LoadingOverlay
         if (stylesheet) {
             stylesheet.disabled = true;
             stylesheet.parentNode.removeChild(stylesheet);
-
-            document.getElementById(this.options.overlayIDName).remove();
-            document.getElementById(this.options.spinnerIDName).remove();
+            
+            document.getElementById(this.options.overlayIDName).parentNode.removeChild(overlay);
+            document.getElementById(this.options.spinnerIDName).parentNode.removeChild(spinner);
         }
     }
 

@@ -334,11 +334,11 @@
         const seatIsBlocked = blockSeatTypeCheck.checked;
         console.log(availableSeatCharacters)
 
-        if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
+        if (availableSeatCharacters.length < 1) return toast.flash.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         const seatCharacter = availableSeatCharacters[0];
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
 
-        if (seatName === "") return toast.danger("Please enter a seat name!");
+        if (seatName === "") return toast.flash.danger("Please enter a seat name!");
         if (seatCharacter.length != 1) utils.throwException("The string for the seat's character is not a single length character!");
 
         const seatType = new SeatType({ 
@@ -419,7 +419,7 @@
 
         try {
             await ajax.post(routes.planner.events, event.convertToApiFormat());
-            await ajax.post(routes.index.successFlash, "A new event has been created successfully!");
+            await ajax.post(routes.notification.success, "A new event has been created successfully!");
 
             utils.removeUnloadListener();
             window.location.replace("/planner/events");

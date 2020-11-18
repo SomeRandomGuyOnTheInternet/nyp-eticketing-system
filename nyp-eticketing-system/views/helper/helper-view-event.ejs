@@ -465,9 +465,9 @@
                 return filtered;
             }, []);
 
-            if (isNaN(noOfSeats)) return toast.danger("Please provide a valid number of seats!");
-            if (noOfSeats < 0) return toast.danger("Please provide a higher number of seats!");
-            if (noOfSeats > (sc.activeNode.find(`${selectedSeatType}.available`)).length) return toast.danger("Please provide a lower number of seats!");
+            if (isNaN(noOfSeats)) return toast.flash.danger("Please provide a valid number of seats!");
+            if (noOfSeats < 0) return toast.flash.danger("Please provide a higher number of seats!");
+            if (noOfSeats > (sc.activeNode.find(`${selectedSeatType}.available`)).length) return toast.flash.danger("Please provide a lower number of seats!");
 
             for (var i = 0; i < noOfSeats; i++) selectedSeatCharacters.push(selectedSeatType);
 
@@ -493,7 +493,7 @@
                 this.classList.toggle('fa-eye-slash', wasActive);
                 this.classList.toggle('fa-eye', !wasActive);
             } else {
-                return toast.danger('Something went wrong while retrieving the seats for that attendee!');
+                return toast.flash.danger('Something went wrong while retrieving the seats for that attendee!');
             }
         });
     });
@@ -507,10 +507,10 @@
         const noOfExtraAttendeesInputVal = noOfExtraAttendeesInput.value;
         const selectedSeats = sc.activeNode.find('selected');
 
-        if (selectedSeats.length === 0) return toast.danger('Please select some seats to reserve for the attendee!');
-        if (reservationNameInputVal === '') return toast.danger('Please enter a name for the attendee!');
-        if (reservationPhoneNumberInputVal === '') return toast.danger('Please enter a phone number for the attendee!');
-        if (!(/^(8|9)[0-9]{7}$/.test(reservationPhoneNumberInputVal))) return toast.danger('Please enter a valid phone number for the attendee!');
+        if (selectedSeats.length === 0) return toast.flash.danger('Please select some seats to reserve for the attendee!');
+        if (reservationNameInputVal === '') return toast.flash.danger('Please enter a name for the attendee!');
+        if (reservationPhoneNumberInputVal === '') return toast.flash.danger('Please enter a phone number for the attendee!');
+        if (!(/^(8|9)[0-9]{7}$/.test(reservationPhoneNumberInputVal))) return toast.flash.danger('Please enter a valid phone number for the attendee!');
 
         const sortedSeats = selectedSeats.seats.reduce((sortedSeats, seat) => ({
             ...sortedSeats,
@@ -562,7 +562,7 @@
 
         try {
             attendee = await ajax.post(routes.helper.reservations, attendee);
-            await ajax.post(routes.index.successFlash, 'The reservation has been created successfully!');
+            await ajax.post(routes.notification.success, 'The reservation has been created successfully!');
         } catch (error) {
             confirmReservationButton.disabled = true;
             window.LoadingOverlay.hide();
@@ -571,15 +571,17 @@
 
         try {
             await ajax.post(routes.helper.sendConfirmationSMS, { attendeeId: attendee.id });
+            await ajax.post(routes.notification.success, 'Confirmation SMS has been sent successfully to the attendee!');
         } catch (error) {
-            await ajax.post(routes.index.errorFlash, 'Something went wrong while sending the confirmation message to the attendee! Please provide them with their reservation details manually.');
+            await ajax.post(routes.notification.success, 'Something went wrong while sending the confirmation SMS to the attendee! Please provide them with their reservation details manually.');
         }
 
         if (sc.activeNode.find('available').seats.length === 0) {
             try {
                 await ajax.delete(`${routes.helper.events}/${eventId}/extra-attendees`);
+                await ajax.post(routes.notification.success, 'Due to the event being fully booked, the waiting list has been purged successfully!');
             } catch (error) {
-                await ajax.post(routes.index.errorFlash, 'Something went wrong while deleting all the attendees in the waiting list due to the event being fully booked!');
+                await ajax.post(routes.notification.danger, 'Something went wrong while deleting all the attendees in the waiting list due to the event being fully booked!');
             }
         }
 
@@ -590,7 +592,7 @@
 
     seatReservationDeleteBtn.addEventListener('click', async function (e) {
         const seatNumber = seatReservationDeleteBtn.getAttribute("data-seat-number");
-        if (!seatNumber) return toast.danger("Something went wrong while deleting this reservation. Please try again later!");
+        if (!seatNumber) return toast.flash.danger("Something went wrong while deleting this reservation. Please try again later!");
 
         const check = confirm("Are you sure you want to delete this seat reservation?");
         if (check === true) {
@@ -599,14 +601,11 @@
 
             try {
                 await ajax.delete(`${routes.helper.events}/${eventId}/seats/${seatNumber}`);
-                await ajax.post(routes.index.successFlash, 'Successfully deleted reservation!');
+                await ajax.post(routes.notification.success, 'Successfully deleted reservation!');
                 utils.removeUnloadListener();
                 window.location.reload();
             } catch (error) {
                 utils.handleError(error);
-            } finally {
-                window.LoadingOverlay.hide();
-                seatReservationDeleteBtn.disabled = false;
             }
         }
     });
@@ -623,7 +622,7 @@
                     reserveSeatForm.classList.remove('d-none');
                     if (event.seatsPerReservation) {
                         if (allSelectedSeats.length >= event.seatsPerReservation) {
-                            toast.danger('You have reached the maximum number of seats allowed per reservation!')
+                            toast.flash.danger('You have reached the maximum number of seats allowed per reservation!')
                             return 'available';
                         }
                     }
@@ -663,7 +662,7 @@
     selectSeatsUsingSelection = (selectedSeatCharacters) => {
         if (event.seatsPerReservation) {
             if (selectedSeatCharacters.length > event.seatsPerReservation) {
-                return toast.danger('You have reached the maximum number of seats allowed per reservation!')
+                return toast.flash.danger('You have reached the maximum number of seats allowed per reservation!')
             }
         }
 
@@ -697,12 +696,12 @@
 
     highlightAttendeeSeats = (attendeeId) => {
         const seatDetails = event.reservedSeats.filter(seat => seat.attendeeId == attendeeId);
-        if (seatDetails.length === 0) return toast.danger('This attendee does not have any seats reserved for this event!');
+        if (seatDetails.length === 0) return toast.flash.danger('This attendee does not have any seats reserved for this event!');
 
         sc.activeNode.find('highlighted').status('reserved');
         
         const seatsToBeHighlighted = sc.activeNode.get(seatDetails.map(seat => seat.seatNumber));
-        if (seatsToBeHighlighted.length !== seatDetails.length) return toast.danger('Please zoom out to view all the seats reserved by the attendee!');
+        if (seatsToBeHighlighted.length !== seatDetails.length) return toast.flash.danger('Please zoom out to view all the seats reserved by the attendee!');
 
         seatsToBeHighlighted.status('highlighted');
 

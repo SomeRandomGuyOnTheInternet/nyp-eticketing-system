@@ -31,14 +31,14 @@ const utils = {
     handleError: function(error) { // Use inside the catch block of a try catch
         if (error.status) {
             if (error.status == 400) {
-                toast.danger(error.message);
+                toast.flash.danger(error.message);
             } else if (error.status == 500) {
-                toast.danger(error.message);
+                toast.flash.danger(error.message);
             }
         } else {
             // Logs the error
             console.error(error);
-            toast.danger("Something went wrong. Please try again later!"); // if no user readable description exists, just flash a generic error
+            toast.flash.danger("Something went wrong. Please try again later!"); // if no user readable description exists, just flash a generic error
         }
     
         return false;

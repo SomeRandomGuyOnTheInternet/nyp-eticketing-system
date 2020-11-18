@@ -1,9 +1,5 @@
 const routes = {
     base: "/api/",
-    index: {
-        successFlash: "/api/success-flash",
-        errorFlash: "/api/error-flash"
-    },
     admin: {
         planners: "/api/admin/planners",
         helpers: "/api/admin/helpers",
@@ -20,5 +16,10 @@ const routes = {
         reservations: "/api/helper/event/reservations",
         attendees: "/api/helper/event/attendees",
         sendConfirmationSMS: "/api/helper/sms-reservation-confirm",
+    },
+    notification: {
+        getAllUnseen: "/api/notification/",
+        success: "/api/notification/success",
+        danger: "/api/notification/danger"
     }
 };

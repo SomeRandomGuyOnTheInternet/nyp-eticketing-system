@@ -224,7 +224,7 @@
             if (check === true) {
                 try {
                     await ajax.delete(e.target.action);
-                    await ajax.post(routes.index.successFlash, "Planner account has been deleted successfully!");
+                    await ajax.post(routes.notification.success, "Planner account has been deleted successfully!");
 
                     window.location.replace('/admin/planners');
                 } catch (error) {
@@ -245,7 +245,7 @@
                 email: emailTextbox.value,
                 password: passwordTextbox.value
             });
-            await ajax.post(routes.index.successFlash, "Planner account has been created successfully!");
+            await ajax.post(routes.notification.success, "Planner account has been created successfully!");
 
             utils.removeUnloadListener(); 
             window.location.replace("/admin/planners");

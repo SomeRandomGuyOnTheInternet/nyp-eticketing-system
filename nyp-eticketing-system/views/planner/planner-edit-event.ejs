@@ -396,7 +396,7 @@
     addSeatTypeButton.addEventListener('click', function (e) {
         utils.addUnloadListener();
 
-        if (availableSeatCharacters.length < 1) return toast.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
+        if (availableSeatCharacters.length < 1) return toast.flash.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         
         const seatName = seatTypeNameInput.value;
         const seatIsBlocked = blockSeatTypeCheck.checked;
@@ -404,7 +404,7 @@
         const seatCharacter = availableSeatCharacters[0];
         availableSeatCharacters.shift(); // Deletes the first element in available seat characters as it's already taken
 
-        if (seatName === "") return toast.danger("Please enter a seat name!");
+        if (seatName === "") return toast.flash.danger("Please enter a seat name!");
         if (seatCharacter.length != 1) utils.throwException("The string for the seat's character is not a single length character!");
 
         const seatType = new SeatType({ 
@@ -495,7 +495,7 @@
         try {
             await ajax.update(`${routes.planner.events}/${eventId}`, event.convertToApiFormat());
 
-            toast.success("The event has been successfully updated!");
+            toast.flash.success("The event has been successfully updated!");
             utils.removeUnloadListener();
         } catch (error) {
             utils.handleError(error);

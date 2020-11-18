@@ -102,64 +102,7 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
 
         console.error(error);
         return respond.error(res, "Something went wrong while creating the reservation. Please try again later!", 500);
-    }
-});
-
-router.put('/event/reservations/:id', auth.isHelper, async (req, res) => {
-    const attendeeId = req.params.id;
-    
-    const name = req.body.name;
-    const phoneNumber = parseInt(req.body.phoneNumber, 10);
-    const noOfExtraAttendees = req.body.noOfExtraAttendees === '' ? 0 : req.body.noOfExtraAttendees;
-    const reservedSeats = req.body.reservedSeats;
-    const eventId = req.body.eventId;
-
-    if (!name)  return respond.error(res, "Please provide an attendee name!");
-    if (!eventId) return respond.error(res, "Please provide an event id!");
-    if (!phoneNumber) return respond.error(res, "Please provide an attendee phone number!");
-    if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please provide a valid eight digit attendee phone number!");
-    if (noOfExtraAttendees) {
-        if (isNaN(noOfExtraAttendees)) return respond.error(res, "Please provide a valid number of extra attendees!");
-        else if (noOfExtraAttendees < 1) return respond.error(res, "Please provide a higher number of extra attendees!");
-        else if (noOfExtraAttendees > 5) return respond.error(res, "Please provide a lower number of extra attendees!");
-    }
-
-    let t = await db.transaction();
-
-    try {
-        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
-        if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
-
-        await EventAttendee.update({
-            name: name,
-            phoneNumber: phoneNumber,
-            noOfExtraAttendees: noOfExtraAttendees
-        },{ 
-            where: { id: attendeeId },
-            transaction: t
-        });
-
-        await EventReservedSeat.destroy({ where: { attendeeId: attendeeId }, transaction: t });
-        await EventReservedSeat.bulkCreate(reservedSeats.map(seatNumber => {
-            return {
-                seatNumber: seatNumber, 
-                eventId: eventId, 
-                attendeeId: attendeeId
-            }
-        }),{
-            validate: true,
-            transaction: t
-        });
-
-        await t.commit();
-
-        return respond.success(res, "Reservation has been updated successfully!", attendee);
-    } catch (error) {
-        await t.rollback();
-
-        console.error(error);
-        return respond.error(res, "Something went wrong while updating the reservation. Please try again later!", 500);
-    }
+    } 
 });
 
 router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => {

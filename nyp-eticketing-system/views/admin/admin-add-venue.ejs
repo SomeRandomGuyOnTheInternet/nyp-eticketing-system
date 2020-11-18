@@ -164,13 +164,13 @@
             const columnVal = columnInput.value;
             const rowVal = rowInput.value;
 
-            if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
+            if (isNaN(columnVal) || isNaN(rowVal)) return flash.danger("Please enter a valid value!");
 
             const columns = Number(columnVal);
             const rows = Number(rowVal);
 
-            if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
-            if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
+            if (columns < 1 || rows < 1) return toast.flash.danger("Please enter a larger value!");
+            if (columns > 40 || rows > 40) return toast.flash.danger("Please enter a smaller value!");
 
             if (e.target.id === rowInput.id) sc.resizeRows(columns, rows); // Changes number of columns
             if (e.target.id === columnInput.id) sc.resizeColumns(columns, rows); // Changes number of rows
@@ -208,7 +208,7 @@
         
         try {
             await ajax.post(routes.admin.venues, venue);
-            await ajax.post(routes.index.successFlash, "Venue has been created successfully!");
+            await ajax.post(routes.notification.success, "Venue has been created successfully!");
 
             utils.removeUnloadListener();
 

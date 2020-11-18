@@ -139,7 +139,7 @@
             if (check === true) {
                 try {
                     await ajax.delete(e.target.action);
-                    await ajax.post(routes.index.successFlash, "Venue has been deleted successfully!");
+                    await ajax.post(routes.notification.success, "Venue has been deleted successfully!");
 
                     window.location.replace('/admin/venues');
                 } catch (error) {

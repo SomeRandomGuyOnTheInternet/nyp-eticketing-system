@@ -30,6 +30,7 @@ const apiRoute = require('./routes/api/index');
 const helperApiRoute = require('./routes/api/helper');
 const plannerApiRoute = require('./routes/api/planner');
 const adminApiRoute = require('./routes/api/admin');
+const notificationApiRoute = require('./routes/api/notification');
 
 // Our app is a blank canvas at this point (wow so artistic)
 const app = express();
@@ -94,6 +95,7 @@ app.use('/api', apiRoute);
 app.use('/api/admin', adminApiRoute);
 app.use('/api/planner', plannerApiRoute);
 app.use('/api/helper', helperApiRoute);
+app.use('/api/notification', notificationApiRoute);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });

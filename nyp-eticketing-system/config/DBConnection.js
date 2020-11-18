@@ -12,6 +12,7 @@ const EventHelpers = require('../models/EventHelper');
 const EventReservedSeats = require('../models/EventReservedSeat');
 const EventAttendees = require('../models/EventAttendee');
 const EventSeatTypes = require('../models/EventSeatType');
+const Notifications = require('../models/Notification');
 
 // const createUsers = require('./dataset/create-users');
 // const createVenues = require('./dataset/create-venues');
@@ -53,6 +54,10 @@ const setUpDB = (drop) => {
         // Each attendee can reserve many seats in an event
         EventAttendees.hasMany(EventReservedSeats, { foreignKey: 'attendeeId' });
         EventReservedSeats.belongsTo(EventAttendees, { foreignKey: 'attendeeId' });
+
+        // Each user can have many notifications
+        Users.hasMany(Notifications, { foreignKey: 'userId' });
+        Notifications.belongsTo(Users, { foreignKey: 'userId' });
 
         mySQLDB.sync({ 
             force: drop 

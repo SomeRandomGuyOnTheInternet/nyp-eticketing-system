@@ -244,7 +244,7 @@
             if (check === true) {
                 try {
                     await ajax.delete(e.target.action);
-                    await ajax.post(routes.index.successFlash, "Helper account has been deleted successfully!");
+                    await ajax.post(routes.notification.success, "Helper account has been deleted successfully!");
 
                     window.location.replace('/admin/helpers');
                 } catch (error) {
@@ -265,7 +265,7 @@
                 phoneNumber: phoneNumberTextbox.value,
                 password: passwordTextbox.value
             });
-            await ajax.post(routes.index.successFlash, "Helper account has been created successfully!");
+            await ajax.post(routes.notification.success, "Helper account has been created successfully!");
 
             utils.removeUnloadListener();
       

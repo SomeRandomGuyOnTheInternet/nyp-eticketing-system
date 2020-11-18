@@ -186,13 +186,13 @@
             const columnVal = columnInput.value;
             const rowVal = rowInput.value;
 
-            if (isNaN(columnVal) || isNaN(rowVal)) return toast.danger("Please enter a valid value!");
+            if (isNaN(columnVal) || isNaN(rowVal)) return toast.flash.danger("Please enter a valid value!");
 
             const columns = Number(columnVal);
             const rows = Number(rowVal);
 
-            if (columns < 1 || rows < 1) return toast.danger("Please enter a larger value!");
-            if (columns > 40 || rows > 40) return toast.danger("Please enter a smaller value!");
+            if (columns < 1 || rows < 1) return toast.flash.danger("Please enter a larger value!");
+            if (columns > 40 || rows > 40) return toast.flash.danger("Please enter a smaller value!");
 
             if (e.target.id === rowInput.id) sc.resizeRows(columns, rows); // Changes number of columns
             if (e.target.id === columnInput.id) sc.resizeColumns(columns, rows); // Changes number of rows
@@ -237,7 +237,7 @@
         try {
             await ajax.update(`${routes.admin.venues}/${venueId}`, venue);
 
-            toast.success("Venue has been updated successfully!");
+            toast.flash.success("Venue has been updated successfully!");
             utils.removeUnloadListener();
         } catch (error) {
             utils.handleError(error);
