@@ -368,9 +368,9 @@
             legendContainer.classList.remove('col-md-9');
             legendContainer.classList.add('col-md-12');
             legendClickInfo.classList.add('d-none');
+            liveGif.classList.remove('d-none');
             venueSelectInput.disabled = true;
             noOfReservationContainer.classList.remove('d-none');
-            liveGif.classList.remove('d-none');
 
             noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
             percentageOfReservationContainer.classList.remove('d-none');
