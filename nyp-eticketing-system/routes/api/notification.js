@@ -1,3 +1,4 @@
+// All APIs are contained here
 
 const express = require('express');
 const router = express.Router();
@@ -8,6 +9,7 @@ const auth = require('../../utils/api-auth');
 
 const Notification = require('../../models/Notification');
 
+// Get all the unseen notification for the specific user
 router.get('/', auth.isUser, async (req, res) => {
     try {
         const notifications = await Notification.findAll({ 
@@ -17,6 +19,7 @@ router.get('/', auth.isUser, async (req, res) => {
             },
         });
 
+        // All unseen notifications are flag as seen
         for (let i = 0; i < notifications.length; i++) {
             notifications[i].isSeen = true;
             await notifications[i].save();
@@ -29,6 +32,7 @@ router.get('/', auth.isUser, async (req, res) => {
     }
 });
 
+// Connects to sequalise and writes a new success notification
 router.post('/success', auth.isUser, async (req, res) => {
     const message = req.body.data;
     if (!message)  return respond.error(res, "Please provide a message!");
@@ -42,6 +46,7 @@ router.post('/success', auth.isUser, async (req, res) => {
     }
 });
 
+// Connects to sequalise and writes a new danger notification
 router.post('/danger', auth.isUser, async (req, res) => {
     const message = req.body.data;
     if (!message)  return respond.error(res, "Please provide a message!");

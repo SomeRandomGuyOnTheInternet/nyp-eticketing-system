@@ -17,6 +17,8 @@ const EventAttendee = require('../../models/EventAttendee');
 // Eg: Use router.get('/venues', ...) instead of router.get('/helper-venues', ...) cause then the url will be '/helper/helper-venues' which is super redundant
 // Always keep route urls are short as possible
 
+// This is where all the pages are rendered for the speific routes 
+
 router.get('/', auth.isHelper, async (req, res) => {
     // Put your ejs files under your specific folder
 	// Eg: Admin .ejs files should be put under the admin folder

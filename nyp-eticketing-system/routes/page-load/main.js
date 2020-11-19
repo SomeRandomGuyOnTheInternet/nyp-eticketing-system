@@ -9,7 +9,8 @@ const auth = require('../../utils/page-load-auth');
 
 // // Sample user object to test navigation
 // // For the test pages, this user is neither a planner or helper or an admin
-// const user = { name: "", isPlanner: false, isHelper: false, isAdmin: false };
+
+// This is where all the pages are rendered for the speific routes 
 
 router.get('/', async (req, res) => {
 	if (req.user) {

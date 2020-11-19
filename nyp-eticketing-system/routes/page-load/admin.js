@@ -13,6 +13,8 @@ const Venue = require('../../models/Venue');
 // Eg: Use router.get('/planners', ...) instead of router.get('/admin-planners', ...) cause then the url will be '/admin/admin-planners' which is super redundant
 // Always keep route urls are short as possible
 
+// This is where all the pages are rendered for the speific routes 
+
 router.get('/planners', auth.isAdmin, async (req, res) => {
 	var planners = await User.getPlanners();
 

@@ -10,6 +10,7 @@ const Venue = require('../../models/Venue');
 const Event = require('../../models/Event');
 const User = require('../../models/User');
 
+// Get all Planners Accounts and displaying it in a table
 router.get('/planners', auth.isAdmin, async (req, res) => {
     try {
         const planners = await User.getPlanners();
@@ -21,20 +22,27 @@ router.get('/planners', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Creating a planner account
 router.post('/planners', auth.isAdmin, async (req, res) => {
 	let name = req.body.name;
 	let email = req.body.email;
     let password = req.body.password;
 
-	if (!name) return respond.error(res, "Please enter a name!", 400);
-	if (!email) return respond.error(res, "Please enter an email!", 400);
+    // Check if the name field is empty
+    if (!name) return respond.error(res, "Please enter a name!", 400);
+    // Check if the email field is empty 
+    if (!email) return respond.error(res, "Please enter an email!", 400);
+    // Validations for whether the email is valid 
     if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) return respond.error(res, "Please enter a valid email!", 400);
+    // Check if the password field is empty
 	if (!password) return respond.error(res, "Please enter a password!", 400);
 
     try {
         let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+        // Check if the email entered in the email field has already been used to register a account. 
         if (existingEmail) return respond.error(res, "This email has already been registered!", 400);
 
+        // Connects to sequalise and creates the user in the database 
         await User.createUser({
             email: email,
             password: password,
@@ -52,6 +60,7 @@ router.post('/planners', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Delete Planner Accounts 
 router.delete('/planners/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
 
@@ -69,6 +78,7 @@ router.delete('/planners/:id', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Get all Helpers Accounts and displaying it in a table
 router.get('/helpers', auth.isAdmin, async (req, res) => {
     try {
         const helpers = await User.getHelpers();
@@ -80,23 +90,32 @@ router.get('/helpers', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Creating a helper account
 router.post('/helpers', auth.isAdmin, async (req, res) => {
 	let name = req.body.name;
 	let email = req.body.email;
 	let password = req.body.password;
 	let phoneNumber = req.body.phoneNumber;
 
-	if (!name) return respond.error(res, "Please enter a name!", 400);
-	if (!email) return respond.error(res, "Please enter an email!", 400);
+    // Check if the name field is empty.
+    if (!name) return respond.error(res, "Please enter a name!", 400);
+    // Check if the email field is empty. 
+    if (!email) return respond.error(res, "Please enter an email!", 400);
+    // Validations for whether the email is valid. 
     if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) return respond.error(res, "Please enter a valid email!", 400);
+    // Check if the phone number field is empty. 
     if (!phoneNumber) return respond.error(res, "Please enter a phone number!", 400);
-	if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please enter a valid phone number!", 400);
-	if (!password) return respond.error(res, "Please enter a password!", 400);
+    // Check if the phone number entered starts with 8/9 and if the max length of the phone number is only 8 digit. 
+    if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please enter a valid phone number!", 400);
+     // Validations for whether the password field is empty.
+    if (!password) return respond.error(res, "Please enter a password!", 400);
 
     try {
         let existingEmail = await User.getUserByEmail(email.toLocaleLowerCase());
+        // Check if the email entered in the email field has already been used to register a account. 
         if (existingEmail) return respond.error(res, "This email has already been registered!", 400);
         
+        // Connects to sequalise and creates the user in the database 
         await User.createUser({
             email: email,
             password: password,
@@ -115,6 +134,7 @@ router.post('/helpers', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Delete Helper Accounts 
 router.delete('/helpers/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
 
@@ -132,6 +152,7 @@ router.delete('/helpers/:id', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Get all Helpers Accounts and displaying it in a table
 router.get('/venues', auth.isAdmin, async (req, res) => {
     try {
         const venues = await Venue.findAll({
@@ -145,6 +166,7 @@ router.get('/venues', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Get specific venues by id to view venues details
 router.get('/venues/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
 
@@ -160,17 +182,22 @@ router.get('/venues/:id', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Creating of venues
 router.post('/venues', auth.isAdmin, async (req, res) => {
     const name = req.body.name;
     const seatMap = req.body.seatMap;
 
+    // Check if the name field is empty
     if (!name) return respond.error(res, "Please provide a venue name!", 400);
+    // Check if there is a seat map provided
     if (!seatMap) return respond.error(res, "Please provide a seat map for the venue!", 400);
 
     try {
+        // Check if the name of the venue has already been used 
         const existingVenue = await Venue.findOne({ where: { name: name } });
         if (existingVenue) return respond.error(res, "Please provide a unqiue name for the venue!", 400);
 
+        // onnects to sequalise and creates the venue in the database  
         await Venue.create({
             name: name,
             seatMap: JSON.stringify(seatMap)
@@ -183,14 +210,18 @@ router.post('/venues', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Updating of the Venues
 router.put('/venues/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
     const name = req.body.name;
     const seatMap = req.body.seatMap;
 
+    // Check if the name field is empty or not
     if (!name) return respond.error(res, "Please provide a venue name!");
+    // Check if a seat map is provided
     if (!seatMap) return respond.error(res, "Please provide a seat map for the venue!");
 
+    // Connects to sequalise and updates the venue in the database  
     try {
         await Venue.update({
             id: id,
@@ -207,6 +238,7 @@ router.put('/venues/:id', auth.isAdmin, async (req, res) => {
     }
 });
 
+// Delete of venues 
 router.delete('/venues/:id', auth.isAdmin, async (req, res) => {
     const id = req.params.id;
     
