@@ -7,6 +7,7 @@ const respond = require('../../utils/respond');
 const auth = require('../../utils/api-auth');
 
 const Venue = require('../../models/Venue');
+const Event = require('../../models/Event');
 const User = require('../../models/User');
 
 router.get('/planners', auth.isAdmin, async (req, res) => {
