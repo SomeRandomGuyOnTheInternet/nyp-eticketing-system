@@ -18,6 +18,7 @@ const Venue = require('../../models/Venue');
 const EventReservedSeat = require('../../models/EventReservedSeat');
 const EventAttendee = require('../../models/EventAttendee');
 
+// Get specific events by id for specific helpers who has access to that particular event only 
 router.get('/events/:id', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
 
@@ -41,6 +42,7 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
     }
 });
 
+// Creating reservations for events
 router.post('/event/reservations', auth.isHelper, async (req, res) => {
     const name = req.body.name;
     const phoneNumber = parseInt(req.body.phoneNumber, 10);
@@ -48,12 +50,18 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
     const noOfExtraAttendees = req.body.noOfExtraAttendees === '' ? 0 : req.body.noOfExtraAttendees;
     const eventId = req.body.eventId;
 
+    // Check if the attendee name field is empty
     if (!name)  return respond.error(res, "Please provide an attendee name!");
+    // Check if the reservations is associated to the right event id
     if (!eventId) return respond.error(res, "Please provide an event id!");
+    // Check if the attendee phone number is empty
     if (!phoneNumber) return respond.error(res, "Please provide an attendee phone number!");
+    // Check if the attendee phone number starts with 8/9 and the length of the number is only 8 digits
     if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please provide a valid eight digit attendee phone number!");
     if (noOfExtraAttendees) {
+        // Check if the number of extra attendee entered in the field is valid or not  
         if (isNaN(noOfExtraAttendees)) return respond.error(res, "Please provide a valid number of extra attendees!");
+        // Check if the number of extra attendee entered in the field is between 1-5
         else if (noOfExtraAttendees < 1) return respond.error(res, "Please provide a higher number of extra attendees!");
         else if (noOfExtraAttendees > 5) return respond.error(res, "Please provide a lower number of extra attendees!");
     }
@@ -61,11 +69,13 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
     let t = await db.transaction();
 
     try {
+        // Check if the helper has the authorisation for that particular event
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
         if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
 
         let attendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
         if (attendee) {
+            // Connects to sequalise and updates the event attendee in the database
             await EventAttendee.update({
                 noOfExtraAttendees: noOfExtraAttendees
             },{ 
@@ -73,6 +83,7 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
                 transaction: t
             });
         } else {
+            // Connects to sequalise and creates the event attendee in the database
             attendee = await EventAttendee.create({
                 name: name,
                 phoneNumber: phoneNumber,
@@ -82,7 +93,8 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
                 transaction: t
             });
         }
-
+        
+        // Connects to sequalise and creates the reservations in the database
         await EventReservedSeat.bulkCreate(reservedSeats.map(seatNumber => {
             return {
                 seatNumber: seatNumber, 
@@ -105,10 +117,12 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
     } 
 });
 
+// Delete of all extra attendees in the event once all the seats in the event are fully booked
 router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
 
     try {
+        // Check if the helper has the authorisation for that particular event
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
         if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
 
@@ -120,11 +134,13 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
             }
         });
 
+        // Connects to sequalise and updates the extra attendees in the database
         for (let i = 0; i < attendeesWithExtraAttendees.length; i++) {
             attendeesWithExtraAttendees[i].noOfExtraAttendees = 0;
             await attendeesWithExtraAttendees[i].save();
         }
 
+        // Sending of apology SMS to attendee phone number 
         for (let i = 0; i < attendeesWithExtraAttendees.length; i++) {
             await sendSMS(attendeesWithExtraAttendees[i].phoneNumber, event.fullyBookedMessage);
         }
@@ -136,14 +152,17 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
     }
 });
 
+// Delete of reservations 
 router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
     const seatNumber = req.params.seatNumber;
 
     try {
+        // Check if the helper has the authorisation for that particular event
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
         if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
 
+        // Finds a reservation that has a seat number that matchs the event id
         const reservedSeat = await EventReservedSeat.findOne({
             where: { 
                 eventId: eventId,
@@ -151,6 +170,7 @@ router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) =
 
             }
         });
+        // if no reservations are found then this error will be prompted
         if (!reservedSeat) return respond.error(res, "No reservations were found with this seat number for this event!", 404);
 
         reservedSeat.destroy();
@@ -162,6 +182,7 @@ router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) =
     }
 });
 
+// Sending of SMS to attendee phone number
 router.post('/sms-reservation-confirm', auth.isHelper, async (req, res) => {
     const attendeeId = req.body.attendeeId;
 

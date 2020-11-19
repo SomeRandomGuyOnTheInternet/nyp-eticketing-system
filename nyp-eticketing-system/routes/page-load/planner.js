@@ -16,6 +16,8 @@ const Event = require('../../models/Event');
 // Eg: Use router.get('/events', ...) instead of router.get('/planner-events', ...) cause then the url will be '/planner/planner-events' which is super redundant
 // Always keep route urls are short as possible
 
+// This is where all the pages are rendered for the speific routes 
+
 router.get('/events', auth.isPlanner, async (req, res) => {
     // Put your ejs files under your specific folder
 	// Eg: Planner .ejs files should be put under the planner folder
