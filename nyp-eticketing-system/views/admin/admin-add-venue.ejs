@@ -75,6 +75,8 @@
 </body>
 
 <script>
+    window.LoadingOverlay.show();
+
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
     const createVenueForm = document.getElementById('createVenueForm');
     const nameInput = document.getElementById('nameInput');
@@ -143,6 +145,8 @@
     window.addEventListener("load", function(e) {
         sc.bindMap();
         sc.scaleContentWidth();
+
+        window.LoadingOverlay.hide();
     });
 
     window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container

@@ -167,6 +167,10 @@ div.col-small-margin {
     -moz-animation-timing-function: ease;
 }
 
+.blink {
+    animation: blinker 1s linear infinite;
+}
+
 .fade-out {
     animation: fade 2s;
     -webkit-animation: fade 2s;

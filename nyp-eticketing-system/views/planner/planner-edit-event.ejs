@@ -172,14 +172,24 @@
                 <div class="row">
                     <!-- Helper Select Input Card  -->
                     <div class="col-sm-6 border-right border-secondary">
-                        <div class="card input-card mb-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card input-card">
+                            <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
-                                <label for="helperSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Student Helpers</small> <!-- The small element is where we actually write down what the input does  -->
-                                </label>
-                                <select id="helperSelectInput" name="helperSelectInput" class="form-control card-input" tabindex="0"> <!-- This is where the user actually inputs all their stuff  -->
-                                    <option selected="true" disabled="disabled">Choose Helper</option> 
-                                </select>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <label for="searchHelperInput" class="card-input-label">
+                                            <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                            <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                                Helpers</small>
+                                            <!-- The small element is where we actually write down what the input does  -->
+                                        </label>
+                                        <input id="searchHelperInput" name="searchHelperInput" class="form-control card-input" type="search"
+                                            placeholder="E.g. Vignesh">
+                                    </div>
+                                    <button id="clearSearchHelperButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
+                                    <button class="btn text-muted" disabled><i class="fas fa-search"></i></button>
+                                    <!-- This is where the user actually inputs all their stuff  -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -266,7 +276,7 @@
     const legendContainer = document.getElementById('legendContainer');
     const legendClickInfo = document.getElementById('legendClickInfo');
     const addSeatTypeCard = document.getElementById('addSeatTypeCard');
-    const helperSelectInput = document.getElementById('helperSelectInput');
+    const searchHelperInput = document.getElementById('searchHelperInput');    
     const helpersCardCol = document.getElementById('helpersCardCol');
     const cancelEditedEventButton = document.getElementById('cancelEditedEventButton');
     const updateEventButton = document.getElementById('updateEventButton');
@@ -351,7 +361,6 @@
             }
         }
         
-        EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         
         if (event.reservedSeats.length > 0) {
@@ -388,6 +397,35 @@
             availableSeatCharacters = availableSeatCharacters.filter(sc => sc !== seatType.char);
         });
 
+        new autoComplete({
+            data: {
+                src: helpers,
+                key: ["name", "phoneNumber"]
+            },
+            trigger: {
+                event: ["input", "focusin", "focusout"]
+            },
+            placeHolder: "e.g. Vignesh",
+            selector: "#searchHelperInput",
+            highlight: true,
+            resultsList: {
+                render: true,
+            },
+            resultItem: {
+                content: (data, source) => {
+                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${(data.key === "name") ? data.value.phoneNumber : data.value.name}&nbsp;•&nbsp; ${data.value.email}`;
+                },
+                element: "li"
+            },
+            onSelection: feedback => {
+                utils.addUnloadListener();
+
+                feedback.selection.value.selected = true;
+                EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
+                searchHelperInput.value = '';
+            }
+        });
+
         window.LoadingOverlay.hide();
     });
 
@@ -408,14 +446,6 @@
 
         sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
         sc.reloadMap();
-    });
-
-    helperSelectInput.addEventListener('change', function (e) {
-        utils.addUnloadListener();
-
-        EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
-        EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
-        EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
     });
 
     addSeatTypeButton.addEventListener('click', function (e) {
@@ -479,7 +509,6 @@
                 if (helper.id == node.id) helper.selected = false;
             });
 
-            EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
             EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         }
     }, false);

@@ -144,14 +144,24 @@
                 <div class="row">
                     <!-- Helper Select Input Card  -->
                     <div class="col-sm-6 border-right border-secondary">
-                        <div class="card input-card mb-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
+                        <div class="card input-card">
+                            <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
-                                <label for="helperSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle mb-2 text-secondary font-weight-normal">Helpers</small> <!-- The small element is where we actually write down what the input does  -->
-                                </label>
-                                <select id="helperSelectInput" name="helperSelectInput" class="form-control card-input" tabindex="0"> <!-- This is where the user actually inputs all their stuff  -->
-                                    <option selected="true" disabled="disabled">Choose Helper</option> 
-                                </select>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <label for="searchHelperInput" class="card-input-label">
+                                            <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                            <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
+                                                Helpers</small>
+                                            <!-- The small element is where we actually write down what the input does  -->
+                                        </label>
+                                        <input id="searchHelperInput" name="searchHelperInput" class="form-control card-input" type="search"
+                                            placeholder="E.g. Vignesh">
+                                    </div>
+                                    <button id="clearSearchHelperButton" class="d-none btn text-muted" type="button"><i class="fas fa-times"></i></button>
+                                    <button class="btn text-muted" disabled><i class="fas fa-search"></i></button>
+                                    <!-- This is where the user actually inputs all their stuff  -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -220,7 +230,7 @@
     const seatMap = document.getElementById('seatMap');
     const legend = document.getElementById('editMapLegend');
     const addSeatTypeCard = document.getElementById('addSeatTypeCard');
-    const helperSelectInput = document.getElementById('helperSelectInput');
+    const searchHelperInput = document.getElementById('searchHelperInput');
     const helpersCardCol = document.getElementById('helpersCardCol');
     const createEventButton = document.getElementById('createEventButton');
     const addSeatTypeModal = document.getElementById('addSeatTypeModal');
@@ -293,7 +303,6 @@
         }
 
         Venue.populateSelect(venues, venueSelectInput);
-        EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
 
         sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
@@ -307,6 +316,35 @@
         // Bind map
         sc.bindMap();
         sc.scaleContentWidth();
+
+        new autoComplete({
+            data: {
+                src: helpers,
+                key: ["name", "phoneNumber"]
+            },
+            trigger: {
+                event: ["input", "focusin", "focusout"]
+            },
+            placeHolder: "e.g. Vignesh",
+            selector: "#searchHelperInput",
+            highlight: true,
+            resultsList: {
+                render: true,
+            },
+            resultItem: {
+                content: (data, source) => {
+                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
+                },
+                element: "li"
+            },
+            onSelection: feedback => {
+                utils.addUnloadListener();
+
+                feedback.selection.value.selected = true;
+                EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
+                searchHelperInput.value = '';
+            }
+        });
 
         window.LoadingOverlay.hide();
     });
@@ -330,20 +368,11 @@
         sc.reloadMap();
     });
 
-    helperSelectInput.addEventListener('change', function (e) {
-        utils.addUnloadListener();
-
-        EventHelper.selectedOption(helpers, helperSelectInput).selected = true;
-        EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
-        EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
-    });
-
     addSeatTypeButton.addEventListener('click', function (e) {
         utils.addUnloadListener();
         
         const seatName = seatTypeNameInput.value;
         const seatIsBlocked = blockSeatTypeCheck.checked;
-        console.log(availableSeatCharacters)
 
         if (availableSeatCharacters.length < 1) return toast.flash.danger("You cannot add anymore seat types! Please delete some if you want to add more.");
         const seatCharacter = availableSeatCharacters[0];
@@ -398,8 +427,7 @@
             helpers.forEach(helper => {
                 if (helper.id == node.id) helper.selected = false;
             });
-
-            EventHelper.populateSelect(helpers.filter(helper => helper.selected === false), helperSelectInput);
+            
             EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         }
     }, false);

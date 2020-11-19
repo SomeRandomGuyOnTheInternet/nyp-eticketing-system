@@ -82,6 +82,8 @@
 </body>
 
 <script>
+    window.LoadingOverlay.show();
+
     const venueId = <%- venue.id %>;
 
     // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
@@ -165,6 +167,8 @@
 
         columnInput.value = sc.map[0].length;
         rowInput.value = sc.map.length;
+
+        window.LoadingOverlay.hide();
     });
 
     window.addEventListener('resize', function (e) { // Upon resizing the browser window, the scaling function is called to make sure the seat chart fits within the new dimensions of the parent container

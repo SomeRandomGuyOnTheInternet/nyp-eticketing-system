@@ -1,6 +1,5 @@
 <!-- TODO: gap detection -->
 <!-- TODO: save base map in class, so can use zoom properly -->
-<!-- TODO: update reserved seats on 5s -->
 <!-- TODO: show arrow to indicate the user to scroll up or down instead of scroll straight away -->
 <!-- TODO: delete seat types -->
 <!-- TODO: show whether seats are to be booked from top to bottom/bottom to top -->
@@ -179,16 +178,16 @@
                                         <th scope="col">Name</th>
                                         <th scope="col">Phone No.</th>
                                         <th scope="col">No. of Extra Attendees</th>
-                                        <th scope="col"></th>
+                                        <th scope="col">Show/Hide Reservation</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <% for (i = 0; i < attendeesOnWaitingList.length; i++) { %>
                                     <tr class="waitingListRow">
-                                        <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].name %></a></td>
-                                        <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].phoneNumber %></a></td>
+                                        <td><a class="clickable-child"><%= attendeesOnWaitingList[i].name %></a></td>
+                                        <td><a class="clickable-child"><%= attendeesOnWaitingList[i].phoneNumber %></a></td>
                                         <td class="font-weight-medium"><a class="clickable-child"><%= attendeesOnWaitingList[i].noOfExtraAttendees %></a></td>
-                                        <th scope="row" class="font-weight-medium text-primary"><i id="<%= attendeesOnWaitingList[i].id %>" class="waitingListViewReservationIcon fas fa-eye-slash" style="font-size: 25px; cursor: pointer;"></i></td>
+                                        <th class="font-weight-medium text-primary"><i id="<%= attendeesOnWaitingList[i].id %>" class="waitingListViewReservationIcon fas fa-eye-slash" style="font-size: 25px; cursor: pointer;"></i></td>
                                     </tr>
                                     <% } %>
                                 </tbody>
@@ -367,8 +366,8 @@
                 highlightAttendeeSeats(feedback.selection.value.id);
                 searchReservationInput.value = feedback.selection.value.name;
                 waitingListViewReservationIcon.forEach(obj => {
-                    obj.classList.remove('fa-eye');
-                    obj.classList.add('fa-eye-slash');
+                    obj.classList.remove('fa-eye-slash');
+                    obj.classList.add('fa-eye');
                 });
             }
         });
@@ -414,8 +413,8 @@
         document.querySelectorAll('.seatCharts-legendCard').forEach(obj => obj.classList.remove('highlighted'));
         editSeatSelection.classList.add('d-none');
         waitingListViewReservationIcon.forEach(obj => {
-            obj.classList.remove('fa-eye');
-            obj.classList.add('fa-eye-slash');
+            obj.classList.remove('fa-eye-slash');
+            obj.classList.add('fa-eye');
         });
     });
 
@@ -474,20 +473,20 @@
     waitingListViewReservationIcon.forEach(function(element) {
         element.addEventListener('click', function (e) {
             const attendee = event.attendees.filter(attendee => attendee.id == this.id);
-            const wasActive = this.classList.contains('fa-eye');
+            const wasActive = this.classList.contains('fa-eye-slash');
 
             sc.activeNode.find('highlighted').status('reserved');
             waitingListViewReservationIcon.forEach(obj => {
-                obj.classList.remove('fa-eye');
-                obj.classList.add('fa-eye-slash');
+                obj.classList.remove('fa-eye-slash');
+                obj.classList.add('fa-eye');
             });
 
             if (attendee.length === 1) {
                 (wasActive) ? null : highlightAttendeeSeats(attendee[0].id);
                 reservationNameInput.value = (wasActive) ? '' : attendee[0].name;
                 reservationPhoneNumberInput.value = (wasActive) ? '' : attendee[0].phoneNumber;
-                this.classList.toggle('fa-eye-slash', wasActive);
-                this.classList.toggle('fa-eye', !wasActive);
+                this.classList.toggle('fa-eye', wasActive);
+                this.classList.toggle('fa-eye-slash', !wasActive);
             } else {
                 return toast.flash.danger('Something went wrong while retrieving the seats for that attendee!');
             }

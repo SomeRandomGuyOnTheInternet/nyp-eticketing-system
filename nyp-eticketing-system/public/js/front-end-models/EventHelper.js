@@ -15,6 +15,7 @@ class EventHelper extends User {
             id: result.id,
             name: result.name,
             email: result.email,
+            phoneNumber: result.phoneNumber,
             isAdmin: result.isAdmin,
             isHelper: result.isHelper,
             isPlanner: result.isPlanner,

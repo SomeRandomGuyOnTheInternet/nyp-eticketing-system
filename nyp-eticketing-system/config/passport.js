@@ -30,7 +30,7 @@ function localStrategy(passport) {
             }
             
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return done(null, false, { message: flash.error(req, "Something went wrong while signing you in. Please try again later!") });
         }
     }));
@@ -43,7 +43,7 @@ function localStrategy(passport) {
         User.findOne({ where: { id: userId }}).then((user) => {
             done(null, user);
         }).catch((done) => {
-            console.log(done);
+            console.error(done);
         });
     });
 }

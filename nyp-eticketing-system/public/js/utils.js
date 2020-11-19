@@ -66,5 +66,15 @@ const utils = {
         while (parent.firstChild) {
             parent.removeChild(parent.firstChild);
         }
+    },
+    togglePasswordVisibility: function (inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+        ['fa-eye-slash', 'fa-eye'].map(v => icon.classList.toggle(v))
     }
 };

@@ -21,7 +21,7 @@
                             <div class="card-body input-card-body">
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
-                                        <label for="searchReservationInput" class="card-input-label">
+                                        <label for="searchPlannerInput" class="card-input-label">
                                             <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                             <small class="card-subtitle mb-2 text-secondary font-weight-normal">Search
                                                 Helpers</small>
@@ -128,14 +128,30 @@
                                 <div class="card input-card mt-3">
                                     <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                                     <div class="card-body input-card-body">
-                                        <label for="password" class="card-input-label">
-                                            <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                            <small
-                                                class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small>
-                                            <!-- The small element is where we actually write down what the input does  -->
-                                        </label>
-                                        <input id="password" name="password" class="form-control card-input" type="password" placeholder="Enter password here">
                                         <!-- This is where the user actually inputs all their stuff  -->
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1">
+                                                <label for="password" class="card-input-label">
+                                                    <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
+                                                    <small
+                                                        class="card-subtitle mb-2 text-secondary font-weight-normal">Password</small>
+                                                    <!-- The small element is where we actually write down what the input does  -->
+                                                </label>
+                                                <input id="password" name="password" class="form-control card-input" type="password" placeholder="Enter password here">
+                                            </div>
+                                            <button class="btn" type="button" onclick="utils.togglePasswordVisibility('password', 'toggleIcon')"><i id="toggleIcon" class="fas fa-eye"></i></button>
+                                            <!-- This is where the user actually inputs all their stuff  -->
+                                        </div>
+                                        <div class="d-flex"> 
+                                            <div class="flex-grow-1 mr-3">
+                                                <div id="progressContainer" class="h-100">
+                                                    <div id="progressBar">
+                                                        <div></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="strengthText"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -164,7 +180,11 @@
     const emailTextbox = document.getElementById('email');
     const phoneNumberTextbox = document.getElementById('phoneNumber');
     const passwordTextbox = document.getElementById('password');
+    const progressBar = document.getElementById('progressBar');
+    const strengthText = document.getElementById('strengthText');
     const registerButton = document.getElementById('registerButton');
+
+    let passwordStrength = 0;
 
     window.addEventListener("load", async function(e) {
         new autoComplete({
@@ -234,6 +254,16 @@
         });
     });
 
+    passwordTextbox.addEventListener('keyup', function(e) {
+        const result = zxcvbn(e.target.value);
+        passwordStrength = result.score;
+        adjustStrengthMeter(passwordStrength);
+
+        if (e.target.value === "") {
+            clearMeter();
+        }
+    });
+
     addPlannerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         
@@ -255,6 +285,21 @@
             registerButton.disabled = false;
         }
     });
+
+    adjustStrengthMeter = (score) => {
+        const percentage = (score * 20) + 20;
+        indicateStrength(passwordMeterConfig.strengthText[score]);
+        progressBar.setAttribute("style", "visibility: visible;" + "width: " + percentage + "%;" + "height: 100%; border-radius: 0.25rem;" + "background-color: " + passwordMeterConfig.color[score]);
+    };
+
+    clearMeter = () => {
+        progressBar.setAttribute("style","visibility: none;");
+    };
+
+    indicateStrength = (str) => {
+        strengthText.innerHTML = str;
+        strengthText.setAttribute("style", "visibility: visible; font-weight: 500;");
+    };
 </script>
 
 <%- include('../templates/footer')-%>
