@@ -17,9 +17,7 @@ function localStrategy(passport) {
                 where: { email: email.toLocaleLowerCase() },
             });
     
-            if (!user) {
-                return done(null, false, { message: flash.error(req, "Please enter a valid email address!") });
-            }
+            if (!user) return done(null, false, { message: flash.error(req, "Please enter a valid email address!") });
     
             const isMatch = await bcrypt.compare(password, user.password);
     

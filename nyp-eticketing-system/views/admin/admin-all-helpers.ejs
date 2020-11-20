@@ -311,7 +311,7 @@
     adjustStrengthMeter = (score) => {
         const percentage = (score * 20) + 20;
         indicateStrength(passwordMeterConfig.strengthText[score]);
-        progressBar.setAttribute("style", "visibility: visible;" + "width: " + percentage + "%;" + "height: 10px; border-radius: 0.25rem; margin-top: 0.5rem;" + "background-color: " + passwordMeterConfig.color[score]);
+        progressBar.setAttribute("style", "visibility: visible;" + "width: " + percentage + "%;" + "height: 100%; border-radius: 0.25rem;" + "background-color: " + passwordMeterConfig.color[score]);
     };
 
     clearMeter = () => {
@@ -320,7 +320,7 @@
 
     indicateStrength = (str) => {
         strengthText.innerHTML = str;
-        strengthText.setAttribute("style", "visibility: visible; font-weight: 500; margin-top: 0.25rem;");
+        strengthText.setAttribute("style", "visibility: visible; font-weight: 500;");
     };
 </script>
 

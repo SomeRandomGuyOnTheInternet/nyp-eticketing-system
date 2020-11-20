@@ -266,6 +266,8 @@
 
     addPlannerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        if (passwordStrength < 2) return toast.flash.danger("Please enter a stronger password!");
         
         registerButton.disabled = true;
 
