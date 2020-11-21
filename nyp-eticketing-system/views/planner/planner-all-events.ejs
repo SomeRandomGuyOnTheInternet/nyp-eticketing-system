@@ -17,13 +17,13 @@
                         <table class="table table-click table-lg"> 
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Venue</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Time</th>
-                                    <th scope="col" class="p-3"> 
-                                        <a class="btn btn-lg btn-primary responsive-float float-right" href="/planner/add-event" role="button"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add Event</a>
+                                    <th scope="col" class="text-truncate">#</th>
+                                    <th scope="col" class="text-truncate">Name</th>
+                                    <th scope="col" class="text-truncate">Venue</th>
+                                    <th scope="col" class="text-truncate">Date</th>
+                                    <th scope="col" class="text-truncate">Time</th>
+                                    <th scope="col" class="p-3 text-truncate"> 
+                                        <a class="btn btn-lg btn-primary responsive-float float-right" href="/planner/add-event" role="button" style="min-width: fit-content;"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add Event</a>
                                     </th>
                                 </tr>
                             </thead>
@@ -38,7 +38,7 @@
                                         <td class="text-center">
                                             <form action="/api/planner/events/<%= events[i].id %>" class="deleteEventForm">
                                                 <button type="submit" class="btn btn-link p-0">
-                                                    <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                                    <i class="fa fa-trash text-danger" style="font-size: 23px;"></i>
                                                 </button>
                                             </form>
                                         </td>

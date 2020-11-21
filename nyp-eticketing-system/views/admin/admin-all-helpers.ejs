@@ -51,13 +51,13 @@
                         <table class="table table-click table-lg">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Phone Number</th>
-                                    <th scope="col">Date Created</th>
-                                    <th scope="col" class="p-3"> 
-                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal">
+                                    <th scope="col" class="text-truncate">#</th>
+                                    <th scope="col" class="text-truncate">Name</th>
+                                    <th scope="col" class="text-truncate">Email</th>
+                                    <th scope="col" class="text-truncate">Phone Number</th>
+                                    <th scope="col" class="text-truncate">Date Created</th>
+                                    <th scope="col" class="p-3 text-truncate"> 
+                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal" style="min-width: fit-content;">
                                             <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Helpers
                                         </button>
                                     </th>
@@ -74,7 +74,7 @@
                                     <td class="text-center">
                                         <form action="/api/admin/helpers/<%= helpers[i].id %>" class="deleteHelperForm">
                                             <button type="submit" class="btn btn-link p-0">
-                                                <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                                <i class="fa fa-trash text-danger" style="font-size: 23px;"></i>
                                             </button>
                                         </form>
                                     </td>
@@ -140,8 +140,7 @@
                                                 class="card-subtitle mb-2 text-secondary font-weight-normal">Phone Number</small>
                                             <!-- The small element is where we actually write down what the input does  -->
                                         </label>
-                                        <input id="phoneNumber" name="phoneNumber" class="form-control card-input" type="tel"
-                                            placeholder="Enter phone number here">
+                                        <input id="phoneNumber" name="phoneNumber" class="form-control card-input" type="tel" placeholder="Enter phone number here">
                                         <!-- This is where the user actually inputs all their stuff  -->
                                     </div>
                                 </div>

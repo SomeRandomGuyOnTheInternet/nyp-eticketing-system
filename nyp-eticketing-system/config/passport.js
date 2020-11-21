@@ -1,4 +1,3 @@
-
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
@@ -13,10 +12,7 @@ function localStrategy(passport) {
         passReqToCallback: true 
     }, async (req, email, password, done) => {
         try {
-            let user = await User.findOne({ 
-                where: { email: email.toLocaleLowerCase() },
-            });
-    
+            let user = await User.findOne({ where: { email: email.toLocaleLowerCase() } });
             if (!user) return done(null, false, { message: flash.error(req, "Please enter a valid email address!") });
     
             const isMatch = await bcrypt.compare(password, user.password);

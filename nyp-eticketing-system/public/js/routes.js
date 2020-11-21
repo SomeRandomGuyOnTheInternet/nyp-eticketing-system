@@ -13,8 +13,8 @@ const routes = {
     },
     helper: {
         events: "/api/helper/events",
-        reservations: "/api/helper/event/reservations",
-        attendees: "/api/helper/event/attendees",
+        reservations: "/api/helper/events/reservations",
+        attendees: "/api/helper/events/attendees",
         sendConfirmationSMS: "/api/helper/sms-reservation-confirm",
     },
     notification: {

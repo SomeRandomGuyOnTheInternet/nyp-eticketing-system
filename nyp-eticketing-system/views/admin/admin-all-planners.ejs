@@ -50,12 +50,12 @@
                         <table class="table table-click table-lg">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Date Created</th>
-                                    <th scope="col" class="p-3">
-                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal">
+                                    <th scope="col" class="text-truncate">#</th>
+                                    <th scope="col" class="text-truncate">Name</th>
+                                    <th scope="col" class="text-truncate">Email</th>
+                                    <th scope="col" class="text-truncate">Date Created</th>
+                                    <th scope="col" class="p-3 text-truncate">
+                                        <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#Modal" style="min-width: fit-content;">
                                             <i class="fas fa-plus"></i>&nbsp;&nbsp;Add Planners
                                         </button>
                                     </th>
@@ -71,7 +71,7 @@
                                         <td class="text-center">
                                             <form action="/api/admin/planners/<%= planners[i].id %>" class="deletePlannerForm">
                                                 <button type="submit" class="btn btn-link p-0">
-                                                    <i class="fa fa-trash text-danger" style="font-size: 25px;"></i>
+                                                    <i class="fa fa-trash text-danger" style="font-size: 23px;"></i>
                                                 </button>
                                             </form>
                                         </td>

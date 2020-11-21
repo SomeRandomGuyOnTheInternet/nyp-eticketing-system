@@ -43,7 +43,7 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
 });
 
 // Creating reservations for events
-router.post('/event/reservations', auth.isHelper, async (req, res) => {
+router.post('/events/reservations', auth.isHelper, async (req, res) => {
     const name = req.body.name;
     const phoneNumber = parseInt(req.body.phoneNumber, 10);
     const reservedSeats = req.body.reservedSeats;
@@ -114,6 +114,67 @@ router.post('/event/reservations', auth.isHelper, async (req, res) => {
 
         console.error(error);
         return respond.error(res, "Something went wrong while creating the reservation. Please try again later!", 500);
+    } 
+});
+
+// Updating reservations for events
+router.put('/events/reservations/:id', auth.isHelper, async (req, res) => {
+    const attendeeId = req.params.id;
+
+    const name = req.body.name;
+    const phoneNumber = parseInt(req.body.phoneNumber, 10);
+    const reservedSeats = req.body.reservedSeats;
+    const noOfExtraAttendees = (req.body.noOfExtraAttendees === undefined || req.body.noOfExtraAttendees === '') ? 0 : req.body.noOfExtraAttendees;
+
+    if (!isNaN(phoneNumber)) {
+        if (!(/^(8|9)[0-9]{7}$/.test(phoneNumber))) return respond.error(res, "Please provide a valid eight digit attendee phone number!");
+    }
+    if (noOfExtraAttendees) {
+        // Check if the number of extra attendee entered in the field is valid or not  
+        if (isNaN(noOfExtraAttendees)) return respond.error(res, "Please provide a valid number of extra attendees!");
+        // Check if the number of extra attendee entered in the field is between 1-5
+        else if (noOfExtraAttendees < 1) return respond.error(res, "Please provide a higher number of extra attendees!");
+        else if (noOfExtraAttendees > 5) return respond.error(res, "Please provide a lower number of extra attendees!");
+    }
+
+    let t = await db.transaction();
+
+    try {
+        let attendee = await EventAttendee.findByPk(attendeeId);
+        if (!attendee) return respond.error(res, "Please provide a valid attendee ID!");
+
+        // Check if the helper has the authorisation for that particular event
+        const isHelper = await EventHelper.isHelperForEvent(req.user.id, attendee.eventId);
+        if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to update this reservation!");
+
+        attendee.name = (name) ? name : attendee.name;
+        attendee.phoneNumber = (!isNaN(phoneNumber)) ? phoneNumber : attendee.phoneNumber;
+        attendee.noOfExtraAttendees = noOfExtraAttendees;
+
+        await attendee.save({ transaction: t });
+
+        if (reservedSeats) {
+            await EventReservedSeat.destroy({ where: { eventId: attendee.eventId }, transaction: t });
+            await EventReservedSeat.bulkCreate(reservedSeats.map(seatNumber => {
+                return {
+                    seatNumber: seatNumber, 
+                    eventId: attendee.eventId, 
+                    attendeeId: attendee.id
+                }
+            }),{
+                validate: true,
+                transaction: t
+            });
+        }
+
+        await t.commit();
+
+        return respond.success(res, "Reservation has been updated successfully!", attendee);
+    } catch (error) {
+        await t.rollback();
+
+        console.error(error);
+        return respond.error(res, "Something went wrong while updated the reservation. Please try again later!", 500);
     } 
 });
 
