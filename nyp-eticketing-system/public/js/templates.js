@@ -83,7 +83,7 @@ const templates = {
     
         $flexGrowContainer.append( 
             $('<small></small>')
-                .addClass('card-subtitle mb-2 text-secondary font-weight-normal')
+                .addClass('card-subtitle text-secondary font-weight-normal')
                 .text(helper.email)
                 .appendTo($cardBody)
         );

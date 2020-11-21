@@ -45,6 +45,10 @@ select[readonly] {
     border-radius: 0;
 }
 
+.card-subtitle {
+    display: inline-flex;
+}
+
 .pointer-cursor {
     cursor: pointer !important;
 }
