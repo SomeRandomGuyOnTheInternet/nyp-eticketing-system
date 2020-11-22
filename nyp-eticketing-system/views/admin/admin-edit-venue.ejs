@@ -133,14 +133,13 @@
     sc.onClick = function () {
         if (shiftHeld === true && lastSelectedSeat !== null) {
             const seats = sc.activeNode.seats;
-            const firstSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) < ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
-            const lastSeat = [this, lastSelectedSeat].reduce((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) > ((1 + curr.settings.row) * (1 + curr.settings.column)) ? prev : curr);
+            const seatRange = [this, lastSelectedSeat].sort((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) - ((1 + curr.settings.row) * (1 + curr.settings.column)));
             let replaceSeats = false;
 
             for (const id in seats) {
-                if (id === firstSeat.settings.id) replaceSeats = true;
+                if (id === seatRange[0].settings.id) replaceSeats = true;
                 if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
-                if (id === lastSeat.settings.id) break;
+                if (id === seatRange[1].settings.id) break;
             }
         } else {
             sc.replaceMapSeat(this, selectedSeatType);

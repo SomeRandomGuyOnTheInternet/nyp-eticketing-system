@@ -860,11 +860,11 @@ class SeatChart {
 
 	getQuadrantDimensions(quadrant) {
 		if (this._map.length == 0) {
-			return throwException("The given map has no rows!");
+			return utils.throwException("The given map has no rows!");
 		}
 	
 		if (this._map[0].length == 0) {
-			return throwException("The given map has no columns!");
+			return utils.throwException("The given map has no columns!");
 		}
 	
 		const rowStart = 0;
