@@ -899,8 +899,14 @@ class SeatChart {
 		}
 	};
 
+	findBestAvailableSeats(character, noOfSeats, prioritiseBackRows = true, useManhttanDistance = true) {
+		return (useManhttanDistance === true) 
+			? this.findSeatsUsingManhattanDistance(character, noOfSeats, prioritiseBackRows)
+			: this.findSeatsFromLeftToRight(character, noOfSeats, prioritiseBackRows)
+	};
+
 	// Manhattan Distance Algorithm (auditorium seat booking is weird)
-	findBestAvailableSeats(character, noOfSeats, prioritiseBackRows = true) {
+	findSeatsUsingManhattanDistance(character, noOfSeats, prioritiseBackRows) {
 		const seatIdMap = sc.activeNode.seatIdMap;
 		const sortedRows = maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length));
 		const optimumSeat = [prioritiseBackRows === false ? 0 : seatIdMap.length - 1, Math.floor(seatIdMap[0].length / 2)];
@@ -955,39 +961,39 @@ class SeatChart {
 	};
 
 	// Left to right algorithm (hacky but it works, if not a bit weird)
-	// findBestAvailableSeats(character, noOfSeats, prioritiseBackRows = true) {
-	// 	const seatIdMap = sc.activeNode.seatIdMap;
-	// 	const sortedRows = maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length));
+	findSeatsFromLeftToRight(character, noOfSeats, prioritiseBackRows) {
+		const seatIdMap = sc.activeNode.seatIdMap;
+		const sortedRows = maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length));
 
-	// 	let availableSeatBlock = [];
-	// 	let fallbackSeats = [];
+		let availableSeatBlock = [];
+		let fallbackSeats = [];
 
-	// 	for (let i = 0; i < sortedRows.length; i++) {
-	// 		let origin = -1;
+		for (let i = 0; i < sortedRows.length; i++) {
+			let origin = -1;
 
-	// 		for (let j = 0; j <= sc.map[sortedRows[i]].length; j++) {
-	// 			const seat = sc.activeNode.get(seatIdMap[sortedRows[i]][j]);
+			for (let j = 0; j <= sc.map[sortedRows[i]].length; j++) {
+				const seat = sc.activeNode.get(seatIdMap[sortedRows[i]][j]);
 				
-	// 			if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
-	// 				origin = (origin >= 0) ? origin : j;
-	// 				availableSeatBlock.push(seat.settings.id);
+				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
+					origin = (origin >= 0) ? origin : j;
+					availableSeatBlock.push(seat.settings.id);
 					
-	// 				if (fallbackSeats.length < noOfSeats) {
-	// 					fallbackSeats.push(seat.settings.id);
-	// 				}
-	// 			} else { 
-	// 				origin = -1;
-	// 				availableSeatBlock = [];
-	// 			}
+					if (fallbackSeats.length < noOfSeats) {
+						fallbackSeats.push(seat.settings.id);
+					}
+				} else { 
+					origin = -1;
+					availableSeatBlock = [];
+				}
 
-	// 			if (availableSeatBlock.length === noOfSeats) {
-	// 				return availableSeatBlock;
-	// 			}
-	// 		}
-	// 	}
+				if (availableSeatBlock.length === noOfSeats) {
+					return availableSeatBlock;
+				}
+			}
+		}
 
-	// 	return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
-	// };
+		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+	};
 
 	static alphabeticalLabels() {
 		return ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','BB','CC','DD','EE','FF','GG','HH','JJ','KK','LL','MM','NN','OO'];
