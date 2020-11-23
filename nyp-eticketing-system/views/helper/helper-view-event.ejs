@@ -672,7 +672,8 @@
 
 
     selectSeatsUsingSelection = (selectedSeatCharacters) => {
-        if (selectedSeatCharacters.length > (sc.activeNode.find(selectedSeatType)).seats.filter(seat => seat.settings.status !== 'reserved').length) {
+        const noOfSelectedSeatsForCurrentType = selectedSeatCharacters.filter(character => character === selectedSeatType).length;
+        if (noOfSelectedSeatsForCurrentType > (sc.activeNode.find(selectedSeatType)).seats.filter(seat => seat.settings.status !== 'reserved').length) {
             return toast.flash.danger('You have reached the maximum number of seats of this type that are available currently!');
         }
 
@@ -686,7 +687,7 @@
             reserveSeatForm.classList.remove('d-none');
 
             sc.activeNode.find('selected').status('available');
-            updateSeatSelectionInput((selectedSeatCharacters.filter(character => character === selectedSeatType)).length);
+            updateSeatSelectionInput(noOfSelectedSeatsForCurrentType);
 
             const seatCharacterCount = utils.countUniqueCharacters(selectedSeatCharacters);
             for (const character in seatCharacterCount) {
