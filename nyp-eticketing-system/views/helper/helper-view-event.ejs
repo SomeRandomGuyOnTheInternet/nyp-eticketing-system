@@ -673,7 +673,7 @@
 
     selectSeatsUsingSelection = (selectedSeatCharacters) => {
         if (selectedSeatCharacters.length > (sc.activeNode.find(selectedSeatType)).seats.filter(seat => seat.settings.status !== 'reserved').length) {
-            return toast.flash.danger('You have reached the maximum number of seats of this type that are available for the event!');
+            return toast.flash.danger('You have reached the maximum number of seats of this type that are available currently!');
         }
 
         if (event.seatsPerReservation) {
@@ -690,7 +690,7 @@
 
             const seatCharacterCount = utils.countUniqueCharacters(selectedSeatCharacters);
             for (const character in seatCharacterCount) {
-                const availableSeatBlock = sc.findAvailableSeatBlock(character, seatCharacterCount[character], Boolean(event.prioritiseBackRows));
+                const availableSeatBlock = sc.findBestAvailableSeats(character, seatCharacterCount[character], Boolean(event.prioritiseBackRows));
                 sc.activeNode.get(availableSeatBlock).status('selected');
             }
         } else {

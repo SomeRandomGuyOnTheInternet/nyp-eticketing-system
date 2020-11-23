@@ -677,6 +677,15 @@ function orderByCountAndDedupe(arr) {
     );
 };
 
+function distance(a, b) {
+	let distance = 0;
+	let dimensions = Math.max(a.length, b.length);
+	for (let i = 0; i < dimensions; i++) {
+		distance += Math.abs((b[i] || 0) - (a[i] || 0))
+	}
+	return distance;
+  }
+
 const maybe = (condition, op) => arg => condition ? op(arg) : arg;
 const range = (start, end) => Array.from({ length: end - start }, (_, i) => start + i);
 
@@ -890,38 +899,58 @@ class SeatChart {
 		}
 	};
 
-	findAvailableSeatBlock(character, noOfSeats, prioritiseBackRows = true) {
+	findBestAvailableSeats(character, noOfSeats, prioritiseBackRows = true) {
 		const seatIdMap = sc.activeNode.seatIdMap;
 		const sortedRows = maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length));
+		const optimumSeat = [prioritiseBackRows === false ? 0 : seatIdMap.length - 1, Math.floor(seatIdMap[0].length / 2)];
 
-		let availableSeatBlock = [];
+		let potentialSeatBlocks = [];
 		let fallbackSeats = [];
 
 		for (let i = 0; i < sortedRows.length; i++) {
-			let origin = -1;
+			let seats = [];
 
-			for (let j = 0; j <= sc.map[sortedRows[i]].length; j++) {
+			for (let j = 0; j < seatIdMap[sortedRows[i]].length; j++) {
+				if (seatIdMap[sortedRows[i]][j] === null) continue;
+
 				const seat = sc.activeNode.get(seatIdMap[sortedRows[i]][j]);
-				
-				if (seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
-					origin = (origin >= 0) ? origin : j;
-					availableSeatBlock.push(seat.settings.id);
-					
+
+				if (seat === seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
+					seats = [...seats, seat];
+	
+					if (seats.length > noOfSeats) {
+						seats.splice(0, 1);
+					}
+
+					if (seats.length === noOfSeats) {
+						potentialSeatBlocks = [...potentialSeatBlocks, seats]
+					}
+
 					if (fallbackSeats.length < noOfSeats) {
 						fallbackSeats.push(seat.settings.id);
 					}
-				} else { 
-					origin = -1;
-					availableSeatBlock = [];
-				}
-
-				if (availableSeatBlock.length === noOfSeats) {
-					return availableSeatBlock;
+				} else {
+					seats = [];
 				}
 			}
 		}
 
-		return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+		if (potentialSeatBlocks.length === 0) {
+			return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+		} else {
+			let manhattanTotalsArr = [];
+			potentialSeatBlocks.map(seat => {
+				let manhattanTotal = 0
+				seat.map(seat => (manhattanTotal = manhattanTotal + distance(optimumSeat, [seat.settings.row, seat.settings.column])));
+				manhattanTotalsArr = [...manhattanTotalsArr, manhattanTotal];
+			});
+
+			const minArrVal = Math.min(...manhattanTotalsArr)
+			const indexOfMinArrVal = manhattanTotalsArr.indexOf(minArrVal)
+			const arrVal = potentialSeatBlocks[indexOfMinArrVal]
+
+			return arrVal.map(seat => seat.settings.id);
+		}
 	};
 
 	static alphabeticalLabels() {
