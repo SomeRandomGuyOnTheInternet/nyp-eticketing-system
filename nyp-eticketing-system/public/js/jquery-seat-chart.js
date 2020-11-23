@@ -681,7 +681,7 @@ function distance(a, b) {
 	let distance = 0;
 	let dimensions = Math.max(a.length, b.length);
 	for (let i = 0; i < dimensions; i++) {
-		distance += Math.abs((b[i] || 0) - (a[i] || 0))
+		distance += Math.abs((b[i] || 0) - (a[i] || 0));
 	}
 	return distance;
   }

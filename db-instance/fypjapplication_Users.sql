@@ -21,6 +21,7 @@
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+TRUNCATE TABLE `users`;
 INSERT INTO `users` VALUES (1,'admin@mymail.nyp.edu.sg','$2b$10$fFa9pF3n2igqepN554DYqOsIhwheea4GHLb.84qt3mFlX5S2pP0t2','Admin',NULL,1,0,0,0,'2020-10-14 10:11:03','2020-10-14 10:11:03'),(2,'173560n@mymail.nyp.edu.sg','$2b$10$7i/6BXhLLb/6ad5EhPc/8Ocvg4dSn2dBg4qr18.jvsbyWKHW6j76m','Darren',95639161,0,0,1,0,'2020-10-14 10:11:03','2020-10-14 10:11:03'),(3,'john_doe@mymail.nyp.edu.sg','$2b$10$oB4JiW92q0LMyjIWS2yM6uBGirey6pVG4XCDaoRDjZEI8U9viROFe','John Doe',NULL,0,1,0,0,'2020-10-14 10:11:03','2020-10-14 10:11:03'),(6,'182084q@mymail.nyp.edu.sg','$2b$10$kgqPAl0laLj9Y.2.1eszce013ZCKFv7ffZ4H8SHBBkIdIz8YvIi6u','Aqil',90894675,0,0,1,0,'2020-10-14 12:00:10','2020-10-14 12:00:10'),(7,'183762o@mymail.nyp.edu.sg','$2b$10$sFFN1J1979zD1OfRbC4RQe6BAI/3XLmff8W54VQjHYXWOVVvIgm4O','Natasha',89764656,0,0,1,0,'2020-10-14 12:00:24','2020-10-14 12:00:24'),(8,'mark@mymail.nyp.edu.sg','$2b$10$1IQi7lDDhTC2ZIQerCRDYugYp/BMJcIHNHxifGh8kea.ZOw3Dte8q','Mark',NULL,0,1,0,0,'2020-10-15 07:14:11','2020-10-15 07:14:11'),(31,'jane_eod@mymail.nyp.edu.sg','$2b$10$wHeLe9Zzw8VFyj.yhtUBQOMHdUAi/XbTgngGXSawy4dNCr9aAXwnu','Jane Eod',NULL,0,1,0,0,'2020-11-23 05:16:35','2020-11-23 05:16:35');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;

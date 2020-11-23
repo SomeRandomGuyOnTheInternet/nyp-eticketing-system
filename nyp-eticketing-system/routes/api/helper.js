@@ -77,6 +77,7 @@ router.post('/events/reservations', auth.isHelper, async (req, res) => {
         if (attendee) {
             // Connects to sequalise and updates the event attendee in the database
             await EventAttendee.update({
+                name: name,
                 noOfExtraAttendees: noOfExtraAttendees
             },{ 
                 where: { id: attendee.id },
@@ -182,6 +183,8 @@ router.put('/events/reservations/:id', auth.isHelper, async (req, res) => {
 router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
 
+    let t = await db.transaction();
+
     try {
         // Check if the helper has the authorisation for that particular event
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
@@ -198,7 +201,7 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
         // Connects to sequalise and updates the extra attendees in the database
         for (let i = 0; i < attendeesWithExtraAttendees.length; i++) {
             attendeesWithExtraAttendees[i].noOfExtraAttendees = 0;
-            await attendeesWithExtraAttendees[i].save();
+            await attendeesWithExtraAttendees[i].save({ transaction: t });
         }
 
         // Sending of apology SMS to attendee phone number 
@@ -206,8 +209,12 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
             await sendSMS(attendeesWithExtraAttendees[i].phoneNumber, event.fullyBookedMessage);
         }
 
+        await t.commit();
+
         return respond.success(res, "Successfully deleted extra attendees from the waiting list!");
     } catch (error) {
+        await t.rollback();
+
         console.error(error);
         return respond.error(res, "Something went wrong while deleting the extra attendees. Please try again later!", 500);
     }
@@ -217,6 +224,8 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
 router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
     const seatNumber = req.params.seatNumber;
+
+    let t = await db.transaction();
 
     try {
         // Check if the helper has the authorisation for that particular event
@@ -228,16 +237,19 @@ router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) =
             where: { 
                 eventId: eventId,
                 seatNumber: seatNumber
-
             }
         });
         // if no reservations are found then this error will be prompted
         if (!reservedSeat) return respond.error(res, "No reservations were found with this seat number for this event!", 404);
 
-        reservedSeat.destroy();
+        reservedSeat.destroy({ transaction: t });
+
+        await t.commit();
 
         return respond.success(res, "Successfully deleted seat reservation!");
     } catch (error) {
+        await t.rollback();
+
         console.error(error);
         return respond.error(res, "Something went wrong while deleting the reservation. Please try again later!", 500);
     }
