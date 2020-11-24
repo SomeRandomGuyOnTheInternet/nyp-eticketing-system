@@ -899,7 +899,7 @@ class SeatChart {
 		}
 	};
 
-	findBestAvailableSeats(character, noOfSeats, prioritiseBackRows = true, useManhttanDistance = true) {
+	findBestAvailableSeats(character, noOfSeats, prioritiseBackRows = true, useManhttanDistance = false) {
 		return (useManhttanDistance === true) 
 			? this.findSeatsUsingManhattanDistance(character, noOfSeats, prioritiseBackRows)
 			: this.findSeatsFromLeftToRight(character, noOfSeats, prioritiseBackRows)

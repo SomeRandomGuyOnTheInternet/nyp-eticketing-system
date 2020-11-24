@@ -273,8 +273,8 @@
             let replaceSeats = false;
 
             for (const id in seats) {
+                if (replaceSeats === true) sc.replaceMapSeat(seats[id], (selectedSeatType === seats[id].settings.character) ? defaultSeatType.char : selectedSeatType);
                 if (id === seatRange[0].settings.id) replaceSeats = true;
-                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
                 if (id === seatRange[1].settings.id) break;
             }
         } else {

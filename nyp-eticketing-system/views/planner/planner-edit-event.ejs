@@ -101,7 +101,7 @@
                 <!-- Content  -->
                 <div class="row">
                     <!-- Venues Select Input Card  -->
-                    <div id="venueSelect" class="col-md-6">
+                    <div id="venueSelect" class="col-lg-6 col-12">
                         <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
                                 <label for="venueSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
@@ -112,7 +112,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="noOfReservationContainer" class="col-md-3 d-none">
+                    <div id="noOfReservationContainer" class="col-lg-3 col-6 d-none">
                         <div class="card input-card mt-3">
                             <div class="card-body input-card-body">
                                 <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
@@ -122,7 +122,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="percentageOfReservationContainer" class="col-md-3 d-none">
+                    <div id="percentageOfReservationContainer" class="col-lg-3 col-6 d-none">
                         <div class="card input-card mt-3">
                             <div class="card-body input-card-body">
                                 <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
@@ -319,8 +319,8 @@
                 let replaceSeats = false;
 
                 for (const id in seats) {
+                    if (replaceSeats === true) sc.replaceMapSeat(seats[id], (selectedSeatType === seats[id].settings.character) ? defaultSeatType.char : selectedSeatType);
                     if (id === seatRange[0].settings.id) replaceSeats = true;
-                    if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
                     if (id === seatRange[1].settings.id) break;
                 }
             } else {
@@ -370,11 +370,10 @@
             liveGif.classList.remove('d-none');
             venueSelectInput.disabled = true;
             noOfReservationContainer.classList.remove('d-none');
+            percentageOfReservationContainer.classList.remove('d-none');
 
             noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
-            percentageOfReservationContainer.classList.remove('d-none');
             percenetageOfReservation.innerText = `${Math.round(((event.reservedSeats.length / event.noOfReservableSeats) * 100 + Number.EPSILON) * 100) / 100}%`;
-            listenForReservationChanges();
         }
 
         sc.map = event.seatMap;
@@ -424,6 +423,8 @@
                 searchHelperInput.value = '';
             }
         });
+
+        listenForReservationChanges();
 
         window.LoadingOverlay.hide();
     });
@@ -563,9 +564,21 @@
         try {
             const result = await ajax.get(`${routes.planner.events}/${eventId}/reservations`);
             if (result.length !== event.reservedSeats.length) {
+                if (event.reservedSeats.length === 0 && result.length !== 0) {
+                    addSeatTypeCard.classList.add('d-none');
+                    legendContainer.classList.remove('col-md-9');
+                    legendContainer.classList.add('col-md-12');
+                    legendClickInfo.classList.add('d-none');
+                    liveGif.classList.remove('d-none');
+                    venueSelectInput.disabled = true;
+                    noOfReservationContainer.classList.remove('d-none');
+                    percentageOfReservationContainer.classList.remove('d-none');
+                    document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove(...(selectableLegendClasses.split(/\s+/))));
+                }
+
                 event.reservedSeats = result.map(reservation => EventReservedSeat.parseApiResult(reservation));
+
                 noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
-                percentageOfReservationContainer.classList.remove('d-none');
                 percenetageOfReservation.innerText = `${Math.round(((event.reservedSeats.length / event.noOfReservableSeats) * 100 + Number.EPSILON) * 100) / 100}%`;
                 sc.activeNode.find('reserved').status('available');
                 sc.disableReservedSeats(event.reservedSeats);

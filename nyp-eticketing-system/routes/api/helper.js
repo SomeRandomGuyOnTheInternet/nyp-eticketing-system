@@ -225,8 +225,6 @@ router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) =
     const eventId = req.params.id;
     const seatNumber = req.params.seatNumber;
 
-    let t = await db.transaction();
-
     try {
         // Check if the helper has the authorisation for that particular event
         const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
@@ -242,14 +240,10 @@ router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) =
         // if no reservations are found then this error will be prompted
         if (!reservedSeat) return respond.error(res, "No reservations were found with this seat number for this event!", 404);
 
-        reservedSeat.destroy({ transaction: t });
-
-        await t.commit();
+        reservedSeat.destroy();
 
         return respond.success(res, "Successfully deleted seat reservation!");
     } catch (error) {
-        await t.rollback();
-
         console.error(error);
         return respond.error(res, "Something went wrong while deleting the reservation. Please try again later!", 500);
     }
