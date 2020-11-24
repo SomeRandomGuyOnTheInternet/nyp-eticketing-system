@@ -41,7 +41,7 @@ function createToastNode(notification) {
         .attr('role', 'alert')
         .attr('aria-live', 'assertive')
         .attr('aria-atomic', 'true')
-        .attr('data-delay', '100000');
+        .attr('data-delay', '20000');
 
     var $toastBody = $('<div></div>')
         .addClass('toast-body')

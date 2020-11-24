@@ -465,7 +465,6 @@
             window.location.replace("/planner/events");
         } catch (error) {
             utils.handleError(error);
-        } finally {
             window.LoadingOverlay.hide();
             createEventButton.disabled = false;
         }

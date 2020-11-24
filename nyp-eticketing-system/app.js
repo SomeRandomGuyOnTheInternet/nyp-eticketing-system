@@ -1,5 +1,4 @@
 // TODO: Complete documentation (app.js & DBConnection.js)
-// TODO: Use camelcase for html ids
 // TODO: Update console.log to morgan
 // TODO: Create 404 page
 // TODO: minify the hosted version

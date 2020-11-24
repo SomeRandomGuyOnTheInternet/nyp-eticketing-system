@@ -113,6 +113,7 @@ div.seatCharts-cardBody {
 }
 
 div.seatCharts-legendCard {
+    /* Change the color if the legend is not clickable thankssss bb #3949683d */
     user-select: none;
     -webkit-user-select: none;
 }

@@ -1,8 +1,6 @@
 <!-- TODO: gap detection -->
 <!-- TODO: save base map in class, so can use zoom properly -->
 <!-- TODO: show arrow to indicate the user to scroll up or down instead of scroll straight away -->
-<!-- TODO: delete seat types -->
-<!-- TODO: show whether seats are to be booked from top to bottom/bottom to top -->
 
 <%- include('../templates/head')-%>
 
@@ -674,7 +672,7 @@
     selectSeatsUsingSelection = (selectedSeatCharacters) => {
         const noOfSelectedSeatsForCurrentType = selectedSeatCharacters.filter(character => character === selectedSeatType).length;
         if (noOfSelectedSeatsForCurrentType > (sc.activeNode.find(selectedSeatType)).seats.filter(seat => seat.settings.status !== 'reserved').length) {
-            return toast.flash.danger('You have reached the maximum number of seats of this type that are available currently!');
+            return toast.flash.danger('You have reached the maximum number of  seats of this type that are available currently!');
         }
 
         if (event.seatsPerReservation) {

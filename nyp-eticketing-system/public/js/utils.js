@@ -25,7 +25,7 @@ handleBeforeUnload = (event) => {
   }
 
 const utils = {
-    throwException: function(description) {// DO NOT USE THIS EVERYWHERE. Use this function whenever there's a rare error or you get unsatisfactory results from an asynchronous call. For normal stuff like validation, just showDangerToast
+    throwException: function(description) { // DO NOT USE THIS EVERYWHERE. Use this function whenever there's a rare error or you get unsatisfactory results from an asynchronous call. For normal stuff like validation, just toast.danger
         throw new AppException(description); // description should be user-readable
     },
     handleError: function(error) { // Use inside the catch block of a try catch
