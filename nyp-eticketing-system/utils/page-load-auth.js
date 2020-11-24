@@ -40,7 +40,7 @@ module.exports.isPlanner = (req, res, next) => {
         return;
     }
     
-    if (req.user.isPlanner) {
+    if (req.user.isPlanner || req.user.isAdmin) {
         next();
     } else {
         flash.error(req, "You do not have authentication to view that page!");
@@ -55,7 +55,7 @@ module.exports.isHelper = (req, res, next) => {
         return;
     }
     
-    if (req.user.isHelper) {
+    if (req.user.isHelper || req.user.isPlanner || req.user.isAdmin) {
         next();
     } else {
         flash.error(req, "You do not have authentication to view that page!");

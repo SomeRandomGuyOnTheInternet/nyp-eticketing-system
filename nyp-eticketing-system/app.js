@@ -96,5 +96,9 @@ app.use('/api/planner', plannerApiRoute);
 app.use('/api/helper', helperApiRoute);
 app.use('/api/notification', notificationApiRoute);
 
+app.get('*', function(req, res) {
+    res.redirect('/');
+});
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => { });

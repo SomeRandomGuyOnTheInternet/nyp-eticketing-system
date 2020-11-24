@@ -23,8 +23,10 @@ router.get('/events/:id', auth.isHelper, async (req, res) => {
     const eventId = req.params.id;
 
     try {
-        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
-        if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
+        if (req.user.isHelper === true) {
+            const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+            if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
+        }
 
         let event = await Event.findByPk(eventId, { raw: true });
         if (!event) return respond.error(res, "Please provide a valid event ID!");
@@ -69,9 +71,11 @@ router.post('/events/reservations', auth.isHelper, async (req, res) => {
     let t = await db.transaction();
 
     try {
-        // Check if the helper has the authorisation for that particular event
-        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
-        if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
+        if (req.user.isHelper === true) {
+            // Check if the helper has the authorisation for that particular event
+            const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+            if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to help for this event!");
+        }
 
         let attendee = await EventAttendee.getEventAttendeeByPhoneNumber(eventId, phoneNumber);
         if (attendee) {
@@ -144,9 +148,11 @@ router.put('/events/reservations/:id', auth.isHelper, async (req, res) => {
         let attendee = await EventAttendee.findByPk(attendeeId);
         if (!attendee) return respond.error(res, "Please provide a valid attendee ID!");
 
-        // Check if the helper has the authorisation for that particular event
-        const isHelper = await EventHelper.isHelperForEvent(req.user.id, attendee.eventId);
-        if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to update this reservation!");
+        if (req.user.isHelper === true) {
+            // Check if the helper has the authorisation for that particular event
+            const isHelper = await EventHelper.isHelperForEvent(req.user.id, attendee.eventId);
+            if  (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to update this reservation!");
+        }
 
         attendee.name = (name) ? name : attendee.name;
         attendee.phoneNumber = (!isNaN(phoneNumber)) ? phoneNumber : attendee.phoneNumber;
@@ -186,9 +192,11 @@ router.delete('/events/:id/extra-attendees', auth.isHelper, async (req, res) => 
     let t = await db.transaction();
 
     try {
-        // Check if the helper has the authorisation for that particular event
-        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
-        if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
+        if (req.user.isHelper === true) {
+            // Check if the helper has the authorisation for that particular event
+            const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+            if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
+        }
 
         const event = await Event.findByPk(eventId);
 
@@ -226,9 +234,11 @@ router.delete('/events/:id/seats/:seatNumber', auth.isHelper, async (req, res) =
     const seatNumber = req.params.seatNumber;
 
     try {
-        // Check if the helper has the authorisation for that particular event
-        const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
-        if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
+        if (req.user.isHelper === true) {
+            // Check if the helper has the authorisation for that particular event
+            const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+            if (!isHelper) return respond.error(res, "The currently signed in helper is not authorised to delete reservations for this event!");
+        }
 
         // Finds a reservation that has a seat number that matchs the event id
         const reservedSeat = await EventReservedSeat.findOne({
@@ -259,7 +269,7 @@ router.post('/sms-reservation-confirm', auth.isHelper, async (req, res) => {
         const attendee = await EventAttendee.getEventAttendeeById(attendeeId);
         const reservedSeats = await EventReservedSeat.getAttendeeReservedSeat(attendee.id);
         const event = await Event.getEventById(attendee.eventId);
-        const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('MMMM Do YYYY, h:mm a')}.`;
+        const message = `You have reserved ${reservedSeats.length} seat(s) (${(reservedSeats.map(a => a.seatNumber)).join(", ")}) at ${event['Venue.name']} on ${moment(event.startDateTime).format('Do MMMM YYYY, h:mm a')}.`;
 
         await sendSMS(attendee.phoneNumber, message);
 

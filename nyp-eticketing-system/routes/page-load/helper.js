@@ -22,7 +22,9 @@ const EventAttendee = require('../../models/EventAttendee');
 router.get('/', auth.isHelper, async (req, res) => {
     // Put your ejs files under your specific folder
 	// Eg: Admin .ejs files should be put under the admin folder
-	const events = await EventHelper.getEventsByHelperId(req.user.id);
+		const events = (req.user.isHelper === true) 
+			? await EventHelper.getEventsByHelperId(req.user.id)
+			: await Event.getAllEvents();
 
 	res.render('helper/helper-all-events', { 
 		title: "Events", 
@@ -33,12 +35,14 @@ router.get('/', auth.isHelper, async (req, res) => {
 
 router.get('/events/:id', auth.isHelper, async (req, res) => {
 	const eventId = req.params.id;
-	const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
 
-	if (!isHelper) {
-		flash.error(req, "You are not assigned that event!");
-		res.redirect('/planner/events');
-		return;
+	if (req.user.isHelper === true) {
+		const isHelper = await EventHelper.isHelperForEvent(req.user.id, eventId);
+		if (!isHelper) {
+			flash.error(req, "You are not assigned that event!");
+			res.redirect('/planner/events');
+			return;
+		}
 	}
 
 	const event = await Event.getEventById(eventId);

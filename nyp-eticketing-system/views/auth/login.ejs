@@ -16,7 +16,7 @@
                                     <label for="email" class="card-input-label">
                                         <small class="card-subtitle text-secondary font-weight-normal">Email Address</small>
                                     </label>
-                                    <input id="email" name="email" class="form-control card-input" type="email" placeholder="e.g. user@mail.com"> 
+                                    <input id="email" name="email" class="form-control card-input" type="email" placeholder="e.g. user@mail.com" autocomplete="email"> 
                                 </div>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
                                                     class="card-subtitle text-secondary font-weight-normal">Password</small>
                                                 <!-- The small element is where we actually write down what the input does  -->
                                             </label>
-                                            <input id="password" name="password" class="form-control card-input" type="password" placeholder="Enter password here">
+                                            <input id="password" name="password" class="form-control card-input" type="password" placeholder="Enter password here" autocomplete="current-password">
                                         </div>
                                         <button class="btn" type="button" onclick="utils.togglePasswordVisibility('password', 'toggleIcon')"><i id="toggleIcon" class="fas fa-eye"></i></button>
                                         <!-- This is where the user actually inputs all their stuff  -->
