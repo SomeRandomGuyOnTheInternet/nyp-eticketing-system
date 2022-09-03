@@ -137,12 +137,14 @@
             let replaceSeats = false;
 
             for (const id in seats) {
+                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], (selectedSeatType === seats[id].settings.character) ? defaultSeat : selectedSeatType);
                 if (id === seatRange[0].settings.id) replaceSeats = true;
-                if (replaceSeats === true)  sc.replaceMapSeat(seats[id], selectedSeatType);
                 if (id === seatRange[1].settings.id) break;
             }
+
+            lastSelectedSeat = null;
         } else {
-            sc.replaceMapSeat(this, selectedSeatType);
+            sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeat : selectedSeatType);
         }
 
         lastSelectedSeat = this;

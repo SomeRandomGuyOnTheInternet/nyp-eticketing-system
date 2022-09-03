@@ -1,5 +1,3 @@
-<!-- TODO: Complete documentation for this part -->
-
 <%- include('../templates/head')-%>
 
 <body>
@@ -9,18 +7,10 @@
             <div class="mt-6"></div> <!-- Used for spacing between sections  -->
             <!-- Event details form section  -->
             <!-- Heading  -->
-            <div class="row">
-                <!-- Use this row div if you want your section heading to be inline with another element  -->
-                <div class="col-sm-6 col-12 align-self-end">
-                    <h2 class="section-heading">Event Details</h2>
-                </div>
-                <div class="col-sm-6 col-12 align-self-end">
-                    <a class="btn btn-primary btn-lg float-right" href="/helper/events/<%= event.id %>" role="button"><i class="fas fa-redo"></i>&nbsp;&nbsp;Switch to Reservation</a>
-                </div>
-            </div>
+            <h2 class="section-heading">Event Details</h2>
             <div class="mt-3"></div>
             <!-- Content  -->
-            <form id="editEventForm" action="/" method="post">
+            <form id="addEventForm" action="/" method="post">
                 <div class="row"> <!-- BTW, rows are used to create responsive columns but I'm guessing yall already know that. But if you don't, better learn the bootstrap grid system cause we're gonna use it a lot.  -->
                     <!-- Event Name Input Card  -->
                     <div class="col-sm-6">
@@ -29,7 +19,7 @@
                                 <label for="eventNameInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle text-secondary font-weight-normal">Event Name</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" value="<%= event.name %>" placeholder="e.g. Dance Competition"> <!-- Note that the name attribute is required to get textbox values from the backend. It should have the same value as the id.  --> 
+                                <input id="eventNameInput" name="eventNameInput" class="form-control card-input" type="text" placeholder="e.g. Dance Competition" > <!-- Note that the name attribute is   to get textbox values from the backend. It should have the same value as the id.  --> 
                             </div>
                         </div>
                     </div>
@@ -40,7 +30,7 @@
                                 <label for="eventDateTimeInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle text-secondary font-weight-normal">Event Date / Time</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" value="<%= moment(event.startDateTime).format('YYYY-MM-DDTkk:mm') %>" placeholder="e.g 13th March 2021, 9am" required> <!-- This is where the user actually inputs all their stuff  -->
+                                <input id="eventDateTimeInput" name="eventDateTimeInput" class="form-control card-input" type="datetime-local" placeholder="e.g 13th March 2021, 9am" > <!-- This is where the user actually inputs all their stuff  -->
                             </div>
                         </div>
                     </div>
@@ -51,7 +41,7 @@
                                 <label for="maxSeatsPerReservationInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle text-secondary font-weight-normal">Maximum no. of seats per reservation</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <input id="maxSeatsPerReservationInput" name="maxSeatsPerReservationInput" class="form-control card-input" type="number" value="<%= event.seatsPerReservation %>" min="1" max="10" placeholder="No Limit">
+                                <input id="maxSeatsPerReservationInput" name="maxSeatsPerReservationInput" class="form-control card-input" type="number" min="1" max="10" placeholder="No Limit">
                             </div>
                         </div>
                     </div>
@@ -64,13 +54,13 @@
                                 </label>
                                 <div id="prioritiseRowLabelCheckForm" class="py-1"> <!-- All check input elements should be enclosed in a div with a unique id  -->
                                     <div class="form-check form-check-inline">
-                                        <input id="frontRow" class="form-check-input" type="radio" name="prioritiseRow"  value="frontRow" <%= event.prioritiseBackRows ? "" : "checked" %>>
+                                        <input id="frontRow" class="form-check-input" type="radio" name="prioritiseRow"  value="frontRow">
                                         <label class="form-check-label px-2" for="frontRow">
                                             Front Rows
                                         </label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input id="backRow" class="form-check-input" type="radio" name="prioritiseRow"  value="backRow" <%= event.prioritiseBackRows ? "checked" : "" %>>
+                                        <input id="backRow" class="form-check-input" type="radio" name="prioritiseRow"  value="backRow" checked>
                                         <label class="form-check-label px-2" for="backRow">
                                             Back Rows
                                         </label>
@@ -86,7 +76,7 @@
                                 <label for="fullyBookedMessageInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
                                     <small class="card-subtitle text-secondary font-weight-normal">SMS to send attendees upon fully booking event</small> <!-- The small element is where we actually write down what the input does  -->
                                 </label>
-                                <textarea id="fullyBookedMessageInput" name="fullyBookedMessageInput" class="form-control card-input" rows="2" placeholder="Enter a message here to send to attendees once they are removed from the waiting list"><%= event.fullyBookedMessage ? event.fullyBookedMessage : "The event has been fully booked, thus your entry in the waiting list has been revoked. Sorry for the inconvenience and we hope to see you soon!" %></textarea>
+                                <textarea id="fullyBookedMessageInput" name="fullyBookedMessageInput" class="form-control card-input" rows="2" placeholder="Enter a message here to send to attendees once they are removed from the waiting list">The event has been fully booked, thus your entry in the waiting list has been revoked. Sorry for the inconvenience and we hope to see you soon!</textarea>
                             </div>
                         </div>
                     </div>
@@ -94,22 +84,13 @@
 
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
                 <!-- Seat chart card section  -->
-                <!-- Heading  -->            
-                <div class="row">
-                    <!-- Use this row div if you want your section heading to be inline with another element  -->
-                    <div class="col-auto align-self-end">
-                        <h2 class="section-heading">Seat Chart</h2>                    
-                    </div>
-                    <div id="liveGif" class="col-auto p-0 mb-2 text-sm-center d-none">
-                        <img src="/images/live-gif.gif" width="35" height="35" data-toggle="tooltip" data-placement="top" title="Reservations made will be updated automatically in the map!" />
-                    </div>
-                </div>
-
+                <!-- Heading  -->
+                <h2 class="section-heading">Seat Chart</h2>
                 <div class="mt-3"></div> <!-- Used for spacing between section heading and content  -->
                 <!-- Content  -->
                 <div class="row">
                     <!-- Venues Select Input Card  -->
-                    <div id="venueSelect" class="col-lg-6 col-12">
+                    <div class="col-sm-6">
                         <div class="card input-card mt-3"> <!-- All form elements should be enclosed in cards so they look consistent with the rest of the ui  -->
                             <div class="card-body input-card-body">
                                 <label for="venueSelectInput" class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
@@ -120,27 +101,8 @@
                             </div>
                         </div>
                     </div>
-                    <div id="noOfReservationContainer" class="col-lg-3 col-6 d-none">
-                        <div class="card input-card mt-3">
-                            <div class="card-body input-card-body">
-                                <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle text-secondary font-weight-normal">No. of Available Seats</small> <!-- The small element is where we actually write down what the input does  -->
-                                </label>
-                                <span id="noOfReservation" class="h4 text-primary">1000 / 1200</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="percentageOfReservationContainer" class="col-lg-3 col-6 d-none">
-                        <div class="card input-card mt-3">
-                            <div class="card-body input-card-body">
-                                <label class="card-input-label"> <!-- Labels are used to indicate to the user what the input is/does. Also, the "for" attribute should contain the exact id of the input element  -->
-                                    <small class="card-subtitle text-secondary font-weight-normal">% of Reserved Seat</small> <!-- The small element is where we actually write down what the input does  -->
-                                </label>
-                                <span id="percenetageOfReservation" class="h4 text-primary">69%</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+
                 <div id="seatChartCard" class="card mt-3"> <!-- Put interactible elements in a card, enclosed with card-body  -->
                     <div class="card-body">
                         <div id="tableWrapper" class="seatCharts-wrapper"> <!-- Seat maps should be ensclosed in a seat chart wrapper -->
@@ -165,11 +127,11 @@
                             <a href="#addSeatTypeModal" class="stretched-link" data-toggle="modal" data-target="#addSeatTypeModal"></a> <!-- On pressing this card, the add seat type button will show up -->
                         </div>
                     </div>
-                    <div id="legendContainer" class="col-md-9">
+                    <div class="col-md-9">
                         <div id="editMapLegend" class="row px-0">
                         </div>
                         <div class="mt-3"></div>
-                        <span id="legendClickInfo" class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types below and select a seat in the map to replace it with your selection.</span>
+                        <span class="text-muted font-weight-light">To edit the seat chart, click on any of the seat types above and select a seat in the map to replace it with your selection.</span>
                     </div>
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
@@ -205,14 +167,7 @@
                     </div>
                 </div>
                 <div class="mt-6"></div> <!-- Used for spacing between sections  -->
-                <div class="row">
-                    <div class="col-sm-6 mb-2">
-                        <button id="cancelEditedEventButton" class="btn btn-warning btn-lg w-100" type="button">Cancel</button>
-                    </div>
-                    <div class="col-sm-6">
-                        <button id="updateEventButton" class="btn btn-primary btn-lg w-100" type="submit">Save Changes</button>
-                    </div>
-                </div>
+                <button id="createEventButton" class="btn btn-primary btn-lg w-100" type="submit">Create Event</button>
             </form>
         </main>
     </div>
@@ -262,32 +217,20 @@
 <script>
     window.LoadingOverlay.show();
 
-    const eventId = <%= event.id %>;
-
-    // Declare all the ids of the various html elements we're gonna manipulate as variables so referencing them in js is easier
-    const editEventForm = document.getElementById('editEventForm');
+    const addEventForm = document.getElementById('addEventForm');
     const eventNameInput = document.getElementById('eventNameInput');
     const eventDateTimeInput = document.getElementById('eventDateTimeInput');
     const maxSeatsPerReservationInput = document.getElementById('maxSeatsPerReservationInput');
     const prioritiseBackRowRadio = document.getElementById('backRow');
     const fullyBookedMessageInput = document.getElementById('fullyBookedMessageInput');
-    const liveGif = document.getElementById('liveGif');
-    const venueSelect = document.getElementById('venueSelect');
     const venueSelectInput = document.getElementById('venueSelectInput');
-    const noOfReservationContainer = document.getElementById('noOfReservationContainer');
-    const noOfReservation = document.getElementById('noOfReservation');
-    const percentageOfReservationContainer = document.getElementById('percentageOfReservationContainer');
-    const percenetageOfReservation = document.getElementById('percenetageOfReservation');
     const mapWrapper = document.getElementById('tableWrapper');
     const seatMap = document.getElementById('seatMap');
     const legend = document.getElementById('editMapLegend');
-    const legendContainer = document.getElementById('legendContainer');
-    const legendClickInfo = document.getElementById('legendClickInfo');
     const addSeatTypeCard = document.getElementById('addSeatTypeCard');
-    const searchHelperInput = document.getElementById('searchHelperInput');    
+    const searchHelperInput = document.getElementById('searchHelperInput');
     const helpersCardCol = document.getElementById('helpersCardCol');
-    const cancelEditedEventButton = document.getElementById('cancelEditedEventButton');
-    const updateEventButton = document.getElementById('updateEventButton');
+    const createEventButton = document.getElementById('createEventButton');
     const addSeatTypeModal = document.getElementById('addSeatTypeModal');
     const seatTypeNameInput = document.getElementById('seatTypeNameInput');
     const blockSeatTypeCheck = document.getElementById('blockSeatTypeCheck');
@@ -295,22 +238,24 @@
 
     const selectableLegendClasses = 'text-primary clickable-div card-hover font-weight-medium'; // These are the css class belonging to legends that can be clicked on by the user
 
-    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","v","w","x","y","z"];
+    let availableSeatCharacters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"];
 
-    const defaultSeatType = "G";
-    let selectedSeatType = defaultSeatType; // This variable will contain the character of the seat type we've selected
+    const defaultSeatType = new SeatType({ char: 'G', category: 'General', blocked: false, classes: 'general' });
+    const handicappedSeatType = new SeatType({ char: 'H', category: 'Handicapped', blocked: false, classes: 'handicapped' });
+    let selectedSeatType = defaultSeatType.char; // This variable will contain the character of the seat type we've selected
 
     let lastSelectedSeat = null;
     let shiftHeld = false;
 
-    let event = null;
     let venues = [];
     let helpers = [];
-    
-    // Seat chart configuration
+
     let sc = new SeatChart({
         map: [],
-        seatTypes: [],
+        seatTypes: [
+            defaultSeatType,
+            handicappedSeatType
+        ],
         legends: [],
         rowLabels: SeatChart.alphabeticalLabels(),
         columnLabels: SeatChart.undefinedLabels(),
@@ -320,88 +265,56 @@
     });
 
     sc.onClick = function () {
-        if (event.reservedSeats.length === 0) {
-            if (shiftHeld === true && lastSelectedSeat !== null) {
-                const seats = sc.activeNode.seats;
-                const seatRange = [this, lastSelectedSeat].sort((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) - ((1 + curr.settings.row) * (1 + curr.settings.column)));
-                let replaceSeats = false;
+        if (shiftHeld === true && lastSelectedSeat !== null) {
+            const seats = sc.activeNode.seats;
+            const seatRange = [this, lastSelectedSeat].sort((prev, curr) => ((1 + prev.settings.row) * (1 + prev.settings.column)) - ((1 + curr.settings.row) * (1 + curr.settings.column)));
+            let replaceSeats = false;
 
-                for (const id in seats) {
-                    if (replaceSeats === true) sc.replaceMapSeat(seats[id], (selectedSeatType === seats[id].settings.character) ? defaultSeatType.char : selectedSeatType);
+            for (const id in seats) {
+                    if (replaceSeats === true) sc.replaceMapSeat(seats[id], (selectedSeatType === seats[id].settings.character) ? defaultSeatType : selectedSeatType);
                     if (id === seatRange[0].settings.id) replaceSeats = true;
                     if (id === seatRange[1].settings.id) break;
                 }
-            } else {
-                sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType : selectedSeatType);
-            }
 
-            lastSelectedSeat = this;
+                lastSelectedSeat = null;
+        } else {
+            sc.replaceMapSeat(this, (selectedSeatType === this.settings.character) ? defaultSeatType.char : selectedSeatType);
         }
 
-        return this.status();
+        lastSelectedSeat = this;
     };
 
     window.addEventListener("load", async function(e) {
         try {
-            event = Event.parseApiResult(await ajax.get(`${routes.planner.events}/${eventId}`));
             venues = (await ajax.get(routes.planner.venues)).map(venue => Venue.parseApiResult(venue));
             helpers = (await ajax.get(routes.planner.helpers)).map((helper) => {
-                const parsedHelper = EventHelper.parseApiResult(helper);
-                parsedHelper.selected = false;
-                for (i = 0; i < event.helpers.length; i++) {
-                    parsedHelper.selected = (parsedHelper.id === event.helpers[i].id || parsedHelper.selected === true);
-                }
-                return parsedHelper;
+                helper = EventHelper.parseApiResult(helper);
+                helper.selected = false;
+                return helper;
             });
-
+            
             // at least a single venue is required to create an event, so throw error if it doesn't exists
-            if (venues.length < 1) utils.throwException("There are no venues available! Please contact the admin to create a venue.");
+            if (venues.length < 1) {
+                utils.throwException("There are no venues available! Please contact the admin to create a venue.");
+            }
         } catch (error) {
             return utils.handleError(error);
         }
 
         Venue.populateSelect(venues, venueSelectInput);
-        for (i = 0; i < venues.length; i++) {
-            if (venues[i].id === event.venue.id) {
-                venueSelectInput.value = i;
-                break;
-            }
-        }
-        
         EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
-        
-        if (event.reservedSeats.length > 0) {
-            addSeatTypeCard.classList.add('d-none');
-            legendContainer.classList.remove('col-md-9');
-            legendContainer.classList.add('col-md-12');
-            legendClickInfo.classList.add('d-none');
-            liveGif.classList.remove('d-none');
-            venueSelectInput.disabled = true;
-            noOfReservationContainer.classList.remove('d-none');
-            percentageOfReservationContainer.classList.remove('d-none');
 
-            noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
-            percenetageOfReservation.innerText = `${Math.round(((event.reservedSeats.length / event.noOfReservableSeats) * 100 + Number.EPSILON) * 100) / 100}%`;
-        }
-
-        sc.map = event.seatMap;
-        sc.seatTypes = event.seatTypes;
-        sc.legends = sc.seatTypes.reduce(function(legends, seatType) {
-            if (event.reservedSeats.length === 0 && seatType.char === defaultSeatType) {
-                return legends;
+        sc.map = Venue.selectedOption(venues, venueSelectInput).seatMap;
+        sc.legends = sc.seatTypes.reduce(function(legends, seatType){
+            if (seatType.char !== defaultSeatType.char){
+                legends.push([seatType.char, "available", seatType.category, selectableLegendClasses]);
             }
-            legends.push([seatType.char, "available", seatType.category.concat((seatType.blocked) ? " (Blocked)" : ""), (event.reservedSeats.length > 0) ? null : selectableLegendClasses]);
             return legends;
         }, []);
 
         // Bind map
         sc.bindMap();
         sc.scaleContentWidth();
-        sc.disableReservedSeats(event.reservedSeats);
-
-        sc.seatTypes.forEach(seatType => {
-            availableSeatCharacters = availableSeatCharacters.filter(sc => sc !== seatType.char);
-        });
 
         new autoComplete({
             data: {
@@ -419,7 +332,7 @@
             },
             resultItem: {
                 content: (data, source) => {
-                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${(data.key === "name") ? data.value.phoneNumber : data.value.name}&nbsp;•&nbsp; ${data.value.email}`;
+                    source.innerHTML = `${data.match}&nbsp;•&nbsp;${(data.key === "name") ? data.value.phoneNumber : data.value.name}`;
                 },
                 element: "li"
             },
@@ -431,8 +344,6 @@
                 searchHelperInput.value = '';
             }
         });
-
-        listenForReservationChanges();
 
         window.LoadingOverlay.hide();
     });
@@ -496,7 +407,7 @@
     });
 
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('seatCharts-legendCard') && e.target.classList.contains('clickable-div')) {
+        if (e.target.classList.contains('seatCharts-legendCard')) {
             utils.addUnloadListener();
 
             const node = e.target;
@@ -507,7 +418,7 @@
 
             if (seatCharAttr) {
                 node.classList.add((highlighted) ? null : "highlighted");
-                selectedSeatType = (highlighted) ? defaultSeatType : seatCharAttr;
+                selectedSeatType = (highlighted) ? defaultSeatType.char : seatCharAttr;
             }
         }
 
@@ -516,30 +427,21 @@
             helpers.forEach(helper => {
                 if (helper.id == node.id) helper.selected = false;
             });
-
+            
             EventHelper.populateColumn(helpers.filter(helper => helper.selected === true), helpersCardCol);
         }
     }, false);
 
-    cancelEditedEventButton.addEventListener('click', async function (e) {
-        const check = confirm("Are you sure you want to cancel updating this event's details?");
-        
-        if (check === true) {
-            utils.removeUnloadListener();
-            window.location.replace('/planner/events');
-        }
-    });
-
-    editEventForm.addEventListener('submit', async function (e) {
+    addEventForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         window.LoadingOverlay.show();
-        updateEventButton.disabled = true;
+        createEventButton.disabled = true;
 
-        let reservableSeatCount = 0;
         const seats = sc.activeNode.seats;
+        let reservableSeatCount = 0;
         for (const id in seats) {
-            if (Boolean(seats[id].settings.data.blocked) === false) reservableSeatCount++;
+            if (Boolean(seats[id].settings.data.blocked) === false) reservableSeatCount++
         }
 
         const event = new Event({
@@ -556,53 +458,17 @@
         });
 
         try {
-            await ajax.update(`${routes.planner.events}/${eventId}`, event.convertToApiFormat());
+            await ajax.post(routes.planner.events, event.convertToApiFormat());
+            await ajax.post(routes.notification.success, "A new event has been created successfully!");
 
-            toast.flash.success("The event has been successfully updated!");
             utils.removeUnloadListener();
+            window.location.replace("/planner/events");
         } catch (error) {
             utils.handleError(error);
-        } finally {
             window.LoadingOverlay.hide();
-            updateEventButton.disabled = false;
+            createEventButton.disabled = false;
         }
     });
-
-    listenForReservationChanges = async () => {
-        try {
-            const result = await ajax.get(`${routes.planner.events}/${eventId}/reservations`);
-            if (result.length !== event.reservedSeats.length) {
-                if (event.reservedSeats.length === 0 && result.length !== 0) {
-                    addSeatTypeCard.classList.add('d-none');
-                    legendContainer.classList.remove('col-md-9');
-                    legendContainer.classList.add('col-md-12');
-                    legendClickInfo.classList.add('d-none');
-                    liveGif.classList.remove('d-none');
-                    venueSelectInput.disabled = true;
-                    noOfReservationContainer.classList.remove('d-none');
-                    percentageOfReservationContainer.classList.remove('d-none');
-                    document.querySelectorAll(".seatCharts-legendCard").forEach(obj => obj.classList.remove(...(selectableLegendClasses.split(/\s+/))));
-                }
-
-                event.reservedSeats = result.map(reservation => EventReservedSeat.parseApiResult(reservation));
-
-                noOfReservation.innerText = `${event.noOfReservableSeats - event.reservedSeats.length} / ${event.noOfReservableSeats}`;
-                percenetageOfReservation.innerText = `${Math.round(((event.reservedSeats.length / event.noOfReservableSeats) * 100 + Number.EPSILON) * 100) / 100}%`;
-                sc.activeNode.find('reserved').status('available');
-                sc.disableReservedSeats(event.reservedSeats);
-            }
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            await listenForReservationChanges();
-        } catch (error) {
-            if (error.status === 502) {
-                await listenForReservationChanges();
-            } else {
-                utils.handleError(error);
-                await new Promise(resolve => setTimeout(resolve, 5000));
-                await listenForReservationChanges();
-            }
-        }
-    }
 </script>
 
 <%- include('../templates/footer')-%>

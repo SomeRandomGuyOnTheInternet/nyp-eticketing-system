@@ -26,7 +26,7 @@ module.exports = (phoneNumber, message) => {
             if (dataRes._Data === "Success") {
                 resolve(true);
             } else {
-                throw new Error("Please provide a valid eight digit mobile number!");
+                reject(dataRes._Data);
             }
         } catch (error) {
             reject(error);

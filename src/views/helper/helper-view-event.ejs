@@ -632,7 +632,7 @@
                     reserveSeatForm.classList.remove('d-none');
                     if (event.seatsPerReservation) {
                         if (allSelectedSeats.length >= event.seatsPerReservation) {
-                            toast.flash.danger('You have reached the maximum number of seats allowed per reservation!')
+                            toast.flash.danger('You have reached the maximum number of seats allowed per reservation!');
                             return 'available';
                         }
                     }

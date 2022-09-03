@@ -908,19 +908,18 @@ class SeatChart {
 	// Manhattan Distance Algorithm (auditorium seat booking is weird)
 	findSeatsUsingManhattanDistance(character, noOfSeats, prioritiseBackRows) {
 		const seatIdMap = sc.activeNode.seatIdMap;
-		const sortedRows = maybe(prioritiseBackRows === true, it => it.reverse())(range(0, sc.map.length));
 		const optimumSeat = [prioritiseBackRows === false ? 0 : seatIdMap.length - 1, Math.floor(seatIdMap[0].length / 2)];
 
 		let potentialSeatBlocks = [];
 		let fallbackSeats = [];
 
-		for (let i = 0; i < sortedRows.length; i++) {
+		for (let i = 0; i < seatIdMap.length; i++) {
 			let seats = [];
 
-			for (let j = 0; j < seatIdMap[sortedRows[i]].length; j++) {
-				if (seatIdMap[sortedRows[i]][j] === null) continue;
+			for (let j = 0; j < seatIdMap[i].length; j++) {
+				if (seatIdMap[i][j] === null) continue;
 
-				const seat = sc.activeNode.get(seatIdMap[sortedRows[i]][j]);
+				const seat = sc.activeNode.get(seatIdMap[i][j]);
 
 				if (seat === seat.length !== 0 && seat.settings.character === character && seat.settings.status === "available") {
 					seats = [...seats, seat];
@@ -933,9 +932,7 @@ class SeatChart {
 						potentialSeatBlocks = [...potentialSeatBlocks, seats]
 					}
 
-					if (fallbackSeats.length < noOfSeats) {
-						fallbackSeats.push(seat.settings.id);
-					}
+					fallbackSeats.push(seat);
 				} else {
 					seats = [];
 				}
@@ -943,7 +940,13 @@ class SeatChart {
 		}
 
 		if (potentialSeatBlocks.length === 0) {
-			return (fallbackSeats.length === noOfSeats) ? fallbackSeats : [];
+			if (fallbackSeats.length < noOfSeats) return [];
+
+			let manhattanArr = [];
+			fallbackSeats.map(seat => manhattanArr.push(distance(optimumSeat, [seat.settings.row, seat.settings.column])));
+	
+			const sortedDistance = manhattanArr.sort((a, b) => { return a - b });
+			sortedDistance.length = noOfSeats;
 		} else {
 			let manhattanTotalsArr = [];
 			potentialSeatBlocks.map(seat => {
@@ -952,9 +955,9 @@ class SeatChart {
 				manhattanTotalsArr = [...manhattanTotalsArr, manhattanTotal];
 			});
 
-			const minArrVal = Math.min(...manhattanTotalsArr)
-			const indexOfMinArrVal = manhattanTotalsArr.indexOf(minArrVal)
-			const arrVal = potentialSeatBlocks[indexOfMinArrVal]
+			const minArrVal = Math.min(...manhattanTotalsArr);
+			const indexOfMinArrVal = manhattanTotalsArr.indexOf(minArrVal);
+			const arrVal = potentialSeatBlocks[indexOfMinArrVal];
 
 			return arrVal.map(seat => seat.settings.id);
 		}

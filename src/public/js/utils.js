@@ -22,7 +22,7 @@ class AppException extends Error {
 
 handleBeforeUnload = (event) => {
     event.returnValue = '';
-  }
+}
 
 const utils = {
     throwException: function(description) { // DO NOT USE THIS EVERYWHERE. Use this function whenever there's a rare error or you get unsatisfactory results from an asynchronous call. For normal stuff like validation, just toast.danger
