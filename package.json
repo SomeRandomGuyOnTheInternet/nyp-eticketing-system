@@ -36,7 +36,7 @@
     "flash-messenger": "^1.1.1",
     "http-errors": "^1.8.0",
     "install": "^0.13.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "method-override": "^3.0.0",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
