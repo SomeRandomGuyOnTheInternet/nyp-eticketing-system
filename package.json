@@ -4,9 +4,10 @@
   "description": "An online system for students and teachers to access and aid in the management and on-site reservation of events to reduce the use of physical tickets.",
   "main": "app.js",
   "scripts": {
-    "mst": "cd ./nyp-eticketing-system && open-cli http://localhost:5000 -- 'google chrome' && nodemon app",
-    "wst": "cd ./nyp-eticketing-system & open-cli http://localhost:5000 -- 'google chrome' & nodemon app",
-    "scss": "node-sass --watch nyp-eticketing-system/public/scss -o nyp-eticketing-system/public/css"
+    "mst": "cd ./src && open-cli http://localhost:8000 -- 'google chrome' && nodemon app",
+    "wst": "cd ./src & open-cli http://localhost:8000 -- 'google chrome' & nodemon app",
+    "scss": "node-sass --watch nyp-eticketing-system/public/scss -o nyp-eticketing-system/public/css",
+    "db:makemigrations": "./node_modules/sequelize-auto-migrations/bin/makemigration.js"
   },
   "engines": {
     "node": ">= 6.0.0",
@@ -40,14 +41,15 @@
     "method-override": "^3.0.0",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
-    "mysql2": "^1.6.5",
-    "node-sass": "^4.14.1",
+    "mysql2": "^3.11.0",
+    "node-sass": "^7.0.0",
     "nodemon": "^2.0.4",
     "open": "^7.3.0",
     "open-cli": "^6.0.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pixl-xml": "^1.0.13",
-    "sequelize": "^5.22.3"
+    "sequelize": "^5.22.5",
+    "sequelize-auto-migrations": "github:scimonster/sequelize-auto-migrations#a063aa6535a3f580623581bf866cef2d609531ba"
   }
 }

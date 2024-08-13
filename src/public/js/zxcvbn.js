@@ -7,7 +7,7 @@ const passwordMeterConfig = {
         "#88af0e"
     ],
     strengthText: [
-        "",
+        "Very Weak",
         "Weak",
         "Moderate",
         "Strong",

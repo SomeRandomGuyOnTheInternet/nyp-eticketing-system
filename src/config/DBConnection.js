@@ -14,9 +14,6 @@ const EventAttendees = require('../models/EventAttendee');
 const EventSeatTypes = require('../models/EventSeatType');
 const Notifications = require('../models/Notification');
 
-// const createUsers = require('./dataset/create-users');
-// const createVenues = require('./dataset/create-venues');
-
 // This function carries out the actual connection to the database while specifying all the relationships between the models
 const setUpDB = (drop) => {
     mySQLDB.authenticate().then(() => {
@@ -62,10 +59,37 @@ const setUpDB = (drop) => {
         mySQLDB.sync({ 
             force: drop 
         }).then(() => {
-            // if (drop == true) {
-            //     createUsers(Users);
-            //     createVenues(Venues);
-            // }
+            if (drop == true) {
+                Users.bulkCreate([
+                    {
+                        email: 'admin@nyp.sg',
+                        password: '$2b$10$/9baW4dN5bemzQDemSouye9WUIBiiPtyNBoq2j1hPOlcUq33t7PPa',
+                        name: 'Admin',
+                        isAdmin: true,
+                        isPlanner: false,
+                        isHelper: false,
+                        isDeleted: false
+                    },
+                    {
+                        email: 'planner@nyp.sg',
+                        password: '$2b$10$/9baW4dN5bemzQDemSouye9WUIBiiPtyNBoq2j1hPOlcUq33t7PPa',
+                        name: 'Vignesh',
+                        isAdmin: false,
+                        isPlanner: false,
+                        isHelper: true,
+                        isDeleted: false
+                    },
+                    {
+                        email: 'helper@nyp.sg',
+                        password: '$2b$10$/9baW4dN5bemzQDemSouye9WUIBiiPtyNBoq2j1hPOlcUq33t7PPa',
+                        name: 'John',
+                        isAdmin: false,
+                        isPlanner: true,
+                        isHelper: false,
+                        isDeleted: false
+                    },
+                ]);
+            }
         });
     });
 };

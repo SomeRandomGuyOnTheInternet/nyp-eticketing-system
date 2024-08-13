@@ -14,6 +14,8 @@ function localStrategy(passport) {
         try {
             let user = await User.findOne({ where: { email: email.toLocaleLowerCase() } });
             if (!user) return done(null, false, { message: flash.error(req, "Please enter a valid email address!") });
+
+            let hashed  = await bcrypt.hash(password, 10);
     
             const isMatch = await bcrypt.compare(password, user.password);
     

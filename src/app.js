@@ -14,7 +14,7 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session');
 const methodOverride = require('method-override');
-require('dotenv').config();
+require('dotenv').config({path: '../.env'});
 
 // Importing all the routes 
 // We split the webpages by routes for clarity and security purposes
@@ -58,11 +58,11 @@ app.use(session({
 	key: 'nyp-seat-reservation',
 	secret: 'totallysecretpassword',
 	store: new MySQLStore({
-		host: process.env.DB_HOST,
-		port: undefined,
-		user: process.env.DB_USERNAME,
-		password: process.env.DB_PASSWORD,
-		database: process.env.DB_DATABASE,
+		host: process.env.DB_HOST || "127.0.0.1",
+		port: process.env.DB_PORT || 3306,
+		user: process.env.DB_USERNAME || "root",
+		password: process.env.DB_PASSWORD || "password",
+		database: process.env.DB_DATABASE || "nyp_eticketing_db",
 		clearExpired: true,
 		checkExpirationInterval: 9999999,
 		expiration: 9999999,
@@ -100,5 +100,5 @@ app.get('*', function(req, res) {
     res.redirect('/');
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.APP_PORT || 5000;
 app.listen(port, () => { });
